@@ -1,0 +1,182 @@
+<!--
+xonix: http://www.youtube.com/watch?v=POhMfAFZ_6c
+java game: http://www.searchamateur.com/Play-Free-Online-Games/Java-Xonix-On-Line.htm
+
+polygons collision script/demo: http://www.amphibian.com/blogstuff/collision.html
+
+calc area and centroid: http://paulbourke.net/geometry/polyarea/
+point in a polygon: http://stackoverflow.com/questions/217578/point-in-polygon-aka-hit-test
+sort points clockwise: http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
+sort polygon points: http://stackoverflow.com/questions/7369710/sorting-polygons-points
+merge adjacent rectangles into polygon: http://stackoverflow.com/questions/643995/algorithm-to-merge-adjacent-rectangles-into-polygon
+-->
+
+<html>
+
+<head>
+    <title>Roei</title>
+    
+    <style>
+        #canvas { background:#00A8A8; }
+    </style>
+    
+    <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/point.js"></script>
+    <script type="text/javascript" src="scripts/edge.js"></script>
+    <script type="text/javascript" src="scripts/path.js"></script>
+    <script type="text/javascript" src="scripts/vector.js"></script>
+    <script type="text/javascript" src="scripts/slice.js"></script>
+    <script type="text/javascript" src="scripts/rectangle.js"></script>    
+    <script type="text/javascript" src="scripts/polygon.js"></script>    
+    <script type="text/javascript" src="scripts/ball.js"></script>
+    
+    <script>
+        var canvasWidth = 600,
+            canvasHeight = 400,
+            frameBorder = 20,
+            totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder),
+            conquredPixels = 0,
+            freePixels = totalPixels - conquredPixels;
+        var numOfBalls = 2;
+        var arrFree = [],
+            arrConquered = [],
+            arrBalls = [];
+        var trackSize = 10;
+        
+        function drawArray(ctx, array, fillStyle) {
+            for (var i=0; i<array.length; i++) {
+                var poly = array[i];
+                poly.draw(ctx, fillStyle);
+            }
+        }
+        function random(min, max) {
+            var val = min + Math.random() * (max - min);
+            return Math.round(val);
+        }
+
+        $(document).ready(function() {
+            var canvas = document.getElementById("canvas");  
+            var ctx = canvas.getContext("2d");
+            
+            for (var i = 0; i < numOfBalls; i++) {
+                arrBalls.push(new Point(
+                    random(frameBorder*2, canvasWidth - frameBorder*2),
+                    random(frameBorder*2, canvasHeight - frameBorder*2)
+                ));
+            }
+            
+            var free = new Polygon([
+                new Point(frameBorder, frameBorder),
+                new Point(canvasWidth - frameBorder, frameBorder),
+                new Point(canvasWidth - frameBorder, canvasHeight - frameBorder),
+                new Point(frameBorder, canvasHeight - frameBorder)
+            ]);
+            arrFree.push(free);
+            
+            var tracks = [];
+            var paths = [];
+            tracks[0] = new Polygon([   // DOWN
+                new Point(200 - (trackSize/2), frameBorder),
+                new Point(200 + (trackSize/2), frameBorder),
+                new Point(200 + (trackSize/2), 100 - (trackSize/2)),
+                new Point(300 + (trackSize/2), 100 - (trackSize/2)),
+                new Point(300 + (trackSize/2), 200 + (trackSize/2)),
+                new Point(260 + (trackSize/2), 200 + (trackSize/2)),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), 200 - (trackSize/2)),
+                new Point(300 - (trackSize/2), 200 - (trackSize/2)),
+                new Point(300 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+            ]);
+            paths[0] = new Path([       // DOWN (INNER)
+                new Point(200 - (trackSize/2), frameBorder),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(300 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(300 - (trackSize/2), 200 - (trackSize/2)),
+                new Point(260 - (trackSize/2), 200 - (trackSize/2)),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+            ]);
+            paths[4] = new Path([       // DOWN (OUTER)
+                new Point(200 + (trackSize/2), frameBorder),
+                new Point(200 + (trackSize/2), 100 - (trackSize/2)),
+                new Point(300 + (trackSize/2), 100 - (trackSize/2)),
+                new Point(300 + (trackSize/2), 200 + (trackSize/2)),
+                new Point(260 + (trackSize/2), 200 + (trackSize/2)),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+            ]);
+            /*
+            paths[1] = new Path([       // UP (INNER)
+                new Point(200, canvasHeight - frameBorder),
+                new Point(200, 200),
+                new Point(400, 200),
+                new Point(400, frameBorder),
+            ]);
+            paths[2] = new Path([       // LEFT
+                new Point(canvasWidth - frameBorder, 240),
+                new Point(200, 240),
+                new Point(200, 160),
+                new Point(frameBorder, 160),
+            ]);
+            paths[3] = new Path([       // RIGHT
+                new Point(frameBorder, 160),
+                new Point(200, 160),
+                new Point(200, 240),
+                new Point(250, 240),
+                new Point(250, canvasHeight - frameBorder)
+            ]);
+            */           
+            var rnd = random(0, 0);
+            var trackPoly = tracks[rnd];
+            var innerPath = paths[rnd];
+            var outerPath = paths[rnd + 4];
+            
+            var result = [];
+            var firstPoly = free.split(innerPath)[0];
+            var secondPoly = free.split(outerPath)[1];
+            result.push(firstPoly);
+            result.push(secondPoly);
+            
+            arrFree = []; // todo: remove only the polygon that we split
+            
+            for (var i=0; i<result.length; i++) {
+                var poly = result[i];
+                var containsBall = false;
+                for (var b=0; b<arrBalls.length; b++) {
+                    if (poly.containsPoint(arrBalls[b])) {
+                        containsBall = true;
+                        break;
+                    }
+                }                
+                if (containsBall) {
+                    arrFree.push(poly);
+                } else {
+                    arrConquered.push(poly);
+                    size = Math.abs(poly.getArea());
+                    freePixels -= size;
+                    conquredPixels += size;
+                }
+            }
+            arrConquered.push(trackPoly);
+            size = Math.abs(trackPoly.getArea());
+            freePixels -= size;
+            conquredPixels += size;
+            
+            console.log('total:' + totalPixels + ' ' + 'conqured:' + conquredPixels + ' ' + 'free:' + freePixels + ' => ' + conquredPixels/totalPixels*100 + '%');
+            console.log('direction:' + innerPath.getDirection());
+            
+            console.log('free:' + arrFree.length);
+            console.log('conquered:' + arrConquered.length);
+            
+            drawArray(ctx, arrFree, 'Black');
+            drawArray(ctx, arrConquered, '#00A8A8');
+            drawArray(ctx, arrBalls, 'Red');
+        });
+    </script>
+</head>
+
+<body>
+	<canvas id="canvas" width="600" height="400"></canvas>
+</body>
+
+</html>

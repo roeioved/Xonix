@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Yair</title>
+    
+    <style>
+        #canvas { background:#00A8A8; }
+    </style>
+    
+    <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/point.js"></script>
+    <script type="text/javascript" src="scripts/edge.js"></script>
+    <script type="text/javascript" src="scripts/path.js"></script>
+    <script type="text/javascript" src="scripts/vector.js"></script>
+    <script type="text/javascript" src="scripts/slice.js"></script>
+    <script type="text/javascript" src="scripts/rectangle.js"></script>    
+    <script type="text/javascript" src="scripts/polygon.js"></script>    
+    <script type="text/javascript" src="scripts/ball.js"></script>
+    
+    <script>
+        function findCollision(ball, polygon) {
+            var intersect = findIntersection(ball, polygon)
+            if (intersect) {
+                 if (polygon.containsPoint(ball.get_center()))
+                 {
+                    return intersect;
+                 }
+            }
+            return null;
+        }
+        
+        function findIntersection(ball, polygon) {
+            //polygon.buildEdges();
+            
+            var minIntersect = 10000;
+            var minIntersectPerpen = null;
+            
+            var edges = polygon.getVectors();
+            
+            for (var edge in edges) {
+                var perpen = edges[edge].getPerpendicular();
+                perpen.normalize();
+                
+                var res1 = projectPolygon(perpen, polygon);
+                var res2 = projectPolygon(perpen, ball.getBoundingRect());
+                
+                var intersect = 0;
+                
+                /*if (res1.min == res2.max || res2.min == res1.max)
+                {
+                    intersect = 0;
+                }*/
+                if (res1.min < res2.min) {
+                    intersect = res2.min - res1.max;
+                } else {
+                    intersect = res1.min - res2.max;
+                }
+                
+                if (intersect > 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    if (Math.abs(intersect) < Math.abs(minIntersect))
+                    {
+                        minIntersect = intersect;
+                        minIntersectPerpen = perpen;
+                    }
+                }
+            }
+            
+            return {intersect: minIntersect, minIntersectPerpen: minIntersectPerpen};
+        }
+        /*
+         Project a polygon on a given axis and return the min and max scalar values on the axis
+         */
+        function projectPolygon(axis, polygon) {
+            var values = polygon.getDotProduct(axis);
+            var max, min;
+
+            max = min = values[0];
+
+            for (var i = 1; i < values.length; i++) {
+                if (values[i] > max) {
+                    max = values[i];
+                }
+                
+                else if (values[i] < min) {
+                    min = values[i];
+                }
+            }
+            
+            return {'min':min, 'max':max};
+        }
+        
+        KeyDir = { top:"top", right:"right", bottom:"bottom", left:"left" };
+        
+        $(document).ready(function () {
+            var ctx = $('#canvas')[0].getContext("2d");
+            var FPS = 30;
+            var keyDir;
+            
+            var balls = [];
+            balls.push(new Ball(ctx, 200, 20, 3, "red", (Math.PI / 180) * 45, new Vector(1, 1.2), { top: 0, right: 150, bottom: 150, left: 0 }));
+            balls.push(new Ball(ctx, 100, 60, 3, "red", (Math.PI / 180) * 45, new Vector(2, 1.4), { top: 0, right: 150, bottom: 150, left: 0 }));
+            //balls.push(new Ball(ctx, 80, 30, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
+            //balls.push(new Ball(ctx, 20, 10, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
+            //balls.push(new Ball(ctx, 83, 50, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
+            
+            var polygons = [];
+            var pol = new Polygon();
+            pol.addPoint(new Point(0, 0));
+            pol.addPoint(new Point(40, 0));
+            pol.addPoint(new Point(40, 40));
+            pol.addPoint(new Point(0, 40));
+            
+            var rectangles = pol.getHorizontalRectangles();
+            
+            for (var i = 0; i < rectangles.length; i++) {
+                polygons.push(rectangles[i]);
+            }
+            
+            pol = new Polygon();
+            pol.addPoint(new Point(40, 60));
+            pol.addPoint(new Point(60, 60));
+            pol.addPoint(new Point(60, 90));
+            pol.addPoint(new Point(100, 90));
+            pol.addPoint(new Point(100, 60));
+            pol.addPoint(new Point(120, 60));
+            pol.addPoint(new Point(120, 110));
+            pol.addPoint(new Point(40, 110));
+            
+            rectangles = pol.getHorizontalRectangles();
+            
+            for (i = 0; i < rectangles.length; i++) {
+                polygons.push(rectangles[i]);
+            }
+            
+            function update() {
+                //player.update();
+                //monster.update();
+                
+                for (var ball in balls) {
+                    var velocity_x_changed = velocity_y_changed = false;
+                    
+                    for (var polygon in polygons) {
+                        
+                        var collision = findCollision(balls[ball], polygons[polygon]);
+                        if (collision) {                            
+                            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
+                                //console.log("collision on y axis");
+                                balls[ball].velocity.y *= -1;
+                                velocity_y_changed = true;
+                                
+                                if (Math.abs(collision.intersect) > Math.abs(balls[ball].velocity.y)) {
+                                    var velocity = Math.abs(collision.intersect) * (Math.abs(balls[ball].velocity.y) / balls[ball].velocity.y);
+                                    balls[ball].y += velocity;
+                                    balls[ball].x -= balls[ball].velocity.x;
+                                }
+                            }
+                            else if (!velocity_x_changed) {
+                                console.log("collision on x axis");
+                                
+                                balls[ball].velocity.x *= -1;
+                                velocity_x_changed = true;
+                                
+                                if (Math.abs(collision.intersect) > Math.abs(balls[ball].velocity.x)) {
+                                    var velocity = Math.abs(collision.intersect) * (Math.abs(balls[ball].velocity.x) / balls[ball].velocity.x);
+                                    balls[ball].x += velocity;
+                                    balls[ball].y -= balls[ball].velocity.y;
+                                }                            
+                            }
+                        }
+                    }
+                    balls[ball].update();
+                }
+            }
+            
+            function draw() {
+                //player.draw();
+                //monster.draw();
+                
+                for (var i = 0; i < polygons.length; i++) {
+                    polygons[i].draw(ctx, 'blue', true);
+                }
+                
+                for (var ball in balls) {
+                    balls[ball].draw();
+                }
+            }
+            
+            setInterval(function () {
+                ctx.clearRect(0, 0, 800, 800);
+                update();
+                draw();
+            }, 1000 / 50);
+            
+            $(document).keydown(function (e) {
+                if (e.keyCode == 37) {
+                    keyDir = KeyDir.left;
+                }
+                else if (e.keyCode == 38) {
+                    keyDir = KeyDir.top;
+                }
+                else if (e.keyCode == 39) {
+                    keyDir = KeyDir.right;
+                }
+                else if (e.keyCode == 40) {
+                    keyDir = KeyDir.bottom;
+                }
+                else {
+                    keyDir = null;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+	<canvas id="canvas" width="600" height="400"></canvas>
+</body>
+
+</html>
