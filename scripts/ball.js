@@ -5,9 +5,10 @@
     this.radius = radius;
     this.color = color;
     this.velocity = velocity;
+    this.boundaries = boundaries;
     this.obstacles = obstacles;
 
-    this.update = function () {        
+    this.update = function () {
         if (boundaries) {
             //top boundry
             if (this.y - radius <= boundaries.top) {
@@ -46,15 +47,16 @@
     };
     
     this.getBoundingRect = function () {
-        var boundary = new Polygon();
-        boundary.addPoint(new Point(this.x -this.radius, this.y -this.radius));
-        boundary.addPoint(new Point(this.x + this.radius, this.y -this.radius));
-        boundary.addPoint(new Point(this.x + this.radius, this.y + this.radius));
-        boundary.addPoint(new Point(this.x -this.radius, this.y + this.radius));
+        var boundary = new Polygon([
+            new Point(this.x -this.radius, this.y -this.radius),
+            new Point(this.x + this.radius, this.y -this.radius),
+            new Point(this.x + this.radius, this.y + this.radius),
+            new Point(this.x -this.radius, this.y + this.radius)
+        ]);
         
         return boundary;
     };
-
+    
     this.get_center = function() {
         return new Point(this.x, this.y);
     };

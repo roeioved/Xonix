@@ -5,7 +5,7 @@ function Polygon(a) {
 	this.points = [];
 	if (a) {
 		if (a instanceof Polygon) {
-			var pts = a.pts;
+			var pts = a.points;
 			var nPts = pts.length;
 			for (var iPt=0; iPt<nPts; nPts++) {
 				this.points.push(new Point(pts[iPt]));

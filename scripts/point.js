@@ -22,15 +22,7 @@ Point.prototype = {
         var degrees = radians * 180 / self.Math.PI;
         return degrees;
     },
-    
-    toString: function() {
-        return "{x:" + this.x + ",y:" + this.y + "}";
-    },
-    
-    toHashkey: function() {
-        return this.x + "_" + this.y;
-    },
-    
+        
     clone: function() {
         return new Point(this);        
     },
@@ -56,6 +48,14 @@ Point.prototype = {
     
     /*
     
+    toString: function() {
+        return "{x:" + this.x + ",y:" + this.y + "}";
+    },
+    
+    toHashkey: function() {
+        return this.x + "_" + this.y;
+    },
+
     offset: function(dx, dy) {
         this.x += dx;
         this.y += dy;
