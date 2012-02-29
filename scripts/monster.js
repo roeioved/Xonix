@@ -1,4 +1,4 @@
-function Monster(top, left, height, width, velocity, boundary, obstacles) {
+function Monster(top, left, width, height, velocity, boundary, obstacles) {
     this.top = top;
     this.left = left;
     this.width = width;
@@ -11,91 +11,77 @@ function Monster(top, left, height, width, velocity, boundary, obstacles) {
 Monster.prototype = {
 
     update: function () {
-
         var velocity_x_dir_changed = false;
         var velocity_y_dir_changed = false;
-
+        
         this.left += this.velocity.x;
-        this.top +=  this.velocity.y;
-
+        this.top += this.velocity.y;
+        
         if (this.boundary) {
-
             //moving left
             if (this.velocity.x < 0)
             {
-                if (this.left == this.boundary.left)
+                if (this.left <= this.boundary.left)
                 {
                     this.velocity.x *= -1;
                     velocity_x_dir_changed = true;
-                }
-                else if (this.left < this.boundary.left)
-                {
-                    this.left = this.boundary.left;
-                    this.velocity.x *= -1;
-                    velocity_x_dir_changed = true;
+                    
+                    if (this.left < this.boundary.left)
+                        this.left = this.boundary.left;
                 }
             }
-
+            
             //moving right
             if (this.velocity.x > 0)
             {
-                if (this.left + this.width == this.boundary.right)
+                if (this.left + this.width >= this.boundary.right)
                 {
                     this.velocity.x *= -1;
                     velocity_x_dir_changed = true;
-                }
-                else if (this.left + this.width > this.boundary.right)
-                {
-                    this.left = this.boundary.right - this.width;
-                    this.velocity.x *= -1;
-                    velocity_x_dir_changed = true;
+                    
+                    if (this.left + this.width > this.boundary.right)
+                        this.left = this.boundary.right - this.width;
                 }
             }
-
+            
             //moving up
             if (this.velocity.y < 0)
             {
-                if (this.top  == this.boundary.top)
+                if (this.top <= this.boundary.top)
                 {
                     this.velocity.y *= -1;
                     velocity_y_dir_changed = true;
-                }
-                else if (this.top < this.boundary.top)
-                {
-                    this.top = this.boundary.top;
-                    this.velocity.y *= -1;
-                    velocity_y_dir_changed = true;
+                    
+                    if (this.top < this.boundary.top)
+                        this.top = this.boundary.top;
                 }
             }
-
+            
             //moving down
             if (this.velocity.y > 0)
             {
-                if (this.top + this.height  == this.boundary.bottom)
+                if (this.top + this.height >= this.boundary.bottom)
                 {
                     this.velocity.y *= -1;
                     velocity_y_dir_changed = true;
-                }
-                else if (this.top + this.height > this.boundary.bottom)
-                {
-                    this.top = this.boundary.bottom - this.height;
-                    this.velocity.y *= -1;
-                    velocity_y_dir_changed = true;
+                    
+                    if (this.top + this.height > this.boundary.bottom)
+                        this.top = this.boundary.bottom - this.height;
                 }
             }
         }
-
+        
         if (! (velocity_x_dir_changed && velocity_y_dir_changed))
         {
            /* var collision_x_min;
             var collision_y_min;
-
+            
             for(var obstacle in this.obstacles)
             {
                 obstacle = this.obstacles[obstacle];
-
+                
                 var collision = obstacle.findCollision(this.get_polygon());
-
+                
                 if (collision.x != null && (collision_x_min == null || collision.x < collision_x_min))
                 {
                     collision_x_min = collision.x;
@@ -105,7 +91,7 @@ Monster.prototype = {
                     collision_y_min = collision.y;
                 }
             }
-
+            
             if (collision_x_min != null)
             {
                 //moving right
@@ -118,7 +104,7 @@ Monster.prototype = {
                     this.left -= collision_x_min;
                 }
             }
-
+            
             if (collision_y_min != null)
             {
                 //moving down
@@ -132,33 +118,34 @@ Monster.prototype = {
                 }
             }*/
         }
-
+        
     },
 
-    draw: function (ctx, stroke, fill) {
-        if (stroke)
-            ctx.strokeStyle = stroke;
+    draw: function (ctx, fill, stroke) {
         if (fill)
             ctx.fillStyle = fill;
-
+        if (stroke)
+            ctx.strokeStyle = stroke;
+        
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(this.top, this.left);
-        ctx.lineTo(this.top, this.left + this.width);
-        ctx.lineTo(this.top + this.height, this.left + this.width);
-        ctx.lineTo(this.top + this.height, this.left);
-
+        ctx.moveTo(this.left, this.top);
+        ctx.lineTo(this.left + this.width, this.top);
+        ctx.lineTo(this.left + this.width, this.top + this.height);
+        ctx.lineTo(this.left, this.top + this.height);
+        
         ctx.closePath();
-
+        
         if (fill) {
             ctx.fill();
         }
         if (stroke) {
             ctx.stroke();
         }
-
+        
         ctx.restore();
     }
+    
 };
 
 

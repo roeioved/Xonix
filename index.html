@@ -17,6 +17,7 @@
     <script type="text/javascript" src="scripts/rectangle.js"></script>
     <script type="text/javascript" src="scripts/polygon.js"></script>
     <script type="text/javascript" src="scripts/ball.js"></script>
+    <script type="text/javascript" src="scripts/monster.js"></script>
     
     <script>
         var canvasWidth = 600,
@@ -25,16 +26,18 @@
             totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder),
             conquredPixels = 0,
             freePixels = totalPixels - conquredPixels;
-        var numOfBalls = 2;
+        var numOfBalls = 2,
+            numOfMonsters = 1;
         var arrFree = [],
             arrConquered = [],
-            arrBalls = [];
+            arrBalls = [],
+            arrMonsters = [];
         var trackSize = 10;
         
         function drawArray(ctx, array, fillStyle) {
             for (var i=0; i<array.length; i++) {
-                var poly = array[i];
-                poly.draw(ctx, fillStyle);
+                var obj = array[i];
+                obj.draw(ctx, fillStyle);
             }
         }
         function random(min, max) {
@@ -122,16 +125,6 @@
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
-            for (var i = 0; i < numOfBalls; i++) {
-                var x = random(frameBorder*2, canvasWidth - frameBorder*2);
-                var y = random(frameBorder*2, canvasHeight - frameBorder*2);
-                var speed = 2;
-                var dirx = random(0, 1) == 0 ? -1 : 1;
-                var diry = random(0, 1) == 0 ? -1 : 1;
-                var ball = new Ball(ctx, x, y, 4, "Red", new Vector(speed * dirx, speed * diry), { top: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder, left: frameBorder });
-                arrBalls.push(ball);
-            }
-            
             //create start free area
             var free = new Polygon([
                 new Point(frameBorder, frameBorder),
@@ -140,6 +133,31 @@
                 new Point(frameBorder, canvasHeight - frameBorder)
             ]);
             arrFree.push(free);
+            
+            //create balls
+            for (var i = 0; i < numOfBalls; i++) {
+                var x = random(frameBorder*2, canvasWidth - frameBorder*2);
+                var y = random(frameBorder*2, canvasHeight - frameBorder*2);
+                var speed = 2;
+                var dirx = random(0, 1) == 0 ? -1 : 1;
+                var diry = random(0, 1) == 0 ? -1 : 1;
+                var boundary = { top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
+                var ball = new Ball(x, y, 4, "Red", new Vector(speed * dirx, speed * diry), boundary, arrConquered);
+                arrBalls.push(ball);
+            }
+            
+            //create monsters
+            for (var i = 0; i < numOfMonsters; i++) {
+                var size = 10;
+                var top = 5;
+                var left = 300;
+                var speed = 2;
+                var dirx = random(0, 1) == 0 ? -1 : 1;
+                var diry = random(0, 1) == 0 ? -1 : 1;
+                var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
+                var monster = new Monster(top, left, size, size, new Vector(speed * dirx, speed * diry), boundary, arrFree);
+                arrMonsters.push(monster);
+            }
             
             var tracks = [];
             var paths = [];
@@ -283,16 +301,26 @@
                             }
                         }
                     }
+                    arrBalls[ball].obstacles = arrConquered;
                     arrBalls[ball].update();
+                }
+                
+                for (var monster in arrMonsters) {
+                    arrMonsters[monster].obstacles = arrFree;
+                    arrMonsters[monster].update();
                 }
             }
             
             function draw() {
                 drawArray(ctx, arrFree, 'Black');
                 drawArray(ctx, arrConquered, '#00A8A8');
-                drawArray(ctx, arrBalls, 'Red');
                 drawArray(ctx, tmp, 'Yellow');
                 trackPoly.draw(ctx, 'Green');
+                drawArray(ctx, arrBalls);
+                
+                for (var monster in arrMonsters) {
+                    arrMonsters[monster].draw(ctx, 'Orange');
+                }
             }
             
             setInterval(function () {
