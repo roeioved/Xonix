@@ -1,0 +1,24 @@
+@font-face {
+    font-family: dos;
+    src: url('dos.ttf');
+}
+
+body {
+    font-family: dos;
+    background: #000 url(../images/pc.jpg) left top no-repeat;
+}
+
+#canvas {
+    position: absolute;
+    left: 395px;
+    top: 170px;
+    background: #00A8A8;
+}
+#status {
+    position: absolute;
+    left: 395px;
+    top: 530px;
+    width: 560px;
+    color: #fff;
+    font-size: 20px;
+}

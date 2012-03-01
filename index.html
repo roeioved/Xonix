@@ -3,9 +3,8 @@
 <head>
     <title>HTML5 XoniX</title>
     
-    <style>
-        #canvas { background:#00A8A8; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style/reset.min.css">
+    <link rel="stylesheet" type="text/css" href="style/style.css">
     
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
@@ -22,8 +21,8 @@
     <script type="text/javascript" src="scripts/player.js"></script>
     
     <script>
-        var canvasWidth = 600,
-            canvasHeight = 400,
+        var canvasWidth = 550,
+            canvasHeight = 360,
             frameBorder = 18,
             totalPixels,
             conquredPixels,
@@ -39,6 +38,8 @@
             ballSize = 8,
             monsterSize = 9,
             trackSize = 9;
+            
+        var sound = new Audio("sounds/fail.mp3");        
         
         function initGame() {
             arrFree = [];
@@ -61,7 +62,7 @@
             //create player
             var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
             player = new Player(0, 0, playerSize, 2, 'White', '#901290', boundary);
-            player.addEventListener('test', function() { console.log('oooops!'); } );
+            player.addEventListener('test', function() { sound.play(); } );
             
             //create balls
             for (var i = 0; i < numOfBalls; i++) {
@@ -224,7 +225,10 @@
 </head>
 
 <body>
-	<canvas id="canvas" width="600" height="400"></canvas>
+    <canvas id="canvas" width="550" height="360"></canvas>
+    <div id="status">
+        Score: 0    Xn: 3   Full: 0%    Time: 90
+    </div>
 </body>
 
 </html>
