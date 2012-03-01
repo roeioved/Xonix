@@ -97,6 +97,8 @@
         KeyDir = { top:"top", right:"right", bottom:"bottom", left:"left" };
         
         $(document).ready(function () {
+
+            debugger;
             var ctx = $('#canvas')[0].getContext("2d");
             var FPS = 60;
             var keyDir;
@@ -119,7 +121,7 @@
             pol.addPoint(new Point(110, 190));
             pol.addPoint(new Point(110, 0));
 
-            var rectangles = pol.getHorizontalRectangles();
+            var rectangles = pol.getRectangles(new Vector(0, 1));
             
             for (var i = 0; i < rectangles.length; i++) {
                 polygons.push(rectangles[i]);
@@ -144,7 +146,8 @@
             function update() {
                 //player.update();
                 //monster.update();
-                
+
+
                 for (var ball in balls) {
                     var velocity_x_changed = velocity_y_changed = false;
                     

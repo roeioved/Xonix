@@ -52,7 +52,21 @@ Ball.prototype = {
             this.y = this.y + this.radius > this.boundaries.bottom ? this.boundaries.bottom - this.radius : this.y;
         }
     
-        var velocity_x_changed = velocity_y_changed = false;
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+    
+    if (this.boundaries) {
+        this.x = this.x - this.radius < this.boundaries.left ? this.boundaries.left + this.radius : this.x;
+        this.x = this.x + this.radius > this.boundaries.right ? this.boundaries.right - this.radius : this.x;
+        this.y = this.y - this.radius < this.boundaries.top ? this.boundaries.top + this.radius : this.y;
+        this.y = this.y + this.radius > this.boundaries.bottom ? this.boundaries.bottom - this.radius : this.y;
+    }
+
+    var velocity_x_changed = velocity_y_changed = false;
+    
+    var regions = [];
+    for (var polygon in this.obstacles) {
+        var rectangles = this.obstacles[polygon].getRectangles(new Vector(0,1));
         
         var regions = [];
         for (var polygon in this.obstacles) {
@@ -100,7 +114,8 @@ Ball.prototype = {
         ctx.stroke();
         ctx.closePath();
     }
-    
+};
+
 };
 
 Ball.prototype = $.extend(
