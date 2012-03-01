@@ -1,231 +1,246 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
-    <title>Yair</title>
-    
-    <style>
-        #canvas { background:#00A8A8; }
-    </style>
-    
-    <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="scripts/point.js"></script>
-    <script type="text/javascript" src="scripts/edge.js"></script>
-    <script type="text/javascript" src="scripts/path.js"></script>
-    <script type="text/javascript" src="scripts/vector.js"></script>
-    <script type="text/javascript" src="scripts/slice.js"></script>
-    <script type="text/javascript" src="scripts/rectangle.js"></script>    
-    <script type="text/javascript" src="scripts/polygon.js"></script>    
-    <script type="text/javascript" src="scripts/ball.js"></script>
-    
-    <script>
-        function findCollision(ball, polygon) {
-            var intersect = findIntersection(ball.getBoundingRect(), polygon)
-            if (intersect) {
-                 //if (polygon.containsPoint(ball.get_center()))
-                 //{
-                    return intersect;
-                 //}
-            }
-            return null;
+<title>HTML5 XoniX</title>
+
+<style>
+    #canvas { background:#00A8A8; }
+</style>
+
+<script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="scripts/point.js"></script>
+<script type="text/javascript" src="scripts/edge.js"></script>
+<script type="text/javascript" src="scripts/path.js"></script>
+<script type="text/javascript" src="scripts/vector.js"></script>
+<script type="text/javascript" src="scripts/slice.js"></script>
+<script type="text/javascript" src="scripts/circle.js"></script>
+<script type="text/javascript" src="scripts/rectangle.js"></script>
+<script type="text/javascript" src="scripts/polygon.js"></script>
+<script type="text/javascript" src="scripts/ball.js"></script>
+<script type="text/javascript" src="scripts/monster.js"></script>
+<script type="text/javascript" src="scripts/player.js"></script>
+
+<script>
+    var canvasWidth = 600,
+            canvasHeight = 400,
+            frameBorder = 18,
+            totalPixels,
+            conquredPixels,
+            freePixels;
+    var numOfBalls = 4,
+            numOfMonsters = 2;
+    var player,
+            arrFree = [],
+            arrConquered = [],
+            arrBalls = [],
+            arrMonsters = [];
+    var playerSize = 9,
+            ballSize = 9,
+            monsterSize = 9,
+            trackSize = 9;
+
+    function initGame() {
+        arrFree = [];
+        arrConquered = [];
+        arrBalls = [];
+        arrMonsters = [];
+        totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder);
+        conquredPixels = 0;
+        freePixels = totalPixels - conquredPixels;
+
+        //create start free area
+        var free = new Polygon([
+            new Point(frameBorder, frameBorder),
+            new Point(canvasWidth - frameBorder, frameBorder),
+            new Point(canvasWidth - frameBorder, canvasHeight - frameBorder),
+            new Point(frameBorder, canvasHeight - frameBorder)
+        ]);
+        arrFree.push(free);
+
+        //create player
+        var speed = 2;
+        var velocityX = speed * 1;
+        var velocityY = speed * 1;
+        var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
+        player = new Player(0, 0, playerSize, 'White', '#901290', new Vector(velocityX, velocityY), boundary);
+
+        //create balls
+        for (var i = 0; i < numOfBalls; i++) {
+            var x = random(frameBorder*2, canvasWidth - frameBorder*2);
+            var y = random(frameBorder*2, canvasHeight - frameBorder*2);
+            var speed = 2;
+            var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
+            var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
+            var boundary = { top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
+            var ball = new Ball(x, y, ballSize/2, '#00A8A8', 'White', new Vector(velocityX, velocityY), boundary, arrConquered);
+            arrBalls.push(ball);
         }
-        
-        function findIntersection(source_pol, target_pol) {
 
-            var minIntersect = 10000;
-            var minIntersectPerpen = null;
-            
-            var edges = target_pol.getVectors();
-            
-            for (var edge in edges) {
-                edge = edges[edge];
-                var perpen = edge.getPerpendicular();
-                perpen.normalize();
-                
-                var res1 = projectPolygon(perpen, target_pol);
-                var res2 = projectPolygon(perpen, source_pol);
-                
-                var intersect = minIntersect;
-                
-                if (res1.min == res2.max || res2.min == res1.max)
-                {
-                    intersect = 0;
-                }
-                else if (res2.min > res1.min) {
-                    intersect = res2.min - res1.max;
-                } else if (res1.min > res2.min) {
-                    intersect = res1.min - res2.max;
-                }
-                
-                if (intersect > 0)
-                {
-                    return null;
-                }
-                else
-                {
-                    if (Math.abs(intersect) < Math.abs(minIntersect))
-                    {
-                        minIntersect = intersect;
-                        minIntersectPerpen = perpen;
-                    }
-                }
-            }
-            
-            return {intersect: minIntersect, minIntersectPerpen: minIntersectPerpen};
+        //create monsters
+        for (var i = 0; i < numOfMonsters; i++) {
+            var left = random(0, canvasWidth - monsterSize);
+            var top = random(canvasHeight - frameBorder, canvasHeight - monsterSize);
+            var speed = 2;
+            var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
+            var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
+            var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
+            var monster = new Monster(left, top, monsterSize, '#00A8A8', 'Black', new Vector(velocityX, velocityY), boundary, arrFree);
+            arrMonsters.push(monster);
         }
-        /*
-         Project a polygon on a given axis and return the min and max scalar values on the axis
-         */
-        function projectPolygon(axis, polygon) {
-            var values = polygon.getDotProduct(axis);
-            var max, min;
-
-            max = min = values[0];
-
-            for (var i = 1; i < values.length; i++) {
-                if (values[i] > max) {
-                    max = values[i];
-                }
-                
-                else if (values[i] < min) {
-                    min = values[i];
-                }
-            }
-            
-            return {'min':min, 'max':max};
+    }
+    function drawArray(ctx, array, fillStyle, strokeStyle) {
+        for (var i=0; i<array.length; i++) {
+            var obj = array[i];
+            obj.draw(ctx, fillStyle);
         }
-        
-        KeyDir = { top:"top", right:"right", bottom:"bottom", left:"left" };
-        
-        $(document).ready(function () {
+    }
+    function random(min, max) {
+        var val = min + Math.random() * (max - min);
+        return Math.round(val);
+    }
 
-            debugger;
-            var ctx = $('#canvas')[0].getContext("2d");
-            var FPS = 60;
-            var keyDir;
-            
-            var balls = [];
-            balls.push(new Ball(200, 20, 10, "red", new Vector(1, 1.2), { top: 0, right: 400, bottom: 400, left: 0 }));
-            balls.push(new Ball(20, 20, 10, "red", new Vector(2, 1.4), { top: 0, right: 400, bottom: 400, left: 0 }));
-            //balls.push(new Ball(ctx, 80, 30, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
-            //balls.push(new Ball(ctx, 20, 10, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
-            //balls.push(new Ball(ctx, 83, 50, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
-            
-            var polygons = [];
-            var pol = new Polygon();
-            pol.addPoint(new Point(100, 0));
-            pol.addPoint(new Point(100, 200));
-            pol.addPoint(new Point(200, 200));
-            pol.addPoint(new Point(200, 400));
-            pol.addPoint(new Point(210, 400));
-            pol.addPoint(new Point(210, 190));
-            pol.addPoint(new Point(110, 190));
-            pol.addPoint(new Point(110, 0));
+    function get_random_color() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+        return color;
+    }
 
-            var rectangles = pol.getRectangles(new Vector(0, 1));
-            
-            for (var i = 0; i < rectangles.length; i++) {
-                polygons.push(rectangles[i]);
-            }
-            
-            pol = new Polygon();
-            pol.addPoint(new Point(40, 60));
-            pol.addPoint(new Point(60, 60));
-            pol.addPoint(new Point(60, 90));
-            pol.addPoint(new Point(100, 90));
-            pol.addPoint(new Point(100, 60));
-            pol.addPoint(new Point(120, 60));
-            pol.addPoint(new Point(120, 110));
-            pol.addPoint(new Point(40, 110));
-            
-            /*rectangles = pol.getHorizontalRectangles();
-            
-            for (i = 0; i < rectangles.length; i++) {
-                polygons.push(rectangles[i]);
-            }*/
-            
-            function update() {
-                //player.update();
-                //monster.update();
+    $(document).ready(function() {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
 
+        var polygons = [];
+        var pol = new Polygon();
+        pol.addPoint(new Point(100, 0));
+        pol.addPoint(new Point(100, 200));
+        pol.addPoint(new Point(200, 200));
+        pol.addPoint(new Point(200, 400));
+        pol.addPoint(new Point(210, 400));
+        pol.addPoint(new Point(210, 190));
+        pol.addPoint(new Point(110, 190));
+        pol.addPoint(new Point(110, 0));
 
-                for (var ball in balls) {
-                    var velocity_x_changed = velocity_y_changed = false;
-                    
-                    for (var polygon in polygons) {
-                        
-                        var collision = findCollision(balls[ball], polygons[polygon]);
-                        if (collision) {                            
-                            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
-                                console.log("collision on y axis");
-                                balls[ball].velocity.y *= -1;
-                                velocity_y_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(balls[ball].velocity.y)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(balls[ball].velocity.y) / balls[ball].velocity.y);
-                                    balls[ball].y += velocity;
-                                    balls[ball].x -= balls[ball].velocity.x;
-                                }
-                            }
-                            else if (!velocity_x_changed) {
-                                console.log("collision on x axis");
-                                
-                                balls[ball].velocity.x *= -1;
-                                velocity_x_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(balls[ball].velocity.x)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(balls[ball].velocity.x) / balls[ball].velocity.x);
-                                    balls[ball].x += velocity;
-                                    balls[ball].y -= balls[ball].velocity.y;
-                                }                            
-                            }
-                        }
-                    }
-                    balls[ball].update();
-                }
-            }
-            
-            function draw() {
-                //player.draw();
-                //monster.draw();
-                
-                for (var i = 0; i < polygons.length; i++) {
-                    polygons[i].draw(ctx, 'blue', true);
-                }
-                
-                for (var ball in balls) {
-                    balls[ball].draw(ctx);
+        var rectangles = pol.getRectangles(new Vector(1,0));
+
+        for (var i=0; i<rectangles.length; i++)
+        {
+            rectangles[i].draw(ctx, get_random_color());
+        }
+
+       /* initGame();
+
+        //create DEBUG track
+        var tracks = [];
+        var paths = [];
+
+        tracks[0] = new Polygon([   // DOWN
+            new Point(200 - (trackSize/2), frameBorder),
+            new Point(200 + (trackSize/2), frameBorder),
+            new Point(200 + (trackSize/2), 100 - (trackSize/2)),
+            new Point(300 + (trackSize/2), 100 - (trackSize/2)),
+            new Point(300 + (trackSize/2), 200 + (trackSize/2)),
+            new Point(260 + (trackSize/2), 200 + (trackSize/2)),
+            new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+            new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+            new Point(260 - (trackSize/2), 200 - (trackSize/2)),
+            new Point(300 - (trackSize/2), 200 - (trackSize/2)),
+            new Point(300 - (trackSize/2), 100 + (trackSize/2)),
+            new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+        ]);
+        paths[0] = new Path([       // DOWN (INNER)
+            new Point(200 - (trackSize/2), frameBorder),
+            new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+            new Point(300 - (trackSize/2), 100 + (trackSize/2)),
+            new Point(300 - (trackSize/2), 200 - (trackSize/2)),
+            new Point(260 - (trackSize/2), 200 - (trackSize/2)),
+            new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+        ]);
+        paths[4] = new Path([       // DOWN (OUTER)
+            new Point(200 + (trackSize/2), frameBorder),
+            new Point(200 + (trackSize/2), 100 - (trackSize/2)),
+            new Point(300 + (trackSize/2), 100 - (trackSize/2)),
+            new Point(300 + (trackSize/2), 200 + (trackSize/2)),
+            new Point(260 + (trackSize/2), 200 + (trackSize/2)),
+            new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+        ]);
+        var rnd = random(0, 0);
+        var trackPoly = tracks[rnd];
+        var innerPath = paths[rnd];
+        var outerPath = paths[rnd + 4];
+
+        //split
+        var result = [];
+        var firstPoly = arrFree[0].split(innerPath)[0];
+        var secondPoly = arrFree[0].split(outerPath)[1];
+        result.push(firstPoly);
+        result.push(secondPoly);
+
+        arrFree = []; // todo: remove only the polygon that we split
+        for (var i=0; i<result.length; i++) {
+            var poly = result[i];
+            var containsBall = false;
+            for (var b=0; b<arrBalls.length; b++) {
+                if (poly.containsPoint(arrBalls[b])) {
+                    containsBall = true;
+                    break;
                 }
             }
-            
-            setInterval(function () {
-                ctx.clearRect(0, 0, 800, 800);
-                update();
-                draw();
-            }, 1000 / FPS);
-            
-            $(document).keydown(function (e) {
-                if (e.keyCode == 37) {
-                    keyDir = KeyDir.left;
-                }
-                else if (e.keyCode == 38) {
-                    keyDir = KeyDir.top;
-                }
-                else if (e.keyCode == 39) {
-                    keyDir = KeyDir.right;
-                }
-                else if (e.keyCode == 40) {
-                    keyDir = KeyDir.bottom;
-                }
-                else {
-                    keyDir = null;
-                }
-            });
-        });
-    </script>
+            if (containsBall) {
+                arrFree.push(poly);
+            } else {
+                arrConquered.push(poly);
+                size = Math.abs(poly.getArea());
+                freePixels -= size;
+                conquredPixels += size;
+            }
+        }
+        arrConquered.push(trackPoly);
+        size = Math.abs(trackPoly.getArea());
+        freePixels -= size;
+        conquredPixels += size;
+
+        console.log('total:' + totalPixels + ' ' + 'conqured:' + conquredPixels + ' ' + 'free:' + freePixels + ' => ' + conquredPixels/totalPixels*100 + '%');
+        console.log('direction:' + innerPath.getDirection());
+
+        console.log('free:' + arrFree.length);
+        console.log('conquered:' + arrConquered.length);
+
+        function update() {
+            player.update();
+
+            for (var ball in arrBalls) {
+                arrBalls[ball].obstacles = arrConquered;
+                arrBalls[ball].update();
+            }
+            for (var monster in arrMonsters) {
+                arrMonsters[monster].obstacles = arrFree;
+                arrMonsters[monster].update();
+            }
+        }
+
+        function draw() {
+            drawArray(ctx, arrFree, 'Black');
+            //drawArray(ctx, arrConquered, '#00A8A8');
+            //trackPoly.draw(ctx, 'Green');
+            drawArray(ctx, arrBalls);
+            drawArray(ctx, arrMonsters);
+            player.draw(ctx);
+        }
+
+        setInterval(function () {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            update();
+            draw();
+        }, 1000 / 50);*/
+    });
+</script>
 </head>
 
 <body>
-	<canvas id="canvas" width="600" height="400"></canvas>
+<canvas id="canvas" width="600" height="400"></canvas>
 </body>
 
 </html>

@@ -27,7 +27,7 @@
             totalPixels,
             conquredPixels,
             freePixels;
-        var numOfBalls = 4,
+        var numOfBalls = 5,
             numOfMonsters = 2;
         var player,
             arrFree = [],
@@ -120,7 +120,7 @@
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
-                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2))
             ]);
             paths[0] = new Path([       // DOWN (INNER)
                 new Point(200 - (trackSize/2), frameBorder),
@@ -128,7 +128,7 @@
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
-                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder)
             ]);
             paths[4] = new Path([       // DOWN (OUTER)
                 new Point(200 + (trackSize/2), frameBorder),
@@ -136,7 +136,7 @@
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
-                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
             var rnd = random(0, 0);
             var trackPoly = tracks[rnd];

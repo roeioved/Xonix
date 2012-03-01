@@ -164,13 +164,20 @@ Polygon.prototype = {
                 }
 
                 var p1_x = p1.x, p2_x = p2.x;
+                var p1_y = p1.y, p2_y = p2.y;
 
                 if (p1_x > p2_x) {
                     p1_x = p2.x;
                     p2_x = p1.x;
                 }
 
-                edge = new Edge(p1_x, p1.y, p2_x, p2.y);
+                if (p1_y > p2_y)
+                {
+                    p1_y = p2.y;
+                    p2_y = p1.y;
+                }
+
+                edge = new Edge(p1_x, p1_y, p2_x, p2_y);
                 this.edges.push(edge);
             }
         }
@@ -209,6 +216,7 @@ Polygon.prototype = {
     getRectangles:function (orientation) {
         if (!this.hRectangles) {
             this.hRectangles = [];
+
             var slices = this._createSlicesWithEdges(orientation);
 
             for (var i = 0; i < slices.length; i++) {
@@ -229,9 +237,21 @@ Polygon.prototype = {
                             for (var recEdge in recEdges) {
                                 recEdge = recEdges[recEdge];
 
-                                if (recEdge.p1.y == recEdge.p2.y) { //if horizontal
+                                if (orientation.y && recEdge.p1.y == recEdge.p2.y) { //if horizontal
                                     for (var j = 0; j < slices.length; j++) {
                                         if (slices[j].value == recEdge.p1.y) {
+                                            if (!slices[j].findEdge(recEdge)) //edge was not found
+                                            {
+                                                slices[j].update(recEdge);
+                                            }
+                                            slices[j].markEdge(recEdge.p1, recEdge.p2);
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (orientation.x && recEdge.p1.x == recEdge.p2.x) { //if vertical
+                                    for (var j = 0; j < slices.length; j++) {
+                                        if (slices[j].value == recEdge.p1.x) {
                                             if (!slices[j].findEdge(recEdge)) //edge was not found
                                             {
                                                 slices[j].update(recEdge);
@@ -245,9 +265,18 @@ Polygon.prototype = {
                         }
                         else { //rectangle not found for edge
                             for (var j = 0; j < slices.length; j++) {
-                                if (slices[j].value == edge.p1.y) {
-                                    slices[j].markEdge(edge.p1, edge.p2);
-                                    break;
+                                if (orientation.y) { //horizontal
+                                    if (slices[j].value == edge.p1.y) {
+                                        slices[j].markEdge(edge.p1, edge.p2);
+                                        break;
+                                    }
+                                }
+                                else // vertical
+                                {
+                                    if (slices[j].value == edge.p1.x) {
+                                        slices[j].markEdge(edge.p1, edge.p2);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -319,8 +348,8 @@ Polygon.prototype = {
         }
     },
 
-    //creates an array of slices. Each slice contains a list of edges positioned on the slice's axis according to its orientation.
-    //the orientation should be a vector of the following options: (0,1) - horizontal or  (1,0) - vertical
+//creates an array of slices. Each slice contains a list of edges positioned on the slice's axis according to its orientation.
+//the orientation should be a vector of the following options: (0,1) - horizontal or  (1,0) - vertical
     _createSlicesWithEdges:function (orientation) {
         var res = [];
         var points = this.points;
@@ -460,8 +489,8 @@ Polygon.prototype = {
                         var pol = new Polygon([
                             new Point(edge.p1.x, edge.p1.y),
                             new Point(slice_edge.p1.x, slice_edge.p1.y),
-                            new Point(slice_edge.p2.x, slice_edge.p2.y),
-                            new Point(edge.p2.x, edge.p2.y)
+                            new Point(slice_edge.p2.x, bottom_y),
+                            new Point(edge.p2.x, bottom_y)
                         ]);
 
                         return pol;
@@ -476,7 +505,7 @@ Polygon.prototype = {
         }
     },
 
-    //splits polygon to two polygons by path
+//splits polygon to two polygons by path
     split:function (path) {
         var polygons = [];
         var pointsToAdd = this.pointsOn(path.getPoints());
@@ -528,7 +557,7 @@ Polygon.prototype = {
         return this.getBox().doesIntersect(rectangle);
     },
 
-    findIntersection: function (rect) {
+    findIntersection:function (rect) {
         var other = new Polygon(rect);
         //polygon.buildEdges();
 
@@ -556,25 +585,22 @@ Polygon.prototype = {
                 intersect = res1.min - res2.max;
             }
 
-            if (intersect > 0)
-            {
+            if (intersect > 0) {
                 return null;
             }
-            else
-            {
-                if (Math.abs(intersect) < Math.abs(minIntersect))
-                {
-                    minIntersect = intersect;
+            else {
+                if (Math.abs(intersect) < Math.abs(minIntersect)) {
+                    minIntersect = Math.abs(intersect);
                     minIntersectPerpen = perpen;
                 }
             }
         }
 
-        return { intersect: minIntersect, minIntersectPerpen: minIntersectPerpen };
+        return { intersect:minIntersect, minIntersectPerpen:minIntersectPerpen };
     },
 
-    //project a polygon on a given axis and return the min and max scalar values on the axis
-    projectPolygon: function (axis) {
+//project a polygon on a given axis and return the min and max scalar values on the axis
+    projectPolygon:function (axis) {
         var values = this.getDotProduct(axis);
         var max, min;
 

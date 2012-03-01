@@ -9,7 +9,7 @@ function Player(left, top, size, fillColor, strokeColor, velocity, boundary) {
 }
 
 Player.prototype = {
-    
+
     update: function () {
         var velocity_x_dir_changed = false;
         var velocity_y_dir_changed = false;
