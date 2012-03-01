@@ -34,14 +34,18 @@ Rectangle.prototype = {
         return new Rectangle(this);
     },
     
-    getTopleft: function() {
+    getTopLeft: function() {
         return new Point(this.tl);
     },
     
-    getBottomright: function() {
+    getBottomRight: function() {
         return new Point(this.br);
     },
         
+    getCenter: function() {
+        return new Point(this.tl.x + this.width()/2, this.tl.y + this.height()/2);
+    },
+
     width: function() {
         return this.br.x - this.tl.x;
     },

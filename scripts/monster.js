@@ -1,8 +1,10 @@
-function Monster(top, left, width, height, velocity, boundary, obstacles) {
+function Monster(top, left, width, height, fillColor, strokeColor, velocity, boundary, obstacles) {
     this.top = top;
     this.left = left;
     this.width = width;
     this.height = height;
+    this.fillColor = fillColor;
+    this.strokeColor = strokeColor;
     this.velocity = velocity;
     this.boundary = boundary;
     this.obstacles = obstacles;
@@ -120,12 +122,21 @@ Monster.prototype = {
         }
         
     },
+    
+    getBox: function () {
+        var boundary = new Rectangle([
+            new Point(this.left, this.top),
+            new Point(this.left + this.width, this.top),
+            new Point(this.left + this.width, this.top),
+            new Point(this.left + this.width, this.top)
+        ]);
+        
+        return boundary;
+    },
 
-    draw: function (ctx, fill, stroke) {
-        if (fill)
-            ctx.fillStyle = fill;
-        if (stroke)
-            ctx.strokeStyle = stroke;
+    draw: function (ctx) {
+        ctx.fillStyle = this.fillColor;
+        ctx.strokeStyle = this.strokeStyle;
         
         ctx.save();
         ctx.beginPath();
@@ -136,12 +147,8 @@ Monster.prototype = {
         
         ctx.closePath();
         
-        if (fill) {
-            ctx.fill();
-        }
-        if (stroke) {
-            ctx.stroke();
-        }
+        ctx.fill();
+        ctx.stroke();
         
         ctx.restore();
     }

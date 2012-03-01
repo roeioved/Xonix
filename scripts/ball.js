@@ -1,4 +1,7 @@
-﻿function Ball(x, y, radius, color, velocity, boundaries, obstacles) {
+﻿/// <reference path="point.js" />
+/// <reference path="rectangle.js" />
+
+function Ball(x, y, radius, color, velocity, boundaries, obstacles) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -41,26 +44,21 @@ Ball.prototype = {
         }
     },
     
+    getBox: function () {
+        var boundary = new Rectangle(this.x - this.radius, this.y - this.radius, this.x + this.radius, this.y + this.radius);
+        
+        return boundary;
+    },
+    
+    getCenter: function() {
+        return new Point(this.x, this.y);
+    },
+
     draw: function (ctx) {
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         ctx.fill();
-    },
-    
-    getBoundingRect: function () {
-        var boundary = new Polygon([
-            new Point(this.x - this.radius, this.y - this.radius),
-            new Point(this.x + this.radius, this.y - this.radius),
-            new Point(this.x + this.radius, this.y + this.radius),
-            new Point(this.x - this.radius, this.y + this.radius)
-        ]);
-        
-        return boundary;
-    },
-    
-    get_center: function() {
-        return new Point(this.x, this.y);
     }
     
 }
