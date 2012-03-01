@@ -1,6 +1,7 @@
-function Monster(top, left, width, height, fillColor, strokeColor, velocity, boundary, obstacles) {
+function Monster(left, top, size, fillColor, strokeColor, velocity, boundary, obstacles) {
     this.tl = new Point(left, top);
-    this.br = new Point(left + height, top + width);
+    this.br = new Point(left + size, top + size);
+    this.size = size;
     this.fillColor = fillColor;
     this.strokeColor = strokeColor;
     this.velocity = velocity;
@@ -28,9 +29,6 @@ Monster.prototype = {
         this.offset(this.velocity.x, this.velocity.y);
         
         if (this.boundary) {
-            var width = this.width();
-            var height = this.height();
-            
             //moving left
             if (this.velocity.x < 0)
             {
@@ -41,7 +39,7 @@ Monster.prototype = {
                     
                     if (this.tl.x < this.boundary.left) {
                         this.tl.x = this.boundary.left;
-                        this.br.x = this.tl.x + width;
+                        this.br.x = this.tl.x + this.size;
                     }
                 }
             }
@@ -56,7 +54,7 @@ Monster.prototype = {
                     
                     if (this.br.x > this.boundary.right) {
                         this.br.x = this.boundary.right;
-                        this.tl.x = this.br.x - width;
+                        this.tl.x = this.br.x - this.size;
                     }
                 }
             }
@@ -71,7 +69,7 @@ Monster.prototype = {
                     
                     if (this.tl.y < this.boundary.top) {
                         this.tl.y = this.boundary.top;
-                        this.br.y = this.tl.y + height;
+                        this.br.y = this.tl.y + this.size;
                     }
                 }
             }
@@ -86,7 +84,7 @@ Monster.prototype = {
                     
                     if (this.br.y > this.boundary.bottom) {                    
                         this.br.y = this.boundary.bottom;
-                        this.tl.y = this.br.y - height;
+                        this.tl.y = this.br.y - this.size;
                     }
                 }
             }
@@ -180,11 +178,11 @@ Monster.prototype = {
         return new Rectangle(this.tl, this.br);
     },
 
-    draw: function (ctx) {
+    draw: function (ctx) {        
         var thickness = 2;
         
         ctx.beginPath();
-        ctx.rect(this.tl.x + thickness, this.tl.y + thickness, this.width() - thickness, this.height() - thickness);
+        ctx.rect(this.tl.x + thickness, this.tl.y + thickness, this.size - thickness, this.size - thickness);
         ctx.fillStyle = this.fillColor;
         ctx.fill();
         ctx.lineWidth = thickness;

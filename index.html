@@ -18,25 +18,36 @@
     <script type="text/javascript" src="scripts/polygon.js"></script>
     <script type="text/javascript" src="scripts/ball.js"></script>
     <script type="text/javascript" src="scripts/monster.js"></script>
+    <script type="text/javascript" src="scripts/player.js"></script>
     
     <script>
         var canvasWidth = 600,
             canvasHeight = 400,
-            frameBorder = 20,
-            totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder),
-            conquredPixels = 0,
-            freePixels = totalPixels - conquredPixels;
-        var numOfBalls = 3,
+            frameBorder = 18,
+            totalPixels,
+            conquredPixels,
+            freePixels;
+        var numOfBalls = 4,
             numOfMonsters = 2;
-        var arrFree = [],
+        var player,
+            arrFree = [],
             arrConquered = [],
             arrBalls = [],
             arrMonsters = [];
-        var ballSize = 8,
-            monsterSize = 10,
-            trackSize = 10;
+        var playerSize = 9,
+            ballSize = 9,
+            monsterSize = 9,
+            trackSize = 9;
         
         function initGame() {
+            arrFree = [];
+            arrConquered = [];
+            arrBalls = [];
+            arrMonsters = [];
+            totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder);
+            conquredPixels = 0;
+            freePixels = totalPixels - conquredPixels;
+            
             //create start free area
             var free = new Polygon([
                 new Point(frameBorder, frameBorder),
@@ -45,6 +56,13 @@
                 new Point(frameBorder, canvasHeight - frameBorder)
             ]);
             arrFree.push(free);
+            
+            //create player
+            var speed = 2;
+            var velocityX = speed * 1;
+            var velocityY = speed * 1;
+            var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
+            player = new Player(0, 0, playerSize, 'White', '#901290', new Vector(velocityX, velocityY), boundary);
             
             //create balls
             for (var i = 0; i < numOfBalls; i++) {
@@ -60,15 +78,15 @@
             
             //create monsters
             for (var i = 0; i < numOfMonsters; i++) {
-                var top = random(canvasHeight - frameBorder, canvasHeight - monsterSize);
                 var left = random(0, canvasWidth - monsterSize);
+                var top = random(canvasHeight - frameBorder, canvasHeight - monsterSize);
                 var speed = 2;
                 var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
                 var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
                 var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
-                var monster = new Monster(top, left, monsterSize, monsterSize, '#00A8A8', 'Black', new Vector(velocityX, velocityY), boundary, arrFree);
+                var monster = new Monster(left, top, monsterSize, '#00A8A8', 'Black', new Vector(velocityX, velocityY), boundary, arrFree);
                 arrMonsters.push(monster);
-            }            
+            }
         }        
         function drawArray(ctx, array, fillStyle, strokeStyle) {
             for (var i=0; i<array.length; i++) {
@@ -161,8 +179,10 @@
             
             console.log('free:' + arrFree.length);
             console.log('conquered:' + arrConquered.length);
-            
+
             function update() {
+                player.update();
+                
                 for (var ball in arrBalls) {
                     arrBalls[ball].obstacles = arrConquered;
                     arrBalls[ball].update();
@@ -179,6 +199,7 @@
                 //trackPoly.draw(ctx, 'Green');
                 drawArray(ctx, arrBalls);
                 drawArray(ctx, arrMonsters);
+                player.draw(ctx);
             }
             
             setInterval(function () {
