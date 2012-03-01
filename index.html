@@ -8,6 +8,7 @@
     </style>
     
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/event_handler.js"></script>
     <script type="text/javascript" src="scripts/point.js"></script>
     <script type="text/javascript" src="scripts/edge.js"></script>
     <script type="text/javascript" src="scripts/path.js"></script>
@@ -60,6 +61,7 @@
             //create player
             var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
             player = new Player(0, 0, playerSize, 2, 'White', '#901290', boundary);
+            player.addEventListener('test', function() { console.log('oooops!'); } );
             
             //create balls
             for (var i = 0; i < numOfBalls; i++) {
@@ -96,7 +98,7 @@
             return Math.round(val);
         }
         
-        $(document).keydown(function(event){
+        $(document).keydown(function(event) {
             switch (event.keyCode) {
                 case 37:
                     player.moveLeft();
@@ -119,9 +121,7 @@
             initGame();
                         
             //create DEBUG track
-            var tracks = [];
-            var paths = [];
-            tracks[0] = new Polygon([   // DOWN
+            var trackPoly = new Polygon([
                 new Point(200 - (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), 100 - (trackSize/2)),
@@ -135,7 +135,7 @@
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(200 - (trackSize/2), 100 + (trackSize/2)),
             ]);
-            paths[0] = new Path([       // DOWN (INNER)
+            var innerPath = new Path([
                 new Point(200 - (trackSize/2), frameBorder),
                 new Point(200 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
@@ -143,7 +143,7 @@
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), canvasHeight - frameBorder),
             ]);
-            paths[4] = new Path([       // DOWN (OUTER)
+            var outerPath = new Path([
                 new Point(200 + (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
@@ -151,10 +151,6 @@
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), canvasHeight - frameBorder),
             ]);
-            var rnd = random(0, 0);
-            var trackPoly = tracks[rnd];
-            var innerPath = paths[rnd];
-            var outerPath = paths[rnd + 4];
             
             //split
             var result = [];
@@ -194,16 +190,19 @@
             console.log('conquered:' + arrConquered.length);
 
             function update() {
-                player.update();
-                
+                var playerObstacles = [];
                 for (var ball in arrBalls) {
                     arrBalls[ball].obstacles = arrConquered;
                     arrBalls[ball].update();
+                    playerObstacles.push(arrBalls[ball].getBox());
                 }                
                 for (var monster in arrMonsters) {
                     arrMonsters[monster].obstacles = arrFree;
                     arrMonsters[monster].update();
+                    playerObstacles.push(arrMonsters[monster].getBox());
                 }
+                player.obstacles = playerObstacles;
+                player.update();
             }
             
             function draw() {

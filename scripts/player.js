@@ -1,4 +1,4 @@
-function Player(left, top, size, speed, fillColor, strokeColor, boundary) {
+function Player(left, top, size, speed, fillColor, strokeColor, boundary, obstacles) {
     this.tl = new Point(left, top);
     this.br = new Point(left + size, top + size);
     this.speed = speed;
@@ -7,10 +7,11 @@ function Player(left, top, size, speed, fillColor, strokeColor, boundary) {
     this.strokeColor = strokeColor;
     this.velocity = new Vector(0, 0);
     this.boundary = boundary;
+    this.obstacles = obstacles;
 }
 
 Player.prototype = {
-    
+        
     getBox: function () {
         return new Rectangle(this.tl, this.br);
     },
@@ -82,6 +83,15 @@ Player.prototype = {
                 }
             }
         }
+        
+        for (var idx in this.obstacles) {
+            var me = this.getBox();
+            var other = this.obstacles[idx];
+            if (me.doesIntersect(other)) {
+                this.init();
+                this._raiseEvent('test');
+            }
+        }
     },
     
     init: function () {
@@ -127,6 +137,7 @@ Player.prototype = {
 
 Player.prototype = $.extend(
     {},
+    EventHandler.prototype,
     Rectangle.prototype,
     Player.prototype
 );
