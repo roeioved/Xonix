@@ -11,6 +11,17 @@ function Monster(top, left, width, height, fillColor, strokeColor, velocity, bou
     this.obstacles = obstacles;
 }
 
+Monster.prototype.findCollision = function (polygon) {
+    var intersect = polygon.findIntersection(this.getBox());
+    if (intersect) {
+         if (polygon.containsPoint(this.getCenter()))
+         {
+            return intersect;
+         }
+    }
+    return null;
+}
+
 Monster.prototype.update = function () {
     var velocity_x_dir_changed = false;
     var velocity_y_dir_changed = false;
@@ -128,7 +139,42 @@ Monster.prototype.update = function () {
                 this.top -= collision_y_min;
             }
         }*/
-    }   
+    }
+
+    var velocity_x_changed = velocity_y_changed = false;
+    
+    var regions = [];
+    for (var polygon in this.obstacles) {
+        var rectangles = this.obstacles[polygon].getHorizontalRectangles();
+        
+        for (var i = 0; i < rectangles.length; i++) {
+            regions.push(rectangles[i]);
+        }
+    }
+    
+    for (var polygon in regions) {
+        var collision = this.findCollision(regions[polygon]);
+        if (collision) {
+            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
+                this.velocity.y *= -1;
+                velocity_y_changed = true;
+                
+                if (Math.abs(collision.intersect) > Math.abs(this.velocity.y)) {
+                    var velocity = Math.abs(collision.intersect) * (Math.abs(this.velocity.y) / this.velocity.y);
+                    this.offset(-this.velocity.x, velocity);
+                }
+            }
+            else if (!velocity_x_changed) {
+                this.velocity.x *= -1;
+                velocity_x_changed = true;
+                
+                if (Math.abs(collision.intersect) > Math.abs(this.velocity.x)) {
+                    var velocity = Math.abs(collision.intersect) * (Math.abs(this.velocity.x) / this.velocity.x);
+                    this.offset(velocity, -this.velocity.y);
+                }
+            }
+        }
+    }
 }
 
 Monster.prototype.getBox = function () {
@@ -136,11 +182,13 @@ Monster.prototype.getBox = function () {
 }
 
 Monster.prototype.draw = function (ctx) {
-    ctx.fillStyle = this.fillColor;
-    ctx.strokeStyle = this.strokeStyle;
+    var thickness = 3;
+    
     ctx.beginPath();
-    ctx.rect(this.tl.x, this.tl.y, this.width(), this.height());
+    ctx.rect(this.tl.x + thickness, this.tl.y + thickness, this.width() - thickness, this.height() - thickness);
+    ctx.fillStyle = this.fillColor;
     ctx.fill();
+    ctx.lineWidth = thickness;
+    ctx.strokeStyle = this.strokeColor;
     ctx.stroke();
-    ctx.closePath();
 }

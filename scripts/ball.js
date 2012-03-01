@@ -1,14 +1,26 @@
 ﻿Ball.prototype = new Circle();
 Ball.prototype.constructor = Ball;
 
-function Ball(x, y, radius, color, velocity, boundaries, obstacles) {
+function Ball(x, y, radius, fillColor, strokeColor, velocity, boundaries, obstacles) {
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.color = color;
+    this.fillColor = fillColor;
+    this.strokeColor = strokeColor;
     this.velocity = velocity;
     this.boundaries = boundaries;
     this.obstacles = obstacles;
+}
+
+Ball.prototype.findCollision = function (polygon) {
+    var intersect = polygon.findIntersection(this.getBox());
+    if (intersect) {
+         if (polygon.containsPoint(this.getCenter()))
+         {
+            return intersect;
+         }
+    }
+    return null;
 }
 
 Ball.prototype.update = function () {
@@ -40,11 +52,52 @@ Ball.prototype.update = function () {
         this.y = this.y - this.radius < this.boundaries.top ? this.boundaries.top + this.radius : this.y;
         this.y = this.y + this.radius > this.boundaries.bottom ? this.boundaries.bottom - this.radius : this.y;
     }
+
+    var velocity_x_changed = velocity_y_changed = false;
+    
+    var regions = [];
+    for (var polygon in this.obstacles) {
+        var rectangles = this.obstacles[polygon].getHorizontalRectangles();
+        
+        for (var i = 0; i < rectangles.length; i++) {
+            regions.push(rectangles[i]);
+        }
+    }
+    
+    for (var polygon in regions) {
+        var collision = this.findCollision(regions[polygon]);
+        if (collision) {
+            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
+                this.velocity.y *= -1;
+                velocity_y_changed = true;
+                
+                if (Math.abs(collision.intersect) > Math.abs(this.velocity.y)) {
+                    var velocity = Math.abs(collision.intersect) * (Math.abs(this.velocity.y) / this.velocity.y);
+                    this.offset(-this.velocity.x, velocity);
+                }
+            }
+            else if (!velocity_x_changed) {
+                this.velocity.x *= -1;
+                velocity_x_changed = true;
+                
+                if (Math.abs(collision.intersect) > Math.abs(this.velocity.x)) {
+                    var velocity = Math.abs(collision.intersect) * (Math.abs(this.velocity.x) / this.velocity.x);
+                    this.offset(velocity, -this.velocity.y);
+                }
+            }
+        }
+    }
 }
     
 Ball.prototype.draw = function (ctx) {
-    ctx.fillStyle = this.color;
+    var thickness = 1;
+
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.arc(this.x, this.y, this.radius - thickness/2, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.fillColor;
     ctx.fill();
+    ctx.lineWidth = thickness;
+    ctx.strokeStyle = this.strokeColor;
+    ctx.stroke();
+    ctx.closePath();
 }

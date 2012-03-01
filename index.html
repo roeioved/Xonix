@@ -54,7 +54,7 @@
                 var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
                 var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
                 var boundary = { top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
-                var ball = new Ball(x, y, ballSize/2, "Red", new Vector(velocityX, velocityY), boundary, arrConquered);
+                var ball = new Ball(x, y, ballSize/2, '#00A8A8', 'White', new Vector(velocityX, velocityY), boundary, arrConquered);
                 arrBalls.push(ball);
             }
             
@@ -66,7 +66,7 @@
                 var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
                 var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
                 var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
-                var monster = new Monster(top, left, monsterSize, monsterSize, "Yellow", "Yellow", new Vector(velocityX, velocityY), boundary, arrFree);
+                var monster = new Monster(top, left, monsterSize, monsterSize, '#00A8A8', 'Black', new Vector(velocityX, velocityY), boundary, arrFree);
                 arrMonsters.push(monster);
             }            
         }        
@@ -81,18 +81,6 @@
             return Math.round(val);
         }
         
-        function findCollision(ball, polygon) {
-            ball = ball.getBox();
-            var intersect = polygon.findIntersection(ball);
-            if (intersect) {
-                 if (polygon.containsPoint(ball.getCenter()))
-                 {
-                    return intersect;
-                 }
-            }
-            return null;
-        }
-                
         $(document).ready(function() {
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
@@ -175,49 +163,6 @@
             console.log('conquered:' + arrConquered.length);
             
             function update() {
-                for (var ball in arrBalls) {
-                    var velocity_x_changed = velocity_y_changed = false;
-                    
-                    var regions = [];
-                    for (var polygon in arrConquered) {
-                        var rectangles = arrConquered[polygon].getHorizontalRectangles();
-                        
-                        for (var i = 0; i < rectangles.length; i++) {
-                            regions.push(rectangles[i]);
-                        }
-                    }
-                    
-                    for (var polygon in regions) {
-                        var collision = findCollision(arrBalls[ball], regions[polygon]);
-                        if (collision) {
-                            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
-                                //console.log("collision on y axis");
-                                arrBalls[ball].velocity.y *= -1;
-                                velocity_y_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(arrBalls[ball].velocity.y)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(arrBalls[ball].velocity.y) / arrBalls[ball].velocity.y);
-                                    arrBalls[ball].y += velocity;
-                                    arrBalls[ball].x -= arrBalls[ball].velocity.x;
-                                }
-                            }
-                            else if (!velocity_x_changed) {
-                                //console.log("collision on x axis");
-                                
-                                arrBalls[ball].velocity.x *= -1;
-                                velocity_x_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(arrBalls[ball].velocity.x)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(arrBalls[ball].velocity.x) / arrBalls[ball].velocity.x);
-                                    arrBalls[ball].x += velocity;
-                                    arrBalls[ball].y -= arrBalls[ball].velocity.y;
-                                }
-                            }
-                        }
-                    }
-                    arrBalls[ball].update();
-                }
-                
                 for (var ball in arrBalls) {
                     arrBalls[ball].obstacles = arrConquered;
                     arrBalls[ball].update();

@@ -25,6 +25,11 @@ Circle.prototype = {
 		return new Rectangle(this.x - this.radius, this.y - this.radius, this.x + this.radius, this.y + this.radius);
 	},
 
+    offset: function(dx, dy) {
+        this.x += dx;
+        this.y += dy;
+    },
+
     draw: function(ctx, fillStyle) {
         ctx.fillStyle = fillStyle;
         ctx.beginPath();

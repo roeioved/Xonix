@@ -28,7 +28,7 @@ Point.prototype = {
     },
         
     clone: function() {
-        return new Point(this);        
+        return new Point(this);
     },
         
     set: function(a) {
