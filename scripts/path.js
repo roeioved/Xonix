@@ -21,6 +21,7 @@ function Path(a, b) {
 }
 
 Path.prototype = {
+		
     addPoint: function(p) {	
         this.points.push(p);
     },

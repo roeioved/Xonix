@@ -259,13 +259,6 @@ Polygon.prototype = {
         return this.hRectangles;
     },
 
-    getVerticalRectangles:function () {
-        if (!this.vRectangles) {
-            this.vRectangles = [];
-        }
-        return this.vRectangles;
-    },
-
     pointOn:function (p) {
         var pts = this.points;
         var nPts = pts.length;
@@ -533,6 +526,71 @@ Polygon.prototype = {
 
     doesIntersect:function (rectangle) {
         return this.getBox().doesIntersect(rectangle);
+    },
+
+    findIntersection: function (rect) {
+        var other = new Polygon(rect);
+        //polygon.buildEdges();
+
+        var minIntersect = 10000;
+        var minIntersectPerpen = null;
+
+        var edges = this.getVectors();
+
+        for (var edge in edges) {
+            var perpen = edges[edge].getPerpendicular();
+            perpen.normalize();
+
+            var res1 = this.projectPolygon(perpen);
+            var res2 = other.projectPolygon(perpen);
+
+            var intersect = 0;
+
+            /*if (res1.min == res2.max || res2.min == res1.max)
+             {
+             intersect = 0;
+             }*/
+            if (res1.min < res2.min) {
+                intersect = res2.min - res1.max;
+            } else {
+                intersect = res1.min - res2.max;
+            }
+
+            if (intersect > 0)
+            {
+                return null;
+            }
+            else
+            {
+                if (Math.abs(intersect) < Math.abs(minIntersect))
+                {
+                    minIntersect = intersect;
+                    minIntersectPerpen = perpen;
+                }
+            }
+        }
+
+        return { intersect: minIntersect, minIntersectPerpen: minIntersectPerpen };
+    },
+
+    //project a polygon on a given axis and return the min and max scalar values on the axis
+    projectPolygon: function (axis) {
+        var values = this.getDotProduct(axis);
+        var max, min;
+
+        max = min = values[0];
+
+        for (var i = 1; i < values.length; i++) {
+            if (values[i] > max) {
+                max = values[i];
+            }
+
+            else if (values[i] < min) {
+                min = values[i];
+            }
+        }
+
+        return { 'min':min, 'max':max };
     },
 
     draw:function (ctx, fillStyle) {

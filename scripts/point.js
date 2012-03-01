@@ -17,6 +17,10 @@ function Point(a, b) {
 
 Point.prototype = {
     
+    toString: function() {
+        return 'x:' + this.x + ' ' + 'y:' + this.y;
+    },
+
     findAngle: function(other) {
         var radians = self.Math.atan2(other.y - this.y, other.x - this.x);
         var degrees = radians * 180 / self.Math.PI;
@@ -24,7 +28,7 @@ Point.prototype = {
     },
         
     clone: function() {
-        return new Point(this);        
+        return new Point(this);
     },
         
     set: function(a) {
@@ -36,6 +40,11 @@ Point.prototype = {
         return this.x == other.x && this.y == other.y;
     },
     
+    offset: function(dx, dy) {
+        this.x += dx;
+        this.y += dy;
+    },
+
     draw: function(ctx, fillStyle) {
         var radius = 5;
         
@@ -46,20 +55,4 @@ Point.prototype = {
         ctx.fill();
     }
     
-    /*
-    
-    toString: function() {
-        return "{x:" + this.x + ",y:" + this.y + "}";
-    },
-    
-    toHashkey: function() {
-        return this.x + "_" + this.y;
-    },
-
-    offset: function(dx, dy) {
-        this.x += dx;
-        this.y += dy;
-    },
-    
-    */
 }

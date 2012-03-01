@@ -26,105 +26,17 @@
             totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder),
             conquredPixels = 0,
             freePixels = totalPixels - conquredPixels;
-        var numOfBalls = 2,
-            numOfMonsters = 1;
+        var numOfBalls = 5,
+            numOfMonsters = 2;
         var arrFree = [],
             arrConquered = [],
             arrBalls = [],
             arrMonsters = [];
-        var trackSize = 10;
+        var ballSize = 6,
+            monsterSize = 10,
+            trackSize = 20;
         
-        function drawArray(ctx, array, fillStyle) {
-            for (var i=0; i<array.length; i++) {
-                var obj = array[i];
-                obj.draw(ctx, fillStyle);
-            }
-        }
-        function random(min, max) {
-            var val = min + Math.random() * (max - min);
-            return Math.round(val);
-        }
-        
-        function findCollision(ball, polygon) {
-            var intersect = findIntersection(ball, polygon)
-            if (intersect) {
-                 if (polygon.containsPoint(ball.get_center()))
-                 {
-                    return intersect;
-                 }
-            }
-            return null;
-        }
-        
-        function findIntersection(ball, polygon) {
-            //polygon.buildEdges();
-            
-            var minIntersect = 10000;
-            var minIntersectPerpen = null;
-            
-            var edges = polygon.getVectors();
-            
-            for (var edge in edges) {
-                var perpen = edges[edge].getPerpendicular();
-                perpen.normalize();
-                
-                var res1 = projectPolygon(perpen, polygon);
-                var res2 = projectPolygon(perpen, ball.getBoundingRect());
-                
-                var intersect = 0;
-                
-                /*if (res1.min == res2.max || res2.min == res1.max)
-                {
-                    intersect = 0;
-                }*/
-                if (res1.min < res2.min) {
-                    intersect = res2.min - res1.max;
-                } else {
-                    intersect = res1.min - res2.max;
-                }
-                
-                if (intersect > 0)
-                {
-                    return null;
-                }
-                else
-                {
-                    if (Math.abs(intersect) < Math.abs(minIntersect))
-                    {
-                        minIntersect = intersect;
-                        minIntersectPerpen = perpen;
-                    }
-                }
-            }
-            
-            return {intersect: minIntersect, minIntersectPerpen: minIntersectPerpen};
-        }
-        /*
-         Project a polygon on a given axis and return the min and max scalar values on the axis
-         */
-        function projectPolygon(axis, polygon) {
-            var values = polygon.getDotProduct(axis);
-            var max, min;
-            
-            max = min = values[0];
-            
-            for (var i = 1; i < values.length; i++) {
-                if (values[i] > max) {
-                    max = values[i];
-                }
-                
-                else if (values[i] < min) {
-                    min = values[i];
-                }
-            }
-            
-            return {'min':min, 'max':max};
-        }
-        
-        $(document).ready(function() {
-            var canvas = document.getElementById("canvas");  
-            var ctx = canvas.getContext("2d");
-            
+        function initGame() {
             //create start free area
             var free = new Polygon([
                 new Point(frameBorder, frameBorder),
@@ -139,26 +51,43 @@
                 var x = random(frameBorder*2, canvasWidth - frameBorder*2);
                 var y = random(frameBorder*2, canvasHeight - frameBorder*2);
                 var speed = 2;
-                var dirx = random(0, 1) == 0 ? -1 : 1;
-                var diry = random(0, 1) == 0 ? -1 : 1;
+                var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
+                var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
                 var boundary = { top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
-                var ball = new Ball(x, y, 4, "Red", new Vector(speed * dirx, speed * diry), boundary, arrConquered);
+                var ball = new Ball(x, y, ballSize/2, '#00A8A8', 'White', new Vector(velocityX, velocityY), boundary, arrConquered);
                 arrBalls.push(ball);
             }
             
             //create monsters
             for (var i = 0; i < numOfMonsters; i++) {
-                var size = 10;
-                var top = 5;
-                var left = 300;
+                var top = random(canvasHeight - frameBorder, canvasHeight - monsterSize);
+                var left = random(0, canvasWidth - monsterSize);
                 var speed = 2;
-                var dirx = random(0, 1) == 0 ? -1 : 1;
-                var diry = random(0, 1) == 0 ? -1 : 1;
+                var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
+                var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
                 var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
-                var monster = new Monster(top, left, size, size, new Vector(speed * dirx, speed * diry), boundary, arrFree);
+                var monster = new Monster(top, left, monsterSize, monsterSize, '#00A8A8', 'Black', new Vector(velocityX, velocityY), boundary, arrFree);
                 arrMonsters.push(monster);
+            }            
+        }        
+        function drawArray(ctx, array, fillStyle, strokeStyle) {
+            for (var i=0; i<array.length; i++) {
+                var obj = array[i];
+                obj.draw(ctx, fillStyle);
             }
+        }
+        function random(min, max) {
+            var val = min + Math.random() * (max - min);
+            return Math.round(val);
+        }
+        
+        $(document).ready(function() {
+            var canvas = document.getElementById("canvas");  
+            var ctx = canvas.getContext("2d");
             
+            initGame();
+            
+            //create DEBUG track
             var tracks = [];
             var paths = [];
             tracks[0] = new Polygon([   // DOWN
@@ -173,7 +102,7 @@
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
-                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2))
             ]);
             paths[0] = new Path([       // DOWN (INNER)
                 new Point(200 - (trackSize/2), frameBorder),
@@ -181,7 +110,7 @@
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
-                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder)
             ]);
             paths[4] = new Path([       // DOWN (OUTER)
                 new Point(200 + (trackSize/2), frameBorder),
@@ -189,43 +118,21 @@
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
-                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
-            /*
-            paths[1] = new Path([       // UP (INNER)
-                new Point(200, canvasHeight - frameBorder),
-                new Point(200, 200),
-                new Point(400, 200),
-                new Point(400, frameBorder),
-            ]);
-            paths[2] = new Path([       // LEFT
-                new Point(canvasWidth - frameBorder, 240),
-                new Point(200, 240),
-                new Point(200, 160),
-                new Point(frameBorder, 160),
-            ]);
-            paths[3] = new Path([       // RIGHT
-                new Point(frameBorder, 160),
-                new Point(200, 160),
-                new Point(200, 240),
-                new Point(250, 240),
-                new Point(250, canvasHeight - frameBorder)
-            ]);
-            */
-            
             var rnd = random(0, 0);
             var trackPoly = tracks[rnd];
             var innerPath = paths[rnd];
             var outerPath = paths[rnd + 4];
             
+            //split
             var result = [];
-            var firstPoly = free.split(innerPath)[0];
-            var secondPoly = free.split(outerPath)[1];
+            var firstPoly = arrFree[0].split(innerPath)[0];
+            var secondPoly = arrFree[0].split(outerPath)[1];
             result.push(firstPoly);
             result.push(secondPoly);
             
-            arrFree = []; // todo: remove only the polygon that we split
-            
+            arrFree = []; // todo: remove only the polygon that we split            
             for (var i=0; i<result.length; i++) {
                 var poly = result[i];
                 var containsBall = false;
@@ -255,56 +162,11 @@
             console.log('free:' + arrFree.length);
             console.log('conquered:' + arrConquered.length);
             
-            var tmp = [];
-            
             function update() {
-                tmp = [];
-                
                 for (var ball in arrBalls) {
-                    var velocity_x_changed = velocity_y_changed = false;
-                    
-                    var regions = [];
-                    for (var polygon in arrConquered) {
-                        var rectangles = arrConquered[polygon].getHorizontalRectangles();
-                        
-                        for (var i = 0; i < rectangles.length; i++) {
-                            regions.push(rectangles[i]);
-                            tmp.push(rectangles[i]);
-                        }
-                    }
-                    
-                    for (var polygon in regions) {
-                        var collision = findCollision(arrBalls[ball], regions[polygon]);
-                        if (collision) {
-                            if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
-                                //console.log("collision on y axis");
-                                arrBalls[ball].velocity.y *= -1;
-                                velocity_y_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(arrBalls[ball].velocity.y)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(arrBalls[ball].velocity.y) / arrBalls[ball].velocity.y);
-                                    arrBalls[ball].y += velocity;
-                                    arrBalls[ball].x -= arrBalls[ball].velocity.x;
-                                }
-                            }
-                            else if (!velocity_x_changed) {
-                                //console.log("collision on x axis");
-                                
-                                arrBalls[ball].velocity.x *= -1;
-                                velocity_x_changed = true;
-                                
-                                if (Math.abs(collision.intersect) > Math.abs(arrBalls[ball].velocity.x)) {
-                                    var velocity = Math.abs(collision.intersect) * (Math.abs(arrBalls[ball].velocity.x) / arrBalls[ball].velocity.x);
-                                    arrBalls[ball].x += velocity;
-                                    arrBalls[ball].y -= arrBalls[ball].velocity.y;
-                                }
-                            }
-                        }
-                    }
                     arrBalls[ball].obstacles = arrConquered;
                     arrBalls[ball].update();
-                }
-                
+                }                
                 for (var monster in arrMonsters) {
                     arrMonsters[monster].obstacles = arrFree;
                     arrMonsters[monster].update();
@@ -313,14 +175,10 @@
             
             function draw() {
                 drawArray(ctx, arrFree, 'Black');
-                drawArray(ctx, arrConquered, '#00A8A8');
-                drawArray(ctx, tmp, 'Yellow');
-                trackPoly.draw(ctx, 'Green');
+                //drawArray(ctx, arrConquered, '#00A8A8');
+                //trackPoly.draw(ctx, 'Green');
                 drawArray(ctx, arrBalls);
-                
-                for (var monster in arrMonsters) {
-                    arrMonsters[monster].draw(ctx, 'Orange');
-                }
+                drawArray(ctx, arrMonsters);
             }
             
             setInterval(function () {

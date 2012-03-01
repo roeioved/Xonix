@@ -24,24 +24,29 @@ function Rectangle(a, b, c, d) {
 		this.br = new Point();
 	}
 }
+
 Rectangle.prototype = {
     
     toString: function() {
-        return "{tl:" + this.tl + ",br:" + this.br + "}";
+        return 'top-left:' + tl.x + ',' + tl.y + ' ' + 'bottom-right:' + this.br.x + ',' + this.br.y;
     },
     
     clone: function() {
         return new Rectangle(this);
     },
     
-    getTopleft: function() {
+    getTopLeft: function() {
         return new Point(this.tl);
     },
     
-    getBottomright: function() {
+    getBottomRight: function() {
         return new Point(this.br);
     },
         
+    getCenter: function() {
+        return new Point(this.tl.x + this.width()/2, this.tl.y + this.height()/2);
+    },
+
     width: function() {
         return this.br.x - this.tl.x;
     },
@@ -106,6 +111,11 @@ Rectangle.prototype = {
         return this;
     },
     
+    offset: function(dx, dy) {
+        this.tl.offset(dx, dy);
+        this.br.offset(dx, dy);
+    },
+
     draw: function(ctx, fillStyle) {
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
@@ -116,11 +126,6 @@ Rectangle.prototype = {
     
     /*
     
-    offset: function(dx, dy) {
-        this.tl.offset(dx, dy);
-        this.br.offset(dx, dy);
-    },
-
     inflate: function(a) {
         this.tl.x -= a;
         this.tl.y -= a;
