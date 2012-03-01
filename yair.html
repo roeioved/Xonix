@@ -19,40 +19,40 @@
     
     <script>
         function findCollision(ball, polygon) {
-            var intersect = findIntersection(ball, polygon)
+            var intersect = findIntersection(ball.getBoundingRect(), polygon)
             if (intersect) {
-                 if (polygon.containsPoint(ball.get_center()))
-                 {
+                 //if (polygon.containsPoint(ball.get_center()))
+                 //{
                     return intersect;
-                 }
+                 //}
             }
             return null;
         }
         
-        function findIntersection(ball, polygon) {
-            //polygon.buildEdges();
-            
+        function findIntersection(source_pol, target_pol) {
+
             var minIntersect = 10000;
             var minIntersectPerpen = null;
             
-            var edges = polygon.getVectors();
+            var edges = target_pol.getVectors();
             
             for (var edge in edges) {
-                var perpen = edges[edge].getPerpendicular();
+                edge = edges[edge];
+                var perpen = edge.getPerpendicular();
                 perpen.normalize();
                 
-                var res1 = projectPolygon(perpen, polygon);
-                var res2 = projectPolygon(perpen, ball.getBoundingRect());
+                var res1 = projectPolygon(perpen, target_pol);
+                var res2 = projectPolygon(perpen, source_pol);
                 
-                var intersect = 0;
+                var intersect = minIntersect;
                 
-                /*if (res1.min == res2.max || res2.min == res1.max)
+                if (res1.min == res2.max || res2.min == res1.max)
                 {
                     intersect = 0;
-                }*/
-                if (res1.min < res2.min) {
+                }
+                else if (res2.min > res1.min) {
                     intersect = res2.min - res1.max;
-                } else {
+                } else if (res1.min > res2.min) {
                     intersect = res1.min - res2.max;
                 }
                 
@@ -98,23 +98,27 @@
         
         $(document).ready(function () {
             var ctx = $('#canvas')[0].getContext("2d");
-            var FPS = 30;
+            var FPS = 60;
             var keyDir;
             
             var balls = [];
-            balls.push(new Ball(ctx, 200, 20, 3, "red", (Math.PI / 180) * 45, new Vector(1, 1.2), { top: 0, right: 150, bottom: 150, left: 0 }));
-            balls.push(new Ball(ctx, 100, 60, 3, "red", (Math.PI / 180) * 45, new Vector(2, 1.4), { top: 0, right: 150, bottom: 150, left: 0 }));
+            balls.push(new Ball(200, 20, 10, "red", new Vector(1, 1.2), { top: 0, right: 400, bottom: 400, left: 0 }));
+            balls.push(new Ball(20, 20, 10, "red", new Vector(2, 1.4), { top: 0, right: 400, bottom: 400, left: 0 }));
             //balls.push(new Ball(ctx, 80, 30, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
             //balls.push(new Ball(ctx, 20, 10, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
             //balls.push(new Ball(ctx, 83, 50, 5, "red", (Math.PI / 180) * 30, 6, { top:0, right:200, bottom:200, left:0 }));
             
             var polygons = [];
             var pol = new Polygon();
-            pol.addPoint(new Point(0, 0));
-            pol.addPoint(new Point(40, 0));
-            pol.addPoint(new Point(40, 40));
-            pol.addPoint(new Point(0, 40));
-            
+            pol.addPoint(new Point(100, 0));
+            pol.addPoint(new Point(100, 200));
+            pol.addPoint(new Point(200, 200));
+            pol.addPoint(new Point(200, 400));
+            pol.addPoint(new Point(210, 400));
+            pol.addPoint(new Point(210, 190));
+            pol.addPoint(new Point(110, 190));
+            pol.addPoint(new Point(110, 0));
+
             var rectangles = pol.getHorizontalRectangles();
             
             for (var i = 0; i < rectangles.length; i++) {
@@ -131,11 +135,11 @@
             pol.addPoint(new Point(120, 110));
             pol.addPoint(new Point(40, 110));
             
-            rectangles = pol.getHorizontalRectangles();
+            /*rectangles = pol.getHorizontalRectangles();
             
             for (i = 0; i < rectangles.length; i++) {
                 polygons.push(rectangles[i]);
-            }
+            }*/
             
             function update() {
                 //player.update();
@@ -149,7 +153,7 @@
                         var collision = findCollision(balls[ball], polygons[polygon]);
                         if (collision) {                            
                             if (collision.minIntersectPerpen.x == 0 && !velocity_y_changed) {
-                                //console.log("collision on y axis");
+                                console.log("collision on y axis");
                                 balls[ball].velocity.y *= -1;
                                 velocity_y_changed = true;
                                 
@@ -186,7 +190,7 @@
                 }
                 
                 for (var ball in balls) {
-                    balls[ball].draw();
+                    balls[ball].draw(ctx);
                 }
             }
             
@@ -194,7 +198,7 @@
                 ctx.clearRect(0, 0, 800, 800);
                 update();
                 draw();
-            }, 1000 / 50);
+            }, 1000 / FPS);
             
             $(document).keydown(function (e) {
                 if (e.keyCode == 37) {
