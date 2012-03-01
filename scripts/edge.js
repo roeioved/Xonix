@@ -24,5 +24,9 @@ function Edge(a, b, c, d) {
 }
 
 Edge.prototype = {
+
+    toString: function() {
+        return 'from:' + this.p1.x + ',' + this.p1.y + ' ' + 'to:' + this.p2.x + ',' + this.p2.y;
+    },
     
 }

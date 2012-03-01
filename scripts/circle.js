@@ -1,5 +1,5 @@
 /// <reference path="point.js" />
-/// <reference path="polygon.js" />
+/// <reference path="rectangle.js" />
 
 function Circle(x, y, radius) {
 	this.x = x;
@@ -9,6 +9,10 @@ function Circle(x, y, radius) {
 
 Circle.prototype = {
     
+    toString: function() {
+        return 'x:' + this.x + ' ' + 'y:' + this.y + ' ' + 'radius:' + this.radius;
+    },
+	
     clone: function() {
         return new Circle(this.x, this.y, this.radius);        
     },
@@ -16,14 +20,9 @@ Circle.prototype = {
 	getCenter: function() {
 		return new Point(this.x, this.y);
 	},
-
+	
 	getBox: function() {
-		return new Polygon([
-			new Point(this.x - this.radius, this.y - this.radius),
-			new Point(this.x + this.radius, this.y - this.radius),
-			new Point(this.x + this.radius, this.y + this.radius),
-			new Point(this.x - this.radius, this.y + this.radius)
-		]);
+		return new Rectangle(this.x - this.radius, this.y - this.radius, this.x + this.radius, this.y + this.radius);
 	},
 
     draw: function(ctx, fillStyle) {
