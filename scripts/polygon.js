@@ -27,10 +27,10 @@ function Polygon(a) {
 		} else if (a instanceof Array) { // array of points
 			this.points = a;
 		} else if (a instanceof Rectangle) {
-            this.points.push(new Point(a.tl)),
-            this.points.push(new Point(a.br.x, a.tl.y)),
-            this.points.push(new Point(a.br)),
-            this.points.push(new Point(a.tl.x, a.br.y))
+            this.points.push(new Point(a.tl));
+            this.points.push(new Point(a.br.x, a.tl.y));
+            this.points.push(new Point(a.br));
+            this.points.push(new Point(a.tl.x, a.br.y));
         }
 	}
 }
@@ -350,7 +350,7 @@ Polygon.prototype = {
                 p2_y = points[i + 1].y;
             }
             
-            if (p1_y == p2_y) { //taking only orizontal edges        
+            if (p1_y == p2_y) { //taking only horizontal edges
                 var currSlice = null;
                 
                 for (var slice in res) {
