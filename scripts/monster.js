@@ -26,7 +26,7 @@ Monster.prototype = {
         return null;
     },
 
-    update: function () {
+    step: function () {
         var velocity_x_dir_changed = false;
         var velocity_y_dir_changed = false;
         

@@ -22,7 +22,7 @@ Ball.prototype = {
         return null;
     },
     
-    update: function () {
+    step: function () {
         if (this.boundaries) {
             //top boundry
             if (this.y - this.radius <= this.boundaries.top) {

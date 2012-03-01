@@ -1,4 +1,4 @@
-function Player(left, top, size, speed, fillColor, strokeColor, boundary, obstacles) {
+function Player(left, top, size, speed, fillColor, strokeColor, boundary, enemies) {
     this.tl = new Point(left, top);
     this.br = new Point(left + size, top + size);
     this.speed = speed;
@@ -7,16 +7,23 @@ function Player(left, top, size, speed, fillColor, strokeColor, boundary, obstac
     this.strokeColor = strokeColor;
     this.velocity = new Vector(0, 0);
     this.boundary = boundary;
-    this.obstacles = obstacles;
+    this.enemies = enemies;
 }
 
 Player.prototype = {
         
+    init: function () {
+        this.tl = new Point(0, 0);
+        this.br = new Point(this.size, this.size);
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+    },
+    
     getBox: function () {
         return new Rectangle(this.tl, this.br);
     },
-    
-    update: function () {
+        
+    step: function () {
         var velocity_x_dir_changed = false;
         var velocity_y_dir_changed = false;
         
@@ -84,23 +91,16 @@ Player.prototype = {
             }
         }
         
-        for (var idx in this.obstacles) {
+        for (var idx in this.enemies) {
             var me = this.getBox();
-            var other = this.obstacles[idx];
+            var other = this.enemies[idx];
+            
             if (me.doesIntersect(other)) {
-                this.init();
-                this._raiseEvent('test');
+                this._raiseEvent('fail');
             }
         }
     },
-    
-    init: function () {
-        this.tl = new Point(0, 0);
-        this.br = new Point(this.size, this.size);
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-    },
-    
+        
     moveLeft: function () {
         this.velocity.x = -this.speed;
         this.velocity.y = 0;
