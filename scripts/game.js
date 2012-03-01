@@ -1,13 +1,17 @@
-function Game(width, height, frameBorder, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed) {
+function Game(width, height, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed) {
     this.width = width;
     this.height = height;
     this.frameBorder = frameBorder;
+    this.numOfLives = numOfLives;
     this.playerSize = playerSize;
     this.speed = speed;
-    
+        
     this.init();
     this.level = new Level(width, height, frameBorder, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
     
+    this.score = 0;
+    
+    this.mute = true;
     this.audio = [];
     this.audio['fail'] = new Audio('sounds/fail.mp3');
 }
@@ -25,11 +29,17 @@ Game.prototype = {
     
     conquer: function (trackPoly, innerPath, outerPath) {
         var area = this.level.conquer(trackPoly, innerPath, outerPath);
-        this._raiseEvent('conquer', area);
+        this.score += Math.round(area / this.width * this.height / 100);
+        this._raiseEvent('conquer', this.level.getConqueredPct());
+        this._raiseEvent('score', this.score);
     },
     
     fail: function () {
+        this.numOfLives--;
         this._playAudio('fail');
+        this._raiseEvent('fail', this.numOfLives);
+        if (this.numOfLives == 0)
+            this._raiseEvent('gameOver', this.score);
         this.player.init();
     },
     
@@ -39,7 +49,7 @@ Game.prototype = {
     },
     
     _playAudio: function (a) {
-        if (this.audio[a])
+        if (!this.mute && this.audio[a])
             this.audio[a].play();
     },
     

@@ -30,8 +30,9 @@
             numOfMonsters = 1,
             ballSize = 8,
             monsterSize = 9,
-            speed = 2;
+            speed = 4;
         var player,
+            numOfLives = 3,
             playerSize = 9,
             trackSize = 9;
         var game;
@@ -58,9 +59,10 @@
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
-            var game = new Game(canvasWidth, canvasHeight, frameBorder, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
-            //game.addEventListener('conquer', updateConquered, this);
+            var game = new Game(canvasWidth, canvasHeight, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
             game.addEventListener('conquer', updateConquered, this);
+            game.addEventListener('fail', updateLives, this);
+            game.addEventListener('score', updateScore, this);
             
             $(document).keydown(function(event) {
                 switch (event.keyCode) {

@@ -74,6 +74,8 @@ Level.prototype = {
     },
     
     conquer: function (trackPoly, innerPath, outerPath) {
+        var area = 0;
+        
         //todo:split and remove the polygon that we split!!!
         
         //split
@@ -97,17 +99,16 @@ Level.prototype = {
                 this.arrFree.push(poly);
             } else {
                 this.arrConquered.push(poly);
-                size = Math.abs(poly.getArea());
-                this._freePixels -= size;
-                this._conquredPixels += size;
+                area += Math.abs(poly.getArea());
             }
         }
         this.arrConquered.push(trackPoly);
-        size = Math.abs(trackPoly.getArea());
-        this._freePixels -= size;
-        this._conquredPixels += size;
+        area += Math.abs(trackPoly.getArea());
         
-        return this.getConqueredPct();
+        this._freePixels -= area;
+        this._conquredPixels += area;
+        
+        return area;
     },
     
     levelUp: function () {
