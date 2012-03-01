@@ -11,6 +11,10 @@ function Monster(left, top, size, fillColor, strokeColor, velocity, boundary, ob
 
 Monster.prototype = {
     
+    getBox: function () {
+        return new Rectangle(this.tl, this.br);
+    },
+    
     findCollision: function (polygon) {
         var intersect = polygon.findIntersection(this.getBox());
         if (intersect) {
@@ -172,10 +176,6 @@ Monster.prototype = {
                 }
             }
         }
-    },
-
-    getBox: function () {
-        return new Rectangle(this.tl, this.br);
     },
 
     draw: function (ctx) {        

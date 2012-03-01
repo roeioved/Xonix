@@ -1,14 +1,19 @@
-function Player(left, top, size, fillColor, strokeColor, velocity, boundary) {
+function Player(left, top, size, speed, fillColor, strokeColor, boundary) {
     this.tl = new Point(left, top);
     this.br = new Point(left + size, top + size);
+    this.speed = speed;
     this.size = size;
     this.fillColor = fillColor;
     this.strokeColor = strokeColor;
-    this.velocity = velocity;
+    this.velocity = new Vector(0, 0);
     this.boundary = boundary;
 }
 
 Player.prototype = {
+    
+    getBox: function () {
+        return new Rectangle(this.tl, this.br);
+    },
     
     update: function () {
         var velocity_x_dir_changed = false;
@@ -22,7 +27,7 @@ Player.prototype = {
             {
                 if (this.tl.x <= this.boundary.left)
                 {
-                    this.velocity.x *= -1;
+                    this.velocity.x = 0;
                     velocity_x_dir_changed = true;
                     
                     if (this.tl.x < this.boundary.left) {
@@ -37,7 +42,7 @@ Player.prototype = {
             {
                 if (this.br.x >= this.boundary.right)
                 {
-                    this.velocity.x *= -1;
+                    this.velocity.x = 0;
                     velocity_x_dir_changed = true;
                     
                     if (this.br.x > this.boundary.right) {
@@ -52,7 +57,7 @@ Player.prototype = {
             {
                 if (this.tl.y <= this.boundary.top)
                 {
-                    this.velocity.y *= -1;
+                    this.velocity.y = 0;
                     velocity_y_dir_changed = true;
                     
                     if (this.tl.y < this.boundary.top) {
@@ -67,7 +72,7 @@ Player.prototype = {
             {
                 if (this.br.y >= this.boundary.bottom)
                 {
-                    this.velocity.y *= -1;
+                    this.velocity.y = 0;
                     velocity_y_dir_changed = true;
                     
                     if (this.br.y > this.boundary.bottom) {                    
@@ -78,9 +83,32 @@ Player.prototype = {
             }
         }
     },
+    
+    init: function () {
+        this.tl = new Point(0, 0);
+        this.br = new Point(this.size, this.size);
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+    },
+    
+    moveLeft: function () {
+        this.velocity.x = -this.speed;
+        this.velocity.y = 0;
+    },
+    
+    moveUp: function () {
+        this.velocity.x = 0;
+        this.velocity.y = -this.speed;
+    },
+    
+    moveRight: function () {
+        this.velocity.x = this.speed;
+        this.velocity.y = 0;
+    },
 
-    getBox: function () {
-        return new Rectangle(this.tl, this.br);
+    moveDown: function () {
+        this.velocity.x = 0;
+        this.velocity.y = this.speed;
     },
 
     draw: function (ctx) {

@@ -35,7 +35,7 @@
             arrBalls = [],
             arrMonsters = [];
         var playerSize = 9,
-            ballSize = 9,
+            ballSize = 8,
             monsterSize = 9,
             trackSize = 9;
         
@@ -58,11 +58,8 @@
             arrFree.push(free);
             
             //create player
-            var speed = 2;
-            var velocityX = speed * 1;
-            var velocityY = speed * 1;
             var boundary = { top: 0, left: 0, right: canvasWidth, bottom: canvasHeight };
-            player = new Player(0, 0, playerSize, 'White', '#901290', new Vector(velocityX, velocityY), boundary);
+            player = new Player(0, 0, playerSize, 2, 'White', '#901290', boundary);
             
             //create balls
             for (var i = 0; i < numOfBalls; i++) {
@@ -99,12 +96,28 @@
             return Math.round(val);
         }
         
+        $(document).keydown(function(event){
+            switch (event.keyCode) {
+                case 37:
+                    player.moveLeft();
+                    break;
+                case 38:
+                    player.moveUp();
+                    break;
+                case 39:
+                    player.moveRight();
+                    break;
+                case 40:
+                    player.moveDown();
+                    break;
+        }});
+        
         $(document).ready(function() {
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
             initGame();
-            
+                        
             //create DEBUG track
             var tracks = [];
             var paths = [];
@@ -150,7 +163,7 @@
             result.push(firstPoly);
             result.push(secondPoly);
             
-            arrFree = []; // todo: remove only the polygon that we split            
+            arrFree = []; // todo: remove only the polygon that we split
             for (var i=0; i<result.length; i++) {
                 var poly = result[i];
                 var containsBall = false;
