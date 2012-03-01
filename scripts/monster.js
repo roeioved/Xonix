@@ -142,7 +142,7 @@ Monster.prototype = {
         
         var regions = [];
         for (var polygon in this.obstacles) {
-            var rectangles = this.obstacles[polygon].getHorizontalRectangles();
+            var rectangles = this.obstacles[polygon].getRectangles(new Vector(0,1));
             
             for (var i = 0; i < rectangles.length; i++) {
                 regions.push(rectangles[i]);
