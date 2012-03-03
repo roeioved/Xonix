@@ -71,7 +71,13 @@
             var speed = 2;
             var velocityX = speed * (random(0, 1) == 0 ? -1 : 1);
             var velocityY = speed * (random(0, 1) == 0 ? -1 : 1);
-            var boundary = { top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
+
+            var top = frameBorder;
+            var right = canvasWidth - frameBorder;
+            var bottom = canvasHeight - frameBorder;
+            var left = frameBorder;
+            var boundary = new Rectangle(left, top, right, bottom); //{ top: frameBorder, left: frameBorder, right: canvasWidth - frameBorder, bottom: canvasHeight - frameBorder }
+
             var ball = new Ball(x, y, ballSize/2, '#00A8A8', 'White', new Vector(velocityX, velocityY), boundary, arrConquered);
             arrBalls.push(ball);
         }
@@ -118,12 +124,14 @@
         pol.addPoint(new Point(100, 200));
         pol.addPoint(new Point(200, 200));
         pol.addPoint(new Point(200, 400));
-        pol.addPoint(new Point(210, 400));
+        pol.addPoint(new Point(150, 400));
+        pol.addPoint(new Point(150, 500));
+        pol.addPoint(new Point(210, 500));
         pol.addPoint(new Point(210, 190));
         pol.addPoint(new Point(110, 190));
         pol.addPoint(new Point(110, 0));
 
-        var rectangles = pol.getRectangles(new Vector(1,0));
+        var rectangles = pol.getRectangles(new Vector(0,1));
 
         for (var i=0; i<rectangles.length; i++)
         {
@@ -240,7 +248,7 @@
 </head>
 
 <body>
-<canvas id="canvas" width="600" height="400"></canvas>
+<canvas id="canvas" width="600" height="500"></canvas>
 </body>
 
 </html>

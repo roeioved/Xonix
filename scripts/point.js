@@ -1,28 +1,30 @@
 function Point(a, b) {
 	// a=x,b=y
 	if (b!==undefined) {
-		this.x = a;
-		this.y = b;
+		this._x = a;
+		this._y = b;
 	}
-	// a=Point or {x:?,y:?}
+	// a=Point
 	else if (a!==undefined && a) {
-		this.x = a.x;
-		this.y = a.y;
+        if (! a.get_x)
+            debugger;
+		this._x = a.get_x();
+		this._y = a.get_y();
 	}
 	// empty
 	else {
-		this.x = this.y = 0;
+		this._x = this._y = 0;
 	}
 }
 
 Point.prototype = {
     
     toString: function() {
-        return 'x:' + this.x + ' ' + 'y:' + this.y;
+        return 'x:' + this._x + ' ' + 'y:' + this._y;
     },
 
     findAngle: function(other) {
-        var radians = self.Math.atan2(other.y - this.y, other.x - this.x);
+        var radians = self.Math.atan2(other.get_y() - this._y, other.get_x() - this._x);
         var degrees = radians * 180 / self.Math.PI;
         return degrees;
     },
@@ -32,17 +34,17 @@ Point.prototype = {
     },
         
     set: function(a) {
-        this.x = a.x;
-    	this.y = a.y;
+        this._x = a.get_x();
+    	this._y = a.get_y();
     },
     
     compare: function(other) {
-        return this.x == other.x && this.y == other.y;
+        return this._x == other.get_x() && this._y == other.get_y();
     },
     
     offset: function(dx, dy) {
-        this.x += dx;
-        this.y += dy;
+        this._x += dx;
+        this._y += dy;
     },
 
     draw: function(ctx, fillStyle) {
@@ -50,9 +52,25 @@ Point.prototype = {
         
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, radius, 0, self.Math.PI*2, true);
+        ctx.arc(this._x, this._y, radius, 0, self.Math.PI*2, true);
         ctx.closePath();
         ctx.fill();
+    },
+
+    get_x: function() {
+        return this._x;
+    },
+
+    set_x: function(x) {
+      this._x = x;
+    },
+
+    get_y: function() {
+        return this._y;
+    },
+
+    set_y: function(y) {
+        this._y = y;
     }
     
 }

@@ -2,40 +2,40 @@
 /// <reference path="rectangle.js" />
 
 function Circle(x, y, radius) {
-	this.x = x;
-	this.y = y;
-    this.radius = radius;
+	this._x = x;
+	this._y = y;
+    this._radius = radius;
 }
 
 Circle.prototype = {
     
     toString: function() {
-        return 'x:' + this.x + ' ' + 'y:' + this.y + ' ' + 'radius:' + this.radius;
+        return 'x:' + this._x + ' ' + 'y:' + this._y + ' ' + 'radius:' + this._radius;
     },
 	
     clone: function() {
-        return new Circle(this.x, this.y, this.radius);        
+        return new Circle(this._x, this._y, this._radius);
     },
         
-	getCenter: function() {
-		return new Point(this.x, this.y);
+	get_center: function() {
+		return new Point(this._x, this._y);
 	},
 	
-	getBox: function() {
-		return new Rectangle(this.x - this.radius, this.y - this.radius, this.x + this.radius, this.y + this.radius);
+	get_box: function() {
+		return new Rectangle(this._x - this._radius, this._y - this._radius, this._x + this._radius, this._y + this._radius);
 	},
 
     offset: function(dx, dy) {
-        this.x += dx;
-        this.y += dy;
+        this._x += dx;
+        this._y += dy;
     },
 
     draw: function(ctx, fillStyle) {
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, self.Math.PI*2, true);
+        ctx.arc(this._x, this._y, this._radius, 0, self.Math.PI*2, true);
         ctx.closePath();
         ctx.fill();
     }
     
-}
+};
