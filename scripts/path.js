@@ -2,20 +2,21 @@
 /// <reference path="edge.js" />
 
 function Path(a, b) {
-	this.points = [];
+	this._points = [];
+
 	if (b!==undefined) {
-		this.points.push(new Point(a));
-		this.points.push(new Point(b));
+		this._points.push(new Point(a));
+		this._points.push(new Point(b));
 	} else if (a) {
 		if (a instanceof Path) {
-			var pts = a.pts;
+			var pts = a.get_points();
 			var nPts = pts.length;
 			for (var iPt=0; iPt<nPts; nPts++) {
-				this.points.push(new Point(pts[iPt]));
+				this._points.push(new Point(pts[iPt]));
 			}
 		}
 		else if (a instanceof Array) {
-			this.points = a;
+			this._points = a;
 		}
 	}
 }
@@ -23,7 +24,7 @@ function Path(a, b) {
 Path.prototype = {
 		
     addPoint: function(p) {	
-        this.points.push(p);
+        this._points.push(p);
     },
     
     addPoints: function(pts) {
@@ -37,38 +38,38 @@ Path.prototype = {
     },
     
     containsPoint: function(p) {
-        var pts = this.points;
+        var pts = this._points;
         var nPts = pts.length;
         for (var i=0; i<nPts; i++) {
             var pt = pts[i];
-            if (p.x == pt.x && p.y == pt.y)
+            if (p.get_x() == pt.get_x() && p.get_y() == pt.get_y())
                 return true;
         }
         return false;
     },
     
-    getPoints: function() {
-        return this.points;
+    get_points: function() {
+        return this._points;
     },
     
     // 0=Up 1=Right 2=Down 3=Left
-    getDirection: function() {
+    get_direction: function() {
         var direction = '?';
-        var pts = this.points;
+        var pts = this._points;
         var nPts = pts.length;	
         if (nPts>1) {
             var ptA = pts[0];
             var ptB = pts[1];
             
-            if (ptA.x == ptB.x) {
-                if (ptA.y > ptB.y)
+            if (ptA.get_x() == ptB.get_x()) {
+                if (ptA.get_y() > ptB.get_y())
                     direction = 'U'; // UP
-                else if (ptA.y < ptB.y)
+                else if (ptA.get_y() < ptB.get_y())
                     direction = 'D'; // DOWN
-            } else if (ptA.y == ptB.y) {
-                if (ptA.x < ptB.x)
+            } else if (ptA.get_y() == ptB.get_y()) {
+                if (ptA.get_x() < ptB.get_x())
                     direction = 'R'; // RIGHT
-                else if (ptA.x > ptB.x)
+                else if (ptA.get_x() > ptB.get_x())
                     direction = 'L'; // LEFT		
             }
         }
@@ -80,15 +81,15 @@ Path.prototype = {
         
         ctx.strokeStyle = strokeStyle;	
         
-        pts = this.points;
+        pts = this._points;
         nPts = pts.length;
         if (nPts > 1) {
             pt = pts[0];
             ctx.beginPath();
-            ctx.moveTo(pt.x, pt.y);        
+            ctx.moveTo(pt.get_x(), pt.get_y());        
             for (var i=1; i<nPts; i++) {
                 pt = pts[i];
-                ctx.lineTo(pt.x, pt.y);
+                ctx.lineTo(pt.get_x(), pt.get_y());
                 ctx.stroke();
             }
         }
@@ -99,12 +100,12 @@ Path.prototype = {
         
         // draw points
         ctx.fillStyle = fillStyle;
-        pts = this.points;
+        pts = this._points;
         nPts = pts.length;
         for (var i=0; i<nPts; i++) {
             pt = pts[i];
             ctx.beginPath();
-            ctx.arc(pt.x, pt.y, radius, 0, self.Math.PI*2, true);
+            ctx.arc(pt.get_x(), pt.get_y(), radius, 0, self.Math.PI*2, true);
             ctx.closePath();
             ctx.fill();
         }
@@ -112,7 +113,7 @@ Path.prototype = {
     
     getEdges: function(p) {
         var edges = [];
-        var pts = this.points;
+        var pts = this._points;
         var nPts = pts.length;
         if (nPts > 1) {
             for (var i=1; i<nPts; i++) {

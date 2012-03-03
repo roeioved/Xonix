@@ -8,6 +8,7 @@
     
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
+    <script type="text/javascript" src="scripts/movable.js"></script>
     <script type="text/javascript" src="scripts/point.js"></script>
     <script type="text/javascript" src="scripts/edge.js"></script>
     <script type="text/javascript" src="scripts/path.js"></script>
@@ -26,7 +27,7 @@
         var canvasWidth = 550,
             canvasHeight = 360,
             frameBorder = 18,
-            numOfBalls = 2,
+            numOfBalls = 10,
             numOfMonsters = 1,
             ballSize = 8,
             monsterSize = 9,
@@ -67,16 +68,16 @@
             $(document).keydown(function(event) {
                 switch (event.keyCode) {
                     case 37:
-                        game.player.moveLeft();
+                        game.get_player().moveLeft();
                         break;
                     case 38:
-                        game.player.moveUp();
+                        game.get_player().moveUp();
                         break;
                     case 39:
-                        game.player.moveRight();
+                        game.get_player().moveRight();
                         break;
                     case 40:
-                        game.player.moveDown();
+                        game.get_player().moveDown();
                         break;
             }});
             
@@ -93,7 +94,7 @@
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
-                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2))
             ]);
             var innerPath = new Path([
                 new Point(200 - (trackSize/2), frameBorder),
@@ -101,7 +102,7 @@
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
-                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder)
             ]);
             var outerPath = new Path([
                 new Point(200 + (trackSize/2), frameBorder),
@@ -109,7 +110,7 @@
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
-                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
             game.conquer(trackPoly, innerPath, outerPath);
             

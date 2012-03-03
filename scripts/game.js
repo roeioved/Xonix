@@ -1,68 +1,75 @@
 function Game(width, height, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed) {
-    this.width = width;
-    this.height = height;
-    this.frameBorder = frameBorder;
-    this.numOfLives = numOfLives;
-    this.playerSize = playerSize;
-    this.speed = speed;
-        
+    this._width = width;
+    this._height = height;
+    this._frameBorder = frameBorder;
+    this._numOfLives = numOfLives;
+    this._playerSize = playerSize;
+    this._speed = speed;
+    this._player = null;
+    
     this.init();
-    this.level = new Level(width, height, frameBorder, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
+    this._level = new Level(width, height, frameBorder, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
     
-    this.score = 0;
+    this._score = 0;
     
-    this.mute = true;
-    this.audio = [];
-    this.audio['fail'] = new Audio('sounds/fail.mp3');
+    this._mute = true;
+    this._audio = [];
+    this._audio['fail'] = new Audio('sounds/fail.mp3');
+    this._outerBoundary = null;
+    this._innerBoundary = null;
 }
 
 Game.prototype = {
     
     init: function () {
-        this.outerBoundary = { top: 0, left: 0, right: this.width, bottom: this.height };
-        this.innerBoundary = { top: this.frameBorder, left: this.frameBorder, right: this.width - this.frameBorder, bottom: this.height - this.frameBorder }
+        this._outerBoundary = new Rectangle(0, 0, this._width, this._height);// { top: 0, left: 0, right: this._width, bottom: this._height };
+        this._innerBoundary = new Rectangle(this._frameBorder, this._frameBorder, this._width - this._frameBorder, this._height - this._frameBorder); //{ top: this._frameBorder, left: this._frameBorder, right: this._width - this._frameBorder, bottom: this._height - this._frameBorder }
         
         //create player
-        this.player = new Player(this.width / 2 - this.playerSize / 2, 0, this.playerSize, this.speed, 'White', '#901290', this.outerBoundary);
-        this.player.addEventListener('fail', this.fail, this );
+        this._player = new Player(this._width / 2 - this._playerSize / 2, 0, this._playerSize, this._speed, 'White', '#901290', this._outerBoundary);
+        this._player.addEventListener('fail', this.onFail, this );
     },
     
     conquer: function (trackPoly, innerPath, outerPath) {
-        var area = this.level.conquer(trackPoly, innerPath, outerPath);
-        this.score += Math.round(area / this.width * this.height / 100);
-        this._raiseEvent('conquer', this.level.getConqueredPct());
-        this._raiseEvent('score', this.score);
+        var area = this._level.conquer(trackPoly, innerPath, outerPath);
+        this._score += Math.round(area / this._width * this._height / 100);
+        this._raiseEvent('conquer', this._level.get_conqueredPct());
+        this._raiseEvent('score', this._score);
     },
-    
-    fail: function () {
-        this.numOfLives--;
+
+    onFail: function () {
+        this._numOfLives--;
         this._playAudio('fail');
-        this._raiseEvent('fail', this.numOfLives);
-        if (this.numOfLives == 0)
-            this._raiseEvent('gameOver', this.score);
-        this.player.init();
+        this._raiseEvent('fail', this._numOfLives);
+        if (this._numOfLives == 0)
+            this._raiseEvent('gameOver', this._score);
+        this._player.init();
     },
     
     levelUp: function () {
-        this.level.levelUp();
-        this.player.init();
+        this._level.levelUp();
+        this._player.init();
     },
     
     _playAudio: function (a) {
-        if (!this.mute && this.audio[a])
-            this.audio[a].play();
+        if (!this._mute && this._audio[a])
+            this._audio[a].play();
     },
     
     step: function () {
-        this.level.step();
+        this._level.step();
         
-        this.player.enemies = this.level.getEnemies();
-        this.player.step();
+        this._player.set_enemies(this._level.get_enemies());
+        this._player.step();
+    },
+
+    get_player: function() {
+      return this._player;
     },
     
     draw: function (ctx) {
-        this.level.draw(ctx);
-        this.player.draw(ctx);
+        this._level.draw(ctx);
+        this._player.draw(ctx);
     }
     
 };

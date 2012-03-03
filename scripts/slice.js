@@ -2,9 +2,9 @@
 
 
 function Slice(orientation, value) {
-    this.orientation = orientation;
-    this.value = value;
-    this.edges = [];
+    this._orientation = orientation;
+    this._value = value;
+    this._edges = [];
 }
 
 Slice.prototype = {
@@ -13,43 +13,43 @@ Slice.prototype = {
         var i = 0;
         var edge = new Edge(p1, p2);
 
-        while (this.edges[i]) {
-            if (this.orientation.y) // horizontal
+        while (this._edges[i]) {
+            if (this._orientation.get_y()) // horizontal
             {
-                if (p1.x < this.edges[i].p1.x) {
-                    this.edges.splice(i, 0, edge);
+                if (p1.get_x() < this._edges[i].get_p1().get_x()) {
+                    this._edges.splice(i, 0, edge);
                     break;
                 }
             }
             else //vertical
             {
-                if (p1.y < this.edges[i].p1.y) {
-                    this.edges.splice(i, 0, edge);
+                if (p1.get_y() < this._edges[i].get_p1().get_y()) {
+                    this._edges.splice(i, 0, edge);
                     break;
                 }
             }
             i++;
         }
 
-        if (i >= this.edges.length) {
-            this.edges.push(edge);
+        if (i >= this._edges.length) {
+            this._edges.push(edge);
         }
     },
 
     removeEdge:function (p1, p2) {
-        for (var i = 0; i < this.edges.length; i++) {
+        for (var i = 0; i < this._edges.length; i++) {
 
-            if (this.edges[i].p1.x == p1.x && this.edges[i].p1.y == p1.y && this.edges[i].p2.x == p2.x && this.edges[i].p2.y == p2.y) {
-                this.edges.splice(i, 1);
+            if (this._edges[i].get_p1().get_x() == p1.get_x() && this._edges[i].get_p1().get_y() == p1.get_y() && this._edges[i].get_p2().get_x() == p2.get_x() && this._edges[i].get_p2().get_y() == p2.get_y()) {
+                this._edges.splice(i, 1);
             }
 
         }
     },
 
     markEdge:function (p1, p2) {
-        for (var i = 0; i < this.edges.length; i++) {
-            if (this.edges[i].p1.x == p1.x && this.edges[i].p1.y == p1.y && this.edges[i].p2.x == p2.x && this.edges[i].p2.y == p2.y) {
-                this.edges[i].isMarked = true;
+        for (var i = 0; i < this._edges.length; i++) {
+            if (this._edges[i].get_p1().get_x() == p1.get_x() && this._edges[i].get_p1().y == p1.y && this._edges[i].get_p2().get_x() == p2.get_x() && this._edges[i].get_p2().y == p2.y) {
+                this._edges[i].isMarked = true;
             }
         }
     },
@@ -57,9 +57,9 @@ Slice.prototype = {
     getUnmarkedEdges:function () {
         var res = [];
 
-        for (var i = 0; i < this.edges.length; i++) {
-            if (!this.edges[i].isMarked) {
-                res.push(this.edges[i]);
+        for (var i = 0; i < this._edges.length; i++) {
+            if (!this._edges[i].isMarked) {
+                res.push(this._edges[i]);
             }
         }
 
@@ -67,9 +67,9 @@ Slice.prototype = {
     },
 
     findEdge:function (edge) {
-        for (var i = 0; i < this.edges.length; i++) {
-            if (this.edges[i].p1.x == edge.p1.x && this.edges[i].p1.y == edge.p1.y && this.edges[i].p2.x == edge.p2.x && this.edges[i].p2.y == edge.p2.y) {
-                return this.edges[i];
+        for (var i = 0; i < this._edges.length; i++) {
+            if (this._edges[i].get_p1().get_x() == edge.get_p1().get_x() && this._edges[i].get_p1().y == edge.get_p1().y && this._edges[i].get_p2().get_x() == edge.get_p2().get_x() && this._edges[i].get_p2().y == edge.get_p2().y) {
+                return this._edges[i];
             }
         }
 
@@ -77,57 +77,57 @@ Slice.prototype = {
     },
 
     update:function (edge) {
-        for (var i = 0; i < this.edges.length; i++) {
-            if (this.orientation.y) { //horizontal
-                if (this.edges[i].p1.x <= edge.p1.x && this.edges[i].p2.x >= edge.p2.x) {
+        for (var i = 0; i < this._edges.length; i++) {
+            if (this._orientation.get_x()) { //horizontal
+                if (this._edges[i].get_p1().get_x() <= edge.get_p1().get_x() && this._edges[i].get_p2().get_x() >= edge.get_p2().get_x()) {
                     //our edge contains the new edge
                     var edges = [];
 
-                    if (this.edges[i].p1.x < edge.p1.x) {
-                        edges.push(new Edge(this.edges[i].p1.x, this.value, edge.p1.x, this.value));
+                    if (this._edges[i].get_p1().get_x() < edge.get_p1().get_x()) {
+                        edges.push(new Edge(this._edges[i].get_p1().get_x(), this._value, edge.get_p1().get_x(), this._value));
                     }
 
-                    if (edge.p2.x <= this.edges[i].p2.x) {
-                        edges.push(new Edge(edge.p1.x, this.value, edge.p2.x, this.value));
+                    if (edge.get_p2().get_x() <= this._edges[i].get_p2().get_x()) {
+                        edges.push(new Edge(edge.get_p1().get_x(), this._value, edge.get_p2().get_x(), this._value));
                     }
 
-                    if (edge.p2.x < this.edges[i].p2.x) {
-                        edges.push(new Edge(edge.p2.x, this.value, this.edges[i].p2.x, this.value));
+                    if (edge.get_p2().get_x() < this._edges[i].get_p2().get_x()) {
+                        edges.push(new Edge(edge.get_p2().get_x(), this._value, this._edges[i].get_p2().get_x(), this._value));
                     }
 
                     if (edges.length > 0) {
-                        this.removeEdge(this.edges[i].p1, this.edges[i].p2);
+                        this.removeEdge(this._edges[i].get_p1(), this._edges[i].get_p2());
 
                         for (var j = 0; j < edges.length; j++) {
-                            this.addEdge(edges[j].p1, edges[j].p2);
+                            this.addEdge(edges[j].get_p1(), edges[j].get_p2());
                         }
 
                         break;
                     }
                 }
             }
-            else if (this.orientation.x) { //vertical
-                if (this.edges[i].p1.y <= edge.p1.y && this.edges[i].p2.y >= edge.p2.y) {
+            else if (this._orientation.y) { //vertical
+                if (this._edges[i].get_p1().y <= edge.get_p1().y && this._edges[i].get_p2().y >= edge.get_p2().y) {
                     //our edge contains the new edge
                     var edges = [];
 
-                    if (this.edges[i].p1.y < edge.p1.y) {
-                        edges.push(new Edge(this.value, this.edges[i].p1.y, this.value, edge.p1.y));
+                    if (this._edges[i].get_p1().y < edge.get_p1().y) {
+                        edges.push(new Edge(this._value, this._edges[i].get_p1().y, this._value, edge.get_p1().y));
                     }
 
-                    if (edge.p2.y <= this.edges[i].p2.y) {
-                        edges.push(new Edge(this.value, edge.p1.y, this.value, edge.p2.y));
+                    if (edge.get_p2().y <= this._edges[i].get_p2().y) {
+                        edges.push(new Edge(this._value, edge.get_p1().y, this._value, edge.get_p2().y));
                     }
 
-                    if (edge.p2.y < this.edges[i].p2.y) {
-                        edges.push(new Edge(this.value, edge.p2.y, this.value, this.edges[i].p2.y));
+                    if (edge.get_p2().y < this._edges[i].get_p2().y) {
+                        edges.push(new Edge(this._value, edge.get_p2().y, this._value, this._edges[i].get_p2().y));
                     }
 
                     if (edges.length > 0) {
-                        this.removeEdge(this.edges[i].p1, this.edges[i].p2);
+                        this.removeEdge(this._edges[i].get_p1(), this._edges[i].get_p2());
 
                         for (var j = 0; j < edges.length; j++) {
-                            this.addEdge(edges[j].p1, edges[j].p2);
+                            this.addEdge(edges[j].get_p1(), edges[j].get_p2());
                         }
 
                         break;
@@ -135,5 +135,13 @@ Slice.prototype = {
                 }
             }
         }
+    },
+
+    get_value: function() {
+        return this._value;
+    },
+
+    get_orientation: function() {
+        return this._orientation;
     }
 };

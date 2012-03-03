@@ -1,125 +1,156 @@
 /// <reference path="point.js" />
 
 function Rectangle(a, b, c, d) {
-	// a=x1,b=y1,c=x2,d=y2
+
+    this._tl, this._br;
+
+	// a=top_left_x1, b=top_left_y1, c=bottom_right_x1, d=bottom_right_y1
 	if (d!==undefined) {
-		this.tl = new Point(a, b);
-		this.br = new Point(c, d);
+		this._tl = new Point(a, b);
+		this._br = new Point(c, d);
 	}
 	// a=Point, b=Point
 	else if (b!==undefined) {
 		var mn = Math.min;
 		var mx = Math.max;
-		this.tl = new Point(mn(a.x, b.x), mn(a.y, b.y));
-		this.br = new Point(mx(a.x, b.x), mx(a.y, b.y));
+		this._tl = new Point(mn(a.get_x(), b.get_x()), mn(a.get_y(), b.get_y()));
+		this._br = new Point(mx(a.get_x(), b.get_x()), mx(a.get_y(), b.get_y()));
 	}
 	// a=Rectangle
 	else if (a) {
-		this.tl = new Point(a.tl);
-		this.br = new Point(a.br);
+		this._tl = new Point(a.get_topLeft());
+		this._br = new Point(a.get_bottomRight());
 	}
 	// empty
 	else {
-		this.tl = new Point();
-		this.br = new Point();
+		this._tl = new Point();
+		this._br = new Point();
 	}
 }
 
 Rectangle.prototype = {
     
-    toString: function() {
-        return 'top-left:' + tl.x + ',' + tl.y + ' ' + 'bottom-right:' + this.br.x + ',' + this.br.y;
-    },
+    /*toString: function() {
+        return 'top-left:' + this._tl.get_x() + ',' + this._tl.get_y() + ' ' + 'bottom-right:' + this._br.get_x() + ',' + this._br.get_y();
+    },*/
     
     clone: function() {
         return new Rectangle(this);
     },
     
-    getTopLeft: function() {
-        return new Point(this.tl);
-    },
-    
-    getBottomRight: function() {
-        return new Point(this.br);
-    },
-        
-    getCenter: function() {
-        return new Point(this.tl.x + this.width()/2, this.tl.y + this.height()/2);
+    get_topLeft: function() {
+        return this._tl;
     },
 
-    width: function() {
-        return this.br.x - this.tl.x;
+    get_left: function() {
+      return this._tl.get_x();
+    },
+
+    get_top: function() {
+        return this._tl.get_y();
+    },
+
+    get_bottom: function() {
+        return this._br.get_y();
+    },
+
+    get_right: function() {
+        return this._br.get_x();
+    },
+
+    get_bottomRight: function() {
+        return this._br;
+    },
+
+    get_center: function() {
+        return new Point(this._tl.get_x() + this.get_width()/2, this._tl.get_y() + this.get_height()/2);
+    },
+
+    get_width: function() {
+        return this._br.get_x() - this._tl.get_x();
     },
     
-    height: function() {
-        return this.br.y - this.tl.y;
+    get_height: function() {
+        return this._br.get_y() - this._tl.get_y();
+    },
+
+    get_box: function () {
+        return new Rectangle(this._tl, this._br);
     },
         
     set: function(a) {
         // array of Points
         var mx = self.Math.max;
         var mn = self.Math.min;
-        this.tl.x = this.br.x = a[0].x;
-        this.tl.y = this.br.y = a[0].y;
+        this._br.set_x(a[0].get_x());
+        this._tl.set_x(a[0].get_x());
+        this._tl.set_y(a[0].get_y());
+        this._br.set_y(a[0].get_y());
         for (var i=1; i<a.length; i++ ) {
             var p = a[i];
-            this.tl.x = mn(this.tl.x,p.x);
-            this.tl.y = mn(this.tl.y,p.y);
-            this.br.x = mx(this.br.x,p.x);
-            this.br.y = mx(this.br.y,p.y);
+            this._tl.set_x(mn(this._tl.get_x(),p.get_x()));
+            this._tl.set_y(mn(this._tl.get_y(),p.get_y()));
+            this._br.set_x(mx(this._br.get_x(),p.get_x()));
+            this._br.set_y(mx(this._br.get_y(),p.get_y()));
         }
     },
     
     pointIn: function(p) {
-        return p.x > this.tl.x && p.x < this.br.x && p.y > this.tl.y && p.y < this.br.y;
+        return p.get_x() > this._tl.get_x() && p.get_x() < this._br.get_x() && p.get_y() > this._tl.get_y() && p.get_y() < this._br.get_y();
     },
     
     doesIntersect: function(other) {
         var mn = self.Math.min;
         var mx = self.Math.max;
-        return (mn(other.br.x,this.br.x)-mx(other.tl.x,this.tl.x)) > 0 && (mn(other.br.y,this.br.y)-mx(other.tl.y,this.tl.y)) > 0;
+        var tl = other.get_topLeft();
+        var br = other.get_bottomRight();
+        return ( mn( br.get_x(), this._br.get_x() ) - mx( tl.get_x(), this._tl.get_x() ) ) > 0 && ( mn( br.get_y(), this._br.get_y() ) - mx( tl.get_y(), this._tl.get_y() ) ) > 0;
     },
         
     isEmpty: function() {
-        return this.width() <= 0 || this.height() <= 0;
+        return this.get_width() <= 0 || this.get_height() <= 0;
     },
     
     unionPoint: function(p) {
         var mn = Math.min;
         var mx = Math.max;
-        this.tl.x = mn(this.tl.x, p.x);
-        this.tl.y = mn(this.tl.y, p.y);
-        this.br.x = mx(this.br.x, p.x);
-        this.br.y = mx(this.br.y, p.y);
+        this._tl.set_x(mn(this._tl.get_x(), p.get_x()));
+        this._tl.set_y(mn(this._tl.get_y(), p.get_y()));
+        this._br.set_x(mx(this._br.get_x(), p.get_x()));
+        this._br.set_y(mx(this._br.get_y(), p.get_y()));
     },
     
     union: function(other) {
         // this rectangle is empty
         if (this.isEmpty()) {
-            this.tl = new Point(other.tl);
-            this.br = new Point(other.br);
+            this._tl = other.get_topLeft();
+            this._br = other.get_bottomRight();
         }
         // union only if other rectangle is not empty
         else if (!other.isEmpty()) {
             var mn = self.Math.min;
             var mx = self.Math.max;
-            this.tl.x = mn(this.tl.x, other.tl.x);
-            this.tl.y = mn(this.tl.y, other.tl.y);
-            this.br.x = mx(this.br.x, other.br.x);
-            this.br.y = mx(this.br.y, other.br.y);
+
+            var tl = other.get_topLeft();
+            var br = other.get_bottomRight();
+
+            this._tl.set_x(mn(this._tl.get_x(), tl.get_x()));
+            this._tl.set_y(mn(this._tl.get_y(), tl.get_y()));
+            this._br.set_x(mx(this._br.get_x(), br.get_x()));
+            this._br.set_y(mx(this._br.get_y(), br.get_y()));
         }
         return this;
     },
     
     offset: function(dx, dy) {
-        this.tl.offset(dx, dy);
-        this.br.offset(dx, dy);
+        this._tl.offset(dx, dy);
+        this._br.offset(dx, dy);
     },
 
     draw: function(ctx, fillStyle) {
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.rect(this.tl.x, this.tl.y, this.width(), this.height());
+        ctx.rect(this._tl.get_x(), this._tl.get_y(), this.get_width(), this.get_height());
         ctx.fill();
         ctx.closePath();
     }
