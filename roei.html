@@ -1,83 +1,88 @@
-<!--
-xonix: http://www.youtube.com/watch?v=POhMfAFZ_6c
-java game: http://www.searchamateur.com/Play-Free-Online-Games/Java-Xonix-On-Line.htm
-
-polygons collision script/demo: http://www.amphibian.com/blogstuff/collision.html
-
-calc area and centroid: http://paulbourke.net/geometry/polyarea/
-point in a polygon: http://stackoverflow.com/questions/217578/point-in-polygon-aka-hit-test
-sort points clockwise: http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
-sort polygon points: http://stackoverflow.com/questions/7369710/sorting-polygons-points
-merge adjacent rectangles into polygon: http://stackoverflow.com/questions/643995/algorithm-to-merge-adjacent-rectangles-into-polygon
-
-multiple class inheritance: http://www.bennadel.com/blog/2039-Experimenting-With-Multiple-Class-Inheritance-In-Javascript.htm
--->
-
 <html>
 
 <head>
-    <title>Roei</title>
+    <title>HTML5 XoniX</title>
     
     <style>
-        #canvas { background:#00A8A8; }
+        #canvas { background: #00A8A8; }
     </style>
     
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/event_handler.js"></script>
     <script type="text/javascript" src="scripts/point.js"></script>
     <script type="text/javascript" src="scripts/edge.js"></script>
     <script type="text/javascript" src="scripts/path.js"></script>
     <script type="text/javascript" src="scripts/vector.js"></script>
     <script type="text/javascript" src="scripts/slice.js"></script>
-    <script type="text/javascript" src="scripts/rectangle.js"></script>    
-    <script type="text/javascript" src="scripts/polygon.js"></script>    
+    <script type="text/javascript" src="scripts/circle.js"></script>
+    <script type="text/javascript" src="scripts/rectangle.js"></script>
+    <script type="text/javascript" src="scripts/polygon.js"></script>
     <script type="text/javascript" src="scripts/ball.js"></script>
-    <!-- Whats up Roei Oved-->
+    <script type="text/javascript" src="scripts/monster.js"></script>
+    <script type="text/javascript" src="scripts/player.js"></script>
+    <script type="text/javascript" src="scripts/level.js"></script>
+    <script type="text/javascript" src="scripts/game.js"></script>
+    
     <script>
-        var canvasWidth = 600,
-            canvasHeight = 400,
+        var canvasWidth = 768,
+            canvasHeight = 460,
             frameBorder = 20,
-            totalPixels = (canvasWidth - frameBorder) * (canvasHeight - frameBorder),
-            conquredPixels = 0,
-            freePixels = totalPixels - conquredPixels;
-        var numOfBalls = 2;
-        var arrFree = [],
-            arrConquered = [],
-            arrBalls = [];
-        var trackSize = 10;
+            numOfBalls = 2,
+            numOfMonsters = 1,
+            ballSize = 9,
+            monsterSize = 10,
+            speed = 4;
+        var player,
+            numOfLives = 3,
+            playerSize = 10,
+            trackSize = 10;
+        var game;
         
-        function drawArray(ctx, array, fillStyle) {
-            for (var i=0; i<array.length; i++) {
-                var poly = array[i];
-                poly.draw(ctx, fillStyle);
-            }
-        }
         function random(min, max) {
             var val = min + Math.random() * (max - min);
             return Math.round(val);
         }
-
+        
+        function updateScore(value) {
+            $('#score').html(value);
+        }
+        function updateLives(value) {
+            $('#lives').html(value);
+        }
+        function updateConquered(value) {
+            $('#conqured').html(value);
+        }
+        function updateTimer(value) {
+            $('#timer').html(value);
+        }
+        
         $(document).ready(function() {
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
-            for (var i = 0; i < numOfBalls; i++) {
-                arrBalls.push(new Point(
-                    random(frameBorder*2, canvasWidth - frameBorder*2),
-                    random(frameBorder*2, canvasHeight - frameBorder*2)
-                ));
-            }
+            var game = new Game(canvasWidth, canvasHeight, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
+            game.addEventListener('conquer', updateConquered, this);
+            game.addEventListener('fail', updateLives, this);
+            game.addEventListener('score', updateScore, this);
             
-            var free = new Polygon([
-                new Point(frameBorder, frameBorder),
-                new Point(canvasWidth - frameBorder, frameBorder),
-                new Point(canvasWidth - frameBorder, canvasHeight - frameBorder),
-                new Point(frameBorder, canvasHeight - frameBorder)
-            ]);
-            arrFree.push(free);
+            $(document).keydown(function(event) {
+                switch (event.keyCode) {
+                    case 37:
+                        game.player.moveLeft();
+                        break;
+                    case 38:
+                        game.player.moveUp();
+                        break;
+                    case 39:
+                        game.player.moveRight();
+                        break;
+                    case 40:
+                        game.player.moveDown();
+                        break;
+            }});
             
-            var tracks = [];
-            var paths = [];
-            tracks[0] = new Polygon([   // DOWN
+            //create DEBUG track
+            var trackPoly = new Polygon([
                 new Point(200 - (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), 100 - (trackSize/2)),
@@ -89,96 +94,48 @@ multiple class inheritance: http://www.bennadel.com/blog/2039-Experimenting-With
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
-                new Point(200 - (trackSize/2), 100 + (trackSize/2))
+                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
             ]);
-            paths[0] = new Path([       // DOWN (INNER)
+            var innerPath = new Path([
                 new Point(200 - (trackSize/2), frameBorder),
                 new Point(200 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
-                new Point(260 - (trackSize/2), canvasHeight - frameBorder)
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
             ]);
-            paths[4] = new Path([       // DOWN (OUTER)
+            var outerPath = new Path([
                 new Point(200 + (trackSize/2), frameBorder),
                 new Point(200 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
-                new Point(260 + (trackSize/2), canvasHeight - frameBorder)
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
             ]);
-            /*
-            paths[1] = new Path([       // UP (INNER)
-                new Point(200, canvasHeight - frameBorder),
-                new Point(200, 200),
-                new Point(400, 200),
-                new Point(400, frameBorder),
-            ]);
-            paths[2] = new Path([       // LEFT
-                new Point(canvasWidth - frameBorder, 240),
-                new Point(200, 240),
-                new Point(200, 160),
-                new Point(frameBorder, 160),
-            ]);
-            paths[3] = new Path([       // RIGHT
-                new Point(frameBorder, 160),
-                new Point(200, 160),
-                new Point(200, 240),
-                new Point(250, 240),
-                new Point(250, canvasHeight - frameBorder)
-            ]);
-            */           
-            var rnd = random(0, 0);
-            var trackPoly = tracks[rnd];
-            var innerPath = paths[rnd];
-            var outerPath = paths[rnd + 4];
+            game.conquer(trackPoly, innerPath, outerPath);
             
-            var result = [];
-            var firstPoly = free.split(innerPath)[0];
-            var secondPoly = free.split(outerPath)[1];
-            result.push(firstPoly);
-            result.push(secondPoly);
-            
-            arrFree = []; // todo: remove only the polygon that we split
-            
-            for (var i=0; i<result.length; i++) {
-                var poly = result[i];
-                var containsBall = false;
-                for (var b=0; b<arrBalls.length; b++) {
-                    if (poly.containsPoint(arrBalls[b])) {
-                        containsBall = true;
-                        break;
-                    }
-                }                
-                if (containsBall) {
-                    arrFree.push(poly);
-                } else {
-                    arrConquered.push(poly);
-                    size = Math.abs(poly.getArea());
-                    freePixels -= size;
-                    conquredPixels += size;
-                }
+            function step() {
+                game.step();
             }
-            arrConquered.push(trackPoly);
-            size = Math.abs(trackPoly.getArea());
-            freePixels -= size;
-            conquredPixels += size;
             
-            console.log('total:' + totalPixels + ' ' + 'conqured:' + conquredPixels + ' ' + 'free:' + freePixels + ' => ' + conquredPixels/totalPixels*100 + '%');
-            console.log('direction:' + innerPath.getDirection());
+            function draw() {
+                game.draw(ctx);
+            }
             
-            console.log('free:' + arrFree.length);
-            console.log('conquered:' + arrConquered.length);
-            
-            drawArray(ctx, arrFree, 'Black');
-            drawArray(ctx, arrConquered, '#00A8A8');
-            drawArray(ctx, arrBalls, 'Red');
+            setInterval(function () {
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                step();
+                draw();
+            }, 1000 / 50);
         });
     </script>
 </head>
 
 <body>
-	<canvas id="canvas" width="600" height="400"></canvas>
+    <canvas id="canvas" width="768" height="460"></canvas>
+    <div id="status">
+        Score: <span id="score">0</span>    Xn: <span id="lives">3</span>   Full: <span id="conqured">0</span>%    Time: <span id="timer">90</span>
+    </div>
 </body>
 
 </html>
