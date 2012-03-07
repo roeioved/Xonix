@@ -47,19 +47,45 @@ Game.prototype = {
         this._arrBalls = [];
         this._arrMonsters = [];
 
+        //set border as conquered area
+        this._arrConquered.push(new Polygon([
+            new Point(0, 0),
+            new Point(this._width, 0),
+            new Point(this._width, this._frameBorder),
+            new Point(0, this._frameBorder)
+        ]));
+        this._arrConquered.push(new Polygon([
+            new Point(0, this._height - this._frameBorder),
+            new Point(this._width, this._height - this._frameBorder),
+            new Point(this._width, this._height),
+            new Point(0, this._height)
+        ]));
+        this._arrConquered.push(new Polygon([
+            new Point(0, this._frameBorder),
+            new Point(this._frameBorder, this._frameBorder),
+            new Point(this._frameBorder, this._height - this._frameBorder),
+            new Point(0, this._height - this._frameBorder)
+        ]));
+        this._arrConquered.push(new Polygon([
+            new Point(this._width - this._frameBorder, this._frameBorder),
+            new Point(this._width, this._frameBorder),
+            new Point(this._width, this._height - this._frameBorder),
+            new Point(this._width - this._frameBorder, this._height - this._frameBorder)
+        ]));
+        
         this._totalArea = (this._width - this._frameBorder) * (this._height - this._frameBorder);
         this._conquredArea = 0;
-
+        
         this._outerBoundary = new Rectangle(0, 0, this._width, this._height);
         this._innerBoundary = new Rectangle(this._frameBorder, this._frameBorder, this._width - this._frameBorder, this._height - this._frameBorder);
-
+        
         //create player
         this._player = new Player(this._width / 2 - this._playerSize / 2, 0, this._playerSize, this._speed, 'White', '#901290', this._outerBoundary);
         this._player.addEventListener('conquer', this.onConquer, this);
         this._player.addEventListener('fail', this.onFail, this);
-
+        
         var self = this;
-
+        
         //create start free area
         var free = new Polygon([
             new Point(this._frameBorder, this._frameBorder),

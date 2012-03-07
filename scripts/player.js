@@ -27,11 +27,12 @@ Player.prototype = {
         this._prevDirection = null;
         this._currDirection = null;
         this._trackStatus = 0; // 0-no track  1-starting  2-conquering  3-finishing  4-finished
+        console.log('status:0');
         this._prevTrackRect = null;
         this._innerTrack = null;
         this._outerTrack = null;
         this._trackPoly = null;
-        this._conquerAreaIndex = null;
+        this._freeAreaIndex = null;
         
         this.stop();
     },
@@ -45,7 +46,7 @@ Player.prototype = {
         var velocity_y_dir_changed = false;
         
         this.offset(this._velocity.get_x(), this._velocity.get_y());
-
+        
         if (this._boundary) {
             //moving left
             if (this._velocity.get_x() < 0)
@@ -117,7 +118,7 @@ Player.prototype = {
         }
         
         if (this._currDirection) {
-            //if player is moving on the conquered area
+            //player is moving on the conquered area
             if (this._trackStatus == 0) {
                 for (var idx in this._freeAreas) {
                     var poly = this._freeAreas[idx];
@@ -126,136 +127,193 @@ Player.prototype = {
                         var intersect = collision.intersect;
                         
                         this._trackStatus = 1;
+                        console.log('status:1');
                         this._innerTrack = new Path();
                         this._outerTrack = new Path();
-                        
-                        this._prevTrackRect = this.get_box();
-                        
+                                                
                         switch (this._currDirection) {
                             case 'L':                                
-                                this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left() + intersect, this._prevTrackRect.get_top()));
-                                this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left() + intersect, this._prevTrackRect.get_bottom()));
+                                this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
+                                this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
                                 break;
                             case 'U':
-                                this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this._prevTrackRect.get_top() + intersect));
-                                this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this._prevTrackRect.get_top() + intersect));
+                                this._innerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
+                                this._outerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
                                 break;
                             case 'R':
-                                this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right() - intersect, this._prevTrackRect.get_bottom()));
-                                this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right() - intersect, this._prevTrackRect.get_top()));
+                                this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
+                                this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
                                 break;
                             case 'D':
-                                this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this._prevTrackRect.get_bottom() - intersect));
-                                this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this._prevTrackRect.get_bottom() - intersect));
+                                this._innerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
+                                this._outerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
                                 break;
                         }
-                        this._conquerAreaIndex = idx;
+                        this._prevTrackRect = this.get_box();
+                        this._freeAreaIndex = idx;
                         break;
                     }
                 }
             }
-            //else, player is moving on the free area
-            else {
-                var stillConquer = false;
-                for (var idx in this._freeAreas) {
-                    var poly = this._freeAreas[idx];
+            //player already begin to conquer but still not completly in the free area
+            else if (this._trackStatus == 1) {
+                var sameStatus = false;
+                for (var idx in this._conqueredAreas) {
+                    var poly = this._conqueredAreas[idx];
                     var collision = this.findCollision(poly);
                     if (collision) {
-                        stillConquer = true;
+                        sameStatus = true;
                         break;
                     }
                 }
-                if (!stillConquer) {
-                    //console.log(this.get_box());
-                    var a = Number(this._conquerAreaIndex);
-                    var b = new Polygon(this._trackPoly.get_points());
-                    var c = new Path(this._innerTrack.get_points());
-                    var d = new Path(this._outerTrack.get_points());
-                    //this._raiseEvent('conquer', a, b, c, d);
-                    this.killTrack();
-                } else {
-                    //check if player moves back (fails himeself)
-                    if ( (this._prevDirection == 'L' && this._currDirection == 'R') || (this._prevDirection == 'R' && this._currDirection == 'L') ||
-                         (this._prevDirection == 'U' && this._currDirection == 'D') || (this._prevDirection == 'D' && this._currDirection == 'U') ) {
-                        this.killTrack();
-                        this._raiseEvent('fail');
-                    } else {                    
-                        if (this._currDirection != this._prevDirection) {
-                            switch (this._currDirection) {
-                                case 'L':
-                                    if (this._prevDirection == 'U') {
-                                        this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_top()));
-                                        this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_bottom()));
-                                    } else if (this._prevDirection == 'D') {
-                                        this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_top()));
-                                        this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_bottom()));
-                                    }
-                                    break;
-                                case 'U':
-                                    if (this._prevDirection == 'L') {
-                                        this._innerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_top()));
-                                        this._outerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_bottom()));
-                                    } else if (this._prevDirection == 'R') {
-                                        this._innerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_bottom()));
-                                        this._outerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_top()));
-                                    }
-                                    break;
-                                case 'R':
-                                    if (this._prevDirection == 'U') {
-                                        this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_bottom()));
-                                        this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_top()));
-                                    } else if (this._prevDirection == 'D') {
-                                        this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_bottom()));
-                                        this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_top()));
-                                    }
-                                    break;
-                                case 'D':
-                                    if (this._prevDirection == 'L') {
-                                        this._innerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_top()));
-                                        this._outerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_bottom()));
-                                    } else if (this._prevDirection == 'R') {
-                                        this._innerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_bottom()));                                        
-                                        this._outerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_top()));
-                                    }
-                                    break;
-                            }
-                            this._prevTrackRect = this.get_box();
-                        }
-                    }
-                    
-                    if (this._innerTrack && this._outerTrack) {
-                        this._trackPoly = new Polygon();
-                        
-                        var pts = this._innerTrack.get_points();
-                        for (var i=0; i<pts.length; i++) {
-                            this._trackPoly.addPoint(pts[i]);
-                        }
-                        
-                        switch (this._currDirection) {
-                            case 'L':
-                                this._trackPoly.addPoint(new Point(this.get_left(), this.get_top()));
-                                this._trackPoly.addPoint(new Point(this.get_left(), this.get_bottom()));
-                                break;
-                            case 'U':
-                                this._trackPoly.addPoint(new Point(this.get_right(), this.get_top()));
-                                this._trackPoly.addPoint(new Point(this.get_left(), this.get_top()));
-                                break;
-                            case 'R':
-                                this._trackPoly.addPoint(new Point(this.get_right(), this.get_bottom()));
-                                this._trackPoly.addPoint(new Point(this.get_right(), this.get_top()));
-                                break;
-                            case 'D':
-                                this._trackPoly.addPoint(new Point(this.get_left(), this.get_bottom()));
-                                this._trackPoly.addPoint(new Point(this.get_right(), this.get_bottom()));
-                                break;
-                        }
-                        
-                        var pts = this._outerTrack.get_points();
-                        for (var i=pts.length; i>0; i--) {
-                            this._trackPoly.addPoint(pts[i - 1]);
-                        }
+                if (!sameStatus) {
+                    this._trackStatus = 2;
+                    console.log('status:2');
+                }
+            }
+            //player is completly in the free area
+            else if (this._trackStatus == 2) {
+                var sameStatus = true;
+                for (var idx in this._conqueredAreas) {
+                    var poly = this._conqueredAreas[idx];
+                    var collision = this.findCollision(poly);
+                    if (collision) {
+                        sameStatus = false;
+                        break;
                     }
                 }
+                if (!sameStatus) {
+                    this._trackStatus = 3;
+                    console.log('status:3');
+                }
+            }
+            //player reached
+            else if (this._trackStatus == 3) {
+                var sameStatus = false;
+                var poly = this._freeAreas[this._freeAreaIndex];
+                var collision = this.findCollision(poly);
+                if (collision) {
+                    var intersect = collision.intersect;
+                    
+                    switch (this._currDirection) {
+                        case 'L':                                
+                            this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
+                            this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
+                            break;
+                        case 'U':
+                            this._innerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
+                            this._outerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
+                            break;
+                        case 'R':
+                            this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
+                            this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
+                            break;
+                        case 'D':
+                            this._innerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
+                            this._outerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
+                            break;
+                    }
+                    sameStatus = true;
+                }
+                if (!sameStatus) {                    
+                    this._trackStatus = 4;
+                    console.log('status:4');
+                }                
+            }
+            
+            //handle track
+            if (this._trackStatus == 2 || this._trackStatus == 3) {
+                
+                //check if player moves back (fails himeself)
+                if ( (this._prevDirection == 'L' && this._currDirection == 'R') || (this._prevDirection == 'R' && this._currDirection == 'L') ||
+                     (this._prevDirection == 'U' && this._currDirection == 'D') || (this._prevDirection == 'D' && this._currDirection == 'U') ) {
+                    this.killTrack();
+                    this._raiseEvent('fail');
+                } else {                    
+                    if (this._currDirection != this._prevDirection) {
+                        switch (this._currDirection) {
+                            case 'L':
+                                if (this._prevDirection == 'U') {
+                                    this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_top()));
+                                    this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_bottom()));
+                                } else if (this._prevDirection == 'D') {
+                                    this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_top()));
+                                    this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_bottom()));
+                                }
+                                break;
+                            case 'U':
+                                if (this._prevDirection == 'L') {
+                                    this._innerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_top()));
+                                    this._outerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_bottom()));
+                                } else if (this._prevDirection == 'R') {
+                                    this._innerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_bottom()));
+                                    this._outerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_top()));
+                                }
+                                break;
+                            case 'R':
+                                if (this._prevDirection == 'U') {
+                                    this._innerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_bottom()));
+                                    this._outerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_top()));
+                                } else if (this._prevDirection == 'D') {
+                                    this._innerTrack.addPoint(new Point(this._prevTrackRect.get_left(), this.get_bottom()));
+                                    this._outerTrack.addPoint(new Point(this._prevTrackRect.get_right(), this.get_top()));
+                                }
+                                break;
+                            case 'D':
+                                if (this._prevDirection == 'L') {
+                                    this._innerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_top()));
+                                    this._outerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_bottom()));
+                                } else if (this._prevDirection == 'R') {
+                                    this._innerTrack.addPoint(new Point(this.get_left(), this._prevTrackRect.get_bottom()));                                        
+                                    this._outerTrack.addPoint(new Point(this.get_right(), this._prevTrackRect.get_top()));
+                                }
+                                break;
+                        }
+                        this._prevTrackRect = this.get_box();
+                    }
+                }
+                
+                if (this._innerTrack && this._outerTrack) {
+                    this._trackPoly = new Polygon();
+                    
+                    var pts = this._innerTrack.get_points();
+                    for (var i=0; i<pts.length; i++) {
+                        this._trackPoly.addPoint(pts[i]);
+                    }
+                    
+                    switch (this._currDirection) {
+                        case 'L':
+                            this._trackPoly.addPoint(new Point(this.get_left(), this.get_top()));
+                            this._trackPoly.addPoint(new Point(this.get_left(), this.get_bottom()));
+                            break;
+                        case 'U':
+                            this._trackPoly.addPoint(new Point(this.get_right(), this.get_top()));
+                            this._trackPoly.addPoint(new Point(this.get_left(), this.get_top()));
+                            break;
+                        case 'R':
+                            this._trackPoly.addPoint(new Point(this.get_right(), this.get_bottom()));
+                            this._trackPoly.addPoint(new Point(this.get_right(), this.get_top()));
+                            break;
+                        case 'D':
+                            this._trackPoly.addPoint(new Point(this.get_left(), this.get_bottom()));
+                            this._trackPoly.addPoint(new Point(this.get_right(), this.get_bottom()));
+                            break;
+                    }
+                    
+                    var pts = this._outerTrack.get_points();
+                    for (var i=pts.length; i>0; i--) {
+                        this._trackPoly.addPoint(pts[i - 1]);
+                    }
+                }
+            }
+            //conquer finished succesully
+            else if (this._trackStatus == 4) {
+                var a = Number(this._freeAreaIndex);
+                var b = new Polygon(this._trackPoly.get_points());
+                var c = new Path(this._innerTrack.get_points());
+                var d = new Path(this._outerTrack.get_points());
+                this._raiseEvent('conquer', a, b, c, d);
+                this.killTrack();
             }
         }
         
@@ -325,6 +383,8 @@ Player.prototype = {
         
         if (this._trackPoly) {
             this._trackPoly.draw(ctx, '#00A8A8');
+            this._innerTrack.drawPoints(ctx, 'Red');
+            this._outerTrack.drawPoints(ctx, 'Orange');
         }
         
         ctx.beginPath();
