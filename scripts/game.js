@@ -9,7 +9,7 @@ function Game(width, height, frameBorder, ctx) {
     this._player = null;
     this._numOfMonsters = Game.NUM_OF_MONSTERS;
     this._monsterSize = 9;
-    this._numOfBalls = 3;
+    this._numOfBalls = 1;
     this._ballSize = 8;
     this._arrFree = [];
     this._arrConquered = [];
@@ -23,7 +23,7 @@ function Game(width, height, frameBorder, ctx) {
 
     this._score = 0;
 
-    this._mute = false;
+    this._mute = true;
     this._audio = [];
     this._audio['fail'] = new Audio('sounds/fail.mp3');
     this._outerBoundary = null;
@@ -32,11 +32,11 @@ function Game(width, height, frameBorder, ctx) {
     this.init();
 }
 
-Game.NUM_OF_LIVES = 3;
+Game.NUM_OF_LIVES = 10;
 Game.PLAYER_SIZE = 9;
 Game.SPEED = 4;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
-Game.NUM_OF_MONSTERS = 1;
+Game.NUM_OF_MONSTERS = 0;
 
 Game.prototype = {
 

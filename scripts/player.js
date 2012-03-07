@@ -266,6 +266,12 @@ Player.prototype = {
                 this._raiseEvent('fail');
                 break;
             }
+            if (this._trackPoly) {
+                if (this._trackPoly.doesIntersect(other)) {
+                    this._raiseEvent('fail');
+                    break;                    
+                }
+            }
         }
     },
     
@@ -316,8 +322,7 @@ Player.prototype = {
         var thickness = 2;
         
         if (this._trackPoly) {
-            //this._trackPoly.draw(ctx, '#00A8A8');
-            this._trackPoly.draw(ctx, 'Red');
+            this._trackPoly.draw(ctx, '#00A8A8');
         }
         
         ctx.beginPath();
