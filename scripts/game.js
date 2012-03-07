@@ -57,7 +57,7 @@ Game.prototype = {
 
         //create player
         this._player = new Player(this._width / 2 - this._playerSize / 2, 0, this._playerSize, this._speed, 'White', '#901290', this._outerBoundary);
-        this._player.addEventListener('conquered', this.onConquer, this);
+        this._player.addEventListener('conquer', this.onConquer, this);
         this._player.addEventListener('fail', this.onFail, this);
 
         var self = this;
@@ -128,12 +128,12 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._width, self._height);
             self.step();
             self.draw();
-        }, 1000 / 50);
+        }, 1000 / 20);
     },
 
     stop:function () {
-        this._state = GAME_STATES.STOPPED;
         clearInterval(this._intervalId);
+        this._state = GAME_STATES.STOPPED;
     },
 
     end:function () {
@@ -161,11 +161,11 @@ Game.prototype = {
     },
 
     draw:function () {
-        this._player.draw(this._ctx);
         this._drawArray(this._ctx, this._arrFree, 'Black');
         this._drawArray(this._ctx, this._arrConquered, '#00A8A8');
         this._drawArray(this._ctx, this._arrBalls);
         this._drawArray(this._ctx, this._arrMonsters);
+        this._player.draw(this._ctx);
     },
 
     _drawArray:function (ctx, array, fillStyle) {
@@ -188,7 +188,7 @@ Game.prototype = {
         return obstacles;
     },
 
-    onConquer:function (trackPoly, innerPath, outerPath, sourcePolyIndex) {
+    onConquer:function (sourcePolyIndex, trackPoly, innerPath, outerPath) {
         var area = 0;
 
         //split
@@ -256,13 +256,9 @@ Game.prototype = {
             this._raiseEvent('gameOver', this._score);
         }
         else {
-            this.init();
-            this.start();
+            var self = this;
+            setTimeout(function() { self.init(); self.start(); }, 1000);
         }
-    },
-
-    levelUp:function () {
-
     },
 
     _playAudio:function (a) {
