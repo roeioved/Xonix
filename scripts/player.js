@@ -26,7 +26,7 @@ Player.prototype = {
     killTrack: function () {
         this._prevDirection = null;
         this._currDirection = null;
-        this._status = 0; // 0:free 1:conquered
+        this._trackStatus = 0; // 0-no track  1-starting  2-conquering  3-finishing  4-finished
         this._prevTrackRect = null;
         this._innerTrack = null;
         this._outerTrack = null;
@@ -118,14 +118,14 @@ Player.prototype = {
         
         if (this._currDirection) {
             //if player is moving on the conquered area
-            if (this._status == 0) {
+            if (this._trackStatus == 0) {
                 for (var idx in this._freeAreas) {
                     var poly = this._freeAreas[idx];
                     var collision = this.findCollision(poly);
                     if (collision) {
                         var intersect = collision.intersect;
                         
-                        this._status = 1;
+                        this._trackStatus = 1;
                         this._innerTrack = new Path();
                         this._outerTrack = new Path();
                         
@@ -159,12 +159,14 @@ Player.prototype = {
                 var stillConquer = false;
                 for (var idx in this._freeAreas) {
                     var poly = this._freeAreas[idx];
-                    if (this.findCollision(poly)) {
+                    var collision = this.findCollision(poly);
+                    if (collision) {
                         stillConquer = true;
                         break;
                     }
                 }
                 if (!stillConquer) {
+                    //console.log(this.get_box());
                     var a = Number(this._conquerAreaIndex);
                     var b = new Polygon(this._trackPoly.get_points());
                     var c = new Path(this._innerTrack.get_points());
@@ -267,7 +269,7 @@ Player.prototype = {
                 break;
             }
             if (this._trackPoly) {
-                if (this._trackPoly.doesIntersect(other)) {
+                if (this._trackPoly.findIntersection(other)) {
                     this._raiseEvent('fail');
                     break;                    
                 }
