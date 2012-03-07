@@ -20,11 +20,11 @@ function Polygon(a) {
                     this._points.push(new Point(pts[i]));
                 }
             }
-
+			/*
             this._box = a.get_box().clone();
             this._area = a.get_area();
-            this._centroid = a.get_centroid().clone();
-
+            this._centroid = a.get_centroid().clone();			
+			
             this._edges = [];
             var edges = a.get_edges();
 
@@ -60,6 +60,7 @@ function Polygon(a) {
                     this._vRectangles.push(new Rectangle(_vRectangles[i]));
                 }
             }
+			*/
         }
 
         else if (a instanceof Array) { // array of points

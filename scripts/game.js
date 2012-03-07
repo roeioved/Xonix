@@ -21,8 +21,6 @@ function Game(width, height, frameBorder, ctx) {
     this._conquredArea = 0;
     this._arrFree = [];
 
-    //this._level = new Level(width, height, frameBorder, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
-
     this._score = 0;
 
     this._mute = false;
@@ -96,7 +94,7 @@ Game.prototype = {
         $(document).keydown(function (event) {
             switch (event.keyCode) {
                 case KEY_CODES.LEFT:
-                    if (self._state = GAME_STATES.RUNNING) {
+                    if (self._state == GAME_STATES.RUNNING) {
                         self._player.moveLeft();
                     }
                     break;
@@ -128,7 +126,7 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._width, self._height);
             self.step();
             self.draw();
-        }, 1000 / 20);
+        }, 1000 / 60);
     },
 
     stop:function () {
@@ -157,6 +155,8 @@ Game.prototype = {
 
         //update player's enemies
         this._player.set_enemies(this.get_enemies());
+        this._player.set_conqueredAreas(this._arrConquered);
+        this._player.set_freeAreas(this._arrFree);
         this._player.step();
     },
 

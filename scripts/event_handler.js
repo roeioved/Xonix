@@ -9,9 +9,13 @@ EventHandler.prototype = {
     },
     
     _raiseEvent: function (event, args) {
+        var arr = [];
+        for(var i=1; i<this._raiseEvent.arguments.length; i++) {
+            arr.push(this._raiseEvent.arguments[i]);
+        }
         var name = '__' + event;
         if (this[name]) {
-            this[name].callback.call(this[name].context, args);
+            this[name].callback.apply(this[name].context, arr);
         }
     }    
     

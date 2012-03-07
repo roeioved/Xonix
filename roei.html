@@ -3,12 +3,12 @@
 <head>
     <title>HTML5 XoniX</title>
     
-    <style>
-        #canvas { background: #00A8A8; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style/reset.min.css">
+    <link rel="stylesheet" type="text/css" href="style/style.css">
     
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
+    <script type="text/javascript" src="scripts/movable.js"></script>
     <script type="text/javascript" src="scripts/point.js"></script>
     <script type="text/javascript" src="scripts/edge.js"></script>
     <script type="text/javascript" src="scripts/path.js"></script>
@@ -20,22 +20,23 @@
     <script type="text/javascript" src="scripts/ball.js"></script>
     <script type="text/javascript" src="scripts/monster.js"></script>
     <script type="text/javascript" src="scripts/player.js"></script>
-    <script type="text/javascript" src="scripts/level.js"></script>
+    <script type="text/javascript" src="scripts/keycodes.js"></script>
     <script type="text/javascript" src="scripts/game.js"></script>
-    
+    <script type="text/javascript" src="scripts/gamestate.js"></script>
+
     <script>
-        var canvasWidth = 768,
-            canvasHeight = 460,
-            frameBorder = 20,
+        var canvasWidth = 550,
+            canvasHeight = 360,
+            frameBorder = 18,
             numOfBalls = 2,
-            numOfMonsters = 1,
-            ballSize = 9,
-            monsterSize = 10,
-            speed = 4;
+            numOfMonsters = 0,
+            ballSize = 8,
+            monsterSize = 9,
+            speed = 2;
         var player,
             numOfLives = 3,
-            playerSize = 10,
-            trackSize = 10;
+            playerSize = 9,
+            trackSize = 9;
         var game;
         
         function random(min, max) {
@@ -60,27 +61,12 @@
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
-            var game = new Game(canvasWidth, canvasHeight, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
+            var game = new Game(canvasWidth, canvasHeight, frameBorder, ctx);
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
             
-            $(document).keydown(function(event) {
-                switch (event.keyCode) {
-                    case 37:
-                        game.player.moveLeft();
-                        break;
-                    case 38:
-                        game.player.moveUp();
-                        break;
-                    case 39:
-                        game.player.moveRight();
-                        break;
-                    case 40:
-                        game.player.moveDown();
-                        break;
-            }});
-            
+            /*
             //create DEBUG track
             var trackPoly = new Polygon([
                 new Point(200 - (trackSize/2), frameBorder),
@@ -94,7 +80,7 @@
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
-                new Point(200 - (trackSize/2), 100 + (trackSize/2)),
+                new Point(200 - (trackSize/2), 100 + (trackSize/2))
             ]);
             var innerPath = new Path([
                 new Point(200 - (trackSize/2), frameBorder),
@@ -102,7 +88,7 @@
                 new Point(300 - (trackSize/2), 100 + (trackSize/2)),
                 new Point(300 - (trackSize/2), 200 - (trackSize/2)),
                 new Point(260 - (trackSize/2), 200 - (trackSize/2)),
-                new Point(260 - (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 - (trackSize/2), canvasHeight - frameBorder)
             ]);
             var outerPath = new Path([
                 new Point(200 + (trackSize/2), frameBorder),
@@ -110,31 +96,22 @@
                 new Point(300 + (trackSize/2), 100 - (trackSize/2)),
                 new Point(300 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
-                new Point(260 + (trackSize/2), canvasHeight - frameBorder),
+                new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
             game.conquer(trackPoly, innerPath, outerPath);
+            */
             
-            function step() {
-                game.step();
-            }
-            
-            function draw() {
-                game.draw(ctx);
-            }
-            
-            setInterval(function () {
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                step();
-                draw();
-            }, 1000 / 50);
+            game.start();
         });
     </script>
 </head>
 
 <body>
-    <canvas id="canvas" width="768" height="460"></canvas>
-    <div id="status">
-        Score: <span id="score">0</span>    Xn: <span id="lives">3</span>   Full: <span id="conqured">0</span>%    Time: <span id="timer">90</span>
+    <div id="container">
+        <canvas id="canvas" width="550" height="360"></canvas>
+        <div id="status">
+            Score: <span id="score">0</span>    Xn: <span id="lives">3</span>   Full: <span id="conqured">0</span>%    Time: <span id="timer">90</span>
+        </div>
     </div>
 </body>
 

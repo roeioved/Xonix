@@ -28,7 +28,7 @@
         var canvasWidth = 550,
             canvasHeight = 360,
             frameBorder = 18,
-            numOfBalls = 10,
+            numOfBalls = 4,
             numOfMonsters = 1,
             ballSize = 8,
             monsterSize = 9,
@@ -65,7 +65,8 @@
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
-
+            
+            /*
             //create DEBUG track
             var trackPoly = new Polygon([
                 new Point(200 - (trackSize/2), frameBorder),
@@ -97,9 +98,9 @@
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
-
-            //game.conquer(trackPoly, innerPath, outerPath);
-
+            game.conquer(trackPoly, innerPath, outerPath);
+            */
+            
             game.start();
         });
     </script>
