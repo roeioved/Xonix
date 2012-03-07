@@ -20,9 +20,10 @@
     <script type="text/javascript" src="scripts/ball.js"></script>
     <script type="text/javascript" src="scripts/monster.js"></script>
     <script type="text/javascript" src="scripts/player.js"></script>
-    <script type="text/javascript" src="scripts/level.js"></script>
+    <script type="text/javascript" src="scripts/keycodes.js"></script>
     <script type="text/javascript" src="scripts/game.js"></script>
-    
+    <script type="text/javascript" src="scripts/gamestate.js"></script>
+
     <script>
         var canvasWidth = 550,
             canvasHeight = 360,
@@ -60,27 +61,11 @@
             var canvas = document.getElementById("canvas");  
             var ctx = canvas.getContext("2d");
             
-            var game = new Game(canvasWidth, canvasHeight, frameBorder, numOfLives, playerSize, numOfBalls, numOfMonsters, ballSize, monsterSize, speed);
+            var game = new Game(canvasWidth, canvasHeight, frameBorder, ctx);
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
-            
-            $(document).keydown(function(event) {
-                switch (event.keyCode) {
-                    case 37:
-                        game.get_player().moveLeft();
-                        break;
-                    case 38:
-                        game.get_player().moveUp();
-                        break;
-                    case 39:
-                        game.get_player().moveRight();
-                        break;
-                    case 40:
-                        game.get_player().moveDown();
-                        break;
-            }});
-            
+
             //create DEBUG track
             var trackPoly = new Polygon([
                 new Point(200 - (trackSize/2), frameBorder),
@@ -112,21 +97,10 @@
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
-            game.conquer(trackPoly, innerPath, outerPath);
-            
-            function step() {
-                game.step();
-            }
-            
-            function draw() {
-                game.draw(ctx);
-            }
-            
-            setInterval(function () {
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                step();
-                draw();
-            }, 1000 / 50);
+
+            //game.conquer(trackPoly, innerPath, outerPath);
+
+            game.start();
         });
     </script>
 </head>
