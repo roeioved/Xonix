@@ -33,8 +33,8 @@ function Game(width, height, frameBorder, ctx) {
 }
 
 Game.NUM_OF_LIVES = 10;
-Game.PLAYER_SIZE = 9;
-Game.SPEED = 4;
+Game.PLAYER_SIZE = 10;
+Game.SPEED = Game.PLAYER_SIZE;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_MONSTERS = 0;
 
@@ -152,7 +152,7 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._width, self._height);
             self.step();
             self.draw();
-        }, 1000 / 60);
+        }, 1000 / 40);
     },
 
     stop:function () {
@@ -189,6 +189,7 @@ Game.prototype = {
     draw:function () {
         this._drawArray(this._ctx, this._arrFree, 'Black');
         this._drawArray(this._ctx, this._arrConquered, '#00A8A8');
+        this._drawPoints(this._ctx, this._arrFree);
         this._drawArray(this._ctx, this._arrBalls);
         this._drawArray(this._ctx, this._arrMonsters);
         this._player.draw(this._ctx);
@@ -198,6 +199,12 @@ Game.prototype = {
         for (var i = 0; i < array.length; i++) {
             var obj = array[i];
             obj.draw(ctx, fillStyle);
+        }
+    },
+    _drawPoints:function (ctx, array) {
+        for (var i = 0; i < array.length; i++) {
+            var obj = array[i];
+            obj.drawGradientPoints(ctx);
         }
     },
 
@@ -244,31 +251,34 @@ Game.prototype = {
                 area += Math.abs(poly.get_area());
             }
         }
-
+        
+        //add track polygon to conqured areas
         this._arrConquered.push(trackPoly);
         area += Math.abs(trackPoly.get_area());
-        this._conquredArea += area;
-
+        
+        console.log('<<<-- split polygons completed! -->>>');
+        console.log('conquered array:');
+        console.log(this._arrConquered);
+        console.log('free array:');
+        console.log(this._arrFree);
+        
         //update score
-        this._score += Math.round(area / this._width * this._height / 100);
-
+        this._conquredArea += area;
+        this._score += Math.round(area / this._width * this._height / 100);        
         var conqueredPercent = Math.round(this._conquredArea / this._totalArea * 100);
-
-        if (conqueredPercent >= Game.CONQUERED_PERCENT_MINIMUM_LIMIT) //did we reach the minimum limit and going to next level
-        {
-            this.stop();
-
-            this._numOfBalls++;
-            this._numOfMonsters++;
-
-            this.init();
-
-            this.start();
-        }
-
+        
         //raise event on changes in score and conquered area
         this._raiseEvent('conquer', conqueredPercent);
         this._raiseEvent('score', this._score);
+        
+        if (conqueredPercent >= Game.CONQUERED_PERCENT_MINIMUM_LIMIT) //did we reach the minimum limit and going to next level
+        {
+            this.stop();
+            this._numOfBalls++;
+            this._numOfMonsters++;
+            this.init();
+            this.start();
+        }        
     },
 
 

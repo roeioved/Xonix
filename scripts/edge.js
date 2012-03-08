@@ -35,6 +35,33 @@ Edge.prototype = {
 
     get_p2: function() {
         return new Point(this._p2);
-    }
+    },
     
+	doesIntersect: function (other) {
+		var epsilon = 10e-6;
+		var p = this.get_p1();
+		var r = this.get_p2().subtract(p);
+		var q = other.get_p1();
+		var s = other.get_p2().subtract(q);
+		var cross = this._cross(r, s);
+		
+		if(cross <= epsilon && cross >= -1 * epsilon){
+				return null; // parallel
+		}
+		
+		var t = this._cross(q.subtract(p), s) / cross;
+		var u = this._cross(q.subtract(p), r) / cross;
+		
+		if (0 <= u && u <= 1 && 0 <= t && t <= 1) {
+				intPoint = p.add(r.scalarMult(t));
+				return new Point(intPoint.get_x(), intPoint.get_y());
+		} else {
+				return null;
+		}
+	},
+	
+	_cross: function (v1, v2) {
+		return v1.get_x() * v2.get_y() - v2.get_x() * v1.get_y();
+	}
+	
 };

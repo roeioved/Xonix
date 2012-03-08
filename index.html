@@ -27,7 +27,7 @@
     <script>
         var canvasWidth = 550,
             canvasHeight = 360,
-            frameBorder = 18;
+            frameBorder = 18
         var game;
         
         function random(min, max) {
@@ -89,7 +89,7 @@
                 new Point(260 + (trackSize/2), 200 + (trackSize/2)),
                 new Point(260 + (trackSize/2), canvasHeight - frameBorder)
             ]);
-            game.conquer(trackPoly, innerPath, outerPath);
+            game.onConquer(0, trackPoly, innerPath, outerPath);
             */
             
             game.start();

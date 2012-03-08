@@ -23,10 +23,10 @@ Vector.prototype = {
         this._y = this._y / mag;
     },
 
-    getDotProduct:function (vector) {
-        return new Vector(this._x * vector.get_x(), this._y * vector.get_y());
+    getDotProduct:function (other) {
+        return new Vector(this._x * other.get_x(), this._y * other.get_y());
     },
-
+      
     rotate:function (angle) {
         this._x = Math.cos(this._x) - Math.sin(this._y);
         this._y = Math.sin(this._x) + Math.cos(this._y);

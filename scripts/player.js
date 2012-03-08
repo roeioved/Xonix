@@ -171,13 +171,42 @@ Player.prototype = {
                     console.log('status:2');
                 }
             }
-            //player is completly in the free area
+            //player is completly in the free area (conquering)
             else if (this._trackStatus == 2) {
                 var sameStatus = true;
                 for (var idx in this._conqueredAreas) {
                     var poly = this._conqueredAreas[idx];
                     var collision = this.findCollision(poly);
                     if (collision) {
+                        var intersect = collision.intersect;
+                        
+                        switch (this._currDirection) {
+                            case 'L':
+                                //this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
+                                //this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
+                                this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
+                                this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
+                                break;
+                            case 'U':
+                                //this._innerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
+                                //this._outerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
+                                this._innerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
+                                this._outerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
+                                break;
+                            case 'R':
+                                //this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
+                                //this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
+                                this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
+                                this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
+                                break;
+                            case 'D':
+                                //this._innerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
+                                //this._outerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
+                                this._innerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
+                                this._outerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
+                                break;
+                        }
+                        
                         sameStatus = false;
                         break;
                     }
@@ -187,38 +216,21 @@ Player.prototype = {
                     console.log('status:3');
                 }
             }
-            //player reached
+            //player reached (about to finish conquering)
             else if (this._trackStatus == 3) {
                 var sameStatus = false;
-                var poly = this._freeAreas[this._freeAreaIndex];
-                var collision = this.findCollision(poly);
-                if (collision) {
-                    var intersect = collision.intersect;
-                    
-                    switch (this._currDirection) {
-                        case 'L':                                
-                            this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
-                            this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
-                            break;
-                        case 'U':
-                            this._innerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
-                            this._outerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
-                            break;
-                        case 'R':
-                            this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
-                            this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
-                            break;
-                        case 'D':
-                            this._innerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
-                            this._outerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
-                            break;
+                for (var idx in this._freeAreas) {
+                    var poly = this._freeAreas[idx];
+                    var collision = this.findCollision(poly);
+                    if (collision) {
+                        sameStatus = true;
+                        break;
                     }
-                    sameStatus = true;
                 }
                 if (!sameStatus) {                    
                     this._trackStatus = 4;
                     console.log('status:4');
-                }                
+                }
             }
             
             //handle track
@@ -383,8 +395,8 @@ Player.prototype = {
         
         if (this._trackPoly) {
             this._trackPoly.draw(ctx, '#00A8A8');
-            this._innerTrack.drawPoints(ctx, 'Red');
-            this._outerTrack.drawPoints(ctx, 'Orange');
+            //this._innerTrack.drawPoints(ctx, 'Red');
+            //this._outerTrack.drawPoints(ctx, 'Orange');
         }
         
         ctx.beginPath();

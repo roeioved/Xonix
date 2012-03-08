@@ -47,6 +47,18 @@ Point.prototype = {
         this._y += dy;
     },
 
+    scalarMult: function (scalar) {
+        return new Point(this._x * scalar, this._y * scalar);
+    },
+    
+    subtract: function (other) {
+        return this.add(other.scalarMult(-1));
+    },
+    
+    add: function (other) {
+        return new Point(this._x + other.get_x(), this._y + other.get_y());
+    },
+
     draw: function(ctx, fillStyle) {
         var radius = 5;
         

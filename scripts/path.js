@@ -115,12 +115,39 @@ Path.prototype = {
         var edges = [];
         var pts = this._points;
         var nPts = pts.length;
-        if (nPts > 1) {
+		if (nPts > 1) {
             for (var i=1; i<nPts; i++) {
                 var edge = new Edge(pts[i-1], pts[i]);
                 edges.push(edge);
             }
         }
         return edges;
-    }
+    },
+	
+	replace: function(p1, p2) {
+		for (var idx in this._points) {
+				if (this._points[idx].compare(p1)) {
+						this._points.splice(idx, 1, p2);
+				}
+		}
+	},
+	
+	removeDuplicatePoints: function () {
+		var points = [];
+		for (var i in this._points) {
+				var exists = false;
+				for (var j in points) {
+						if (this._points[i].compare(points[j])) {
+								console.log('remove ' + this._points[i]);
+								exists = true;
+								break;
+						}						
+				}
+				if (!exists) {
+						points.push(this._points[i]);
+				}
+		}
+		this._points = points;
+	}
+	
 }

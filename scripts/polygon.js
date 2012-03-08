@@ -547,8 +547,40 @@ Polygon.prototype = {
 //splits polygon to two polygons by path
     split:function (path) {
         var polygons = [];
-        var pointsToAdd = this.pointsOn(path.get_points());
-
+        var pointsToAdd = [];
+		
+		var polyEdges = this.get_edges();
+		var pathEdges = path.getEdges();
+		
+        console.log('<<<-- split polygons -->>>');
+		console.log('polygon:');
+		console.log(this._points);
+		console.log('path:');
+		console.log(path._points);
+		//path.removeDuplicatePoints();
+		//console.log('path distinct');
+		//console.log(path);
+		
+		var counter = 0;
+		for (var pathEdge in pathEdges) {
+				var e1 = pathEdges[pathEdge];
+				
+				for (var polyEdge in polyEdges) {
+						var e2 = polyEdges[polyEdge];
+						var intersect = e1.doesIntersect(e2);
+						if (intersect) {
+								if (pointsToAdd.length == 0) {
+										console.log('replace ' + path._points[pathEdge] + ' with ' + intersect);
+										path._points.splice(pathEdge, 1, new Point(intersect));
+								} else if (pointsToAdd.length == 1) {
+										console.log('replace ' + path._points[pathEdge+1] + ' with ' + intersect);
+										path._points.splice(pathEdge + 1, 1, new Point(intersect));
+								}
+								pointsToAdd.push(intersect);
+						}
+				}
+		}
+		
         if (pointsToAdd.length != 2)
             throw "invalid path";
 
@@ -563,10 +595,10 @@ Polygon.prototype = {
         for (iPt = 0; iPt < nPts; iPt++) {
             var pt = pts[iPt].clone();
             var exists = path.containsPoint(pt);
-
+			
             if (exists) {
                 tmp *= -1;
-
+				
                 if (poly2.get_points().length == 0) {
                     if (direction == 'D' || direction == 'L') {
                         for (i = 0; i < path.get_points().length; i++) {
@@ -585,7 +617,7 @@ Polygon.prototype = {
                 else poly2.get_points().push(pt);
             }
         }
-
+		
         polygons.push(poly1);
         polygons.push(poly2);
 
@@ -692,5 +724,27 @@ Polygon.prototype = {
             ctx.closePath();
             ctx.fill();
         }
+    },
+
+    drawGradientPoints:function (ctx) {       
+        var pts = this._points;
+        var nPts = pts.length;        
+
+		var r = 255;
+		var g = 0;
+		var b = 0;
+		var diff = 10;
+        var radius = 5;
+		
+		for (var i = 0; i < nPts; i++) {
+			var pt = pts[i];
+            ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+            ctx.beginPath();
+            ctx.arc(pt.get_x(), pt.get_y(), radius, 0, self.Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+			r -= diff;
+        }
     }
+	
 };
