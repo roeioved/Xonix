@@ -27,7 +27,6 @@ Player.prototype = {
         this._prevDirection = null;
         this._currDirection = null;
         this._trackStatus = 0; // 0-no track  1-starting  2-conquering  3-finishing  4-finished
-        console.log('status:0');
         this._prevTrackRect = null;
         this._innerTrack = null;
         this._outerTrack = null;
@@ -124,7 +123,7 @@ Player.prototype = {
                         console.log('status:1');
                         this._innerTrack = new Path();
                         this._outerTrack = new Path();
-                                                
+                        
                         switch (this._currDirection) {
                             case 'L':                                
                                 this._innerTrack.addPoint(new Point(this.get_left() + collision.x, this.get_top()));
@@ -175,26 +174,18 @@ Player.prototype = {
 
                         switch (this._currDirection) {
                             case 'L':
-                                //this._innerTrack.addPoint(new Point(this.get_right() - intersect, this.get_top()));
-                                //this._outerTrack.addPoint(new Point(this.get_right() - intersect, this.get_bottom()));
                                 this._innerTrack.addPoint(new Point(this.get_left() + collision.x, this.get_top()));
                                 this._outerTrack.addPoint(new Point(this.get_left() + collision.x, this.get_bottom()));
                                 break;
                             case 'U':
-                                //this._innerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - intersect));
-                                //this._outerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - intersect));
                                 this._innerTrack.addPoint(new Point(this.get_right(), this.get_top() + collision.y));
                                 this._outerTrack.addPoint(new Point(this.get_left(), this.get_top() + collision.y));
                                 break;
                             case 'R':
-                                //this._innerTrack.addPoint(new Point(this.get_left() + intersect, this.get_bottom()));
-                                //this._outerTrack.addPoint(new Point(this.get_left() + intersect, this.get_top()));
                                 this._innerTrack.addPoint(new Point(this.get_right() - collision.x, this.get_bottom()));
                                 this._outerTrack.addPoint(new Point(this.get_right() - collision.x, this.get_top()));
                                 break;
                             case 'D':
-                                //this._innerTrack.addPoint(new Point(this.get_left(), this.get_top() + intersect));
-                                //this._outerTrack.addPoint(new Point(this.get_right(), this.get_top() + intersect));
                                 this._innerTrack.addPoint(new Point(this.get_left(), this.get_bottom() - collision.y));
                                 this._outerTrack.addPoint(new Point(this.get_right(), this.get_bottom() - collision.y));
                                 break;
@@ -389,7 +380,7 @@ Player.prototype = {
         if (this._trackPoly) {
             this._trackPoly.draw(ctx, '#00A8A8');
             //this._innerTrack.drawPoints(ctx, 'Red');
-            //this._outerTrack.drawPoints(ctx, 'Orange');
+            //this._outerTrack.drawPoints(ctx, 'Yellow');
         }
         
         ctx.beginPath();

@@ -34,7 +34,7 @@ function Game(width, height, frameBorder, ctx) {
 
 Game.NUM_OF_LIVES = 10;
 Game.PLAYER_SIZE = 10;
-Game.SPEED = Game.PLAYER_SIZE;
+Game.SPEED = 5;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_MONSTERS = 0;
 
@@ -142,31 +142,44 @@ Game.prototype = {
             }
         });
     },
-
-    start:function () {
+    
+    relocatePlayer: function () {
+        this._player.killTrack();
+        var left = this._width / 2 - this._playerSize / 2;
+        var top = 0;
+        this._player._tl = new Point(left, top);
+        this._player._br = new Point(left + this._player._size, top + this._player._size);
+    },
+    
+    start: function () {
         var self = this;
 
         this._state = GAME_STATES.RUNNING;
 
         this._intervalId = setInterval(function () {
-            self._ctx.clearRect(0, 0, self._width, self._height);
-            self.step();
-            self.draw();
-        }, 1000 / 40);
+            try {
+                self._ctx.clearRect(0, 0, self._width, self._height);
+                self.step();
+                self.draw();
+            } catch (err) {
+                clearInterval(this._intervalId);
+                console.log(err.message);
+                debugger;
+            }
+        }, 1000 / 30);
     },
 
-    stop:function () {
+    stop: function () {
         clearInterval(this._intervalId);
         this._state = GAME_STATES.STOPPED;
     },
 
-    end:function () {
+    end: function () {
         this._state = GAME_STATES.ENDED;
         this.stop();
     },
 
-    step:function () {
-
+    step: function () {
         //update ball's obstacles
         for (var ball in this._arrBalls) {
             this._arrBalls[ball].set_obstacles(this._arrConquered);
@@ -186,29 +199,29 @@ Game.prototype = {
         this._player.step();
     },
 
-    draw:function () {
+    draw: function () {
         this._drawArray(this._ctx, this._arrFree, 'Black');
         this._drawArray(this._ctx, this._arrConquered, '#00A8A8');
         this._drawPoints(this._ctx, this._arrFree);
-        this._drawArray(this._ctx, this._arrBalls);
         this._drawArray(this._ctx, this._arrMonsters);
         this._player.draw(this._ctx);
+        this._drawArray(this._ctx, this._arrBalls);
     },
 
-    _drawArray:function (ctx, array, fillStyle) {
+    _drawArray: function (ctx, array, fillStyle) {
         for (var i = 0; i < array.length; i++) {
             var obj = array[i];
             obj.draw(ctx, fillStyle);
         }
     },
-    _drawPoints:function (ctx, array) {
+    _drawPoints: function (ctx, array) {
         for (var i = 0; i < array.length; i++) {
             var obj = array[i];
             obj.drawGradientPoints(ctx);
         }
     },
 
-    get_enemies:function () {
+    get_enemies: function () {
         var obstacles = [];
 
         for (var ball in this._arrBalls) {
@@ -221,51 +234,55 @@ Game.prototype = {
         return obstacles;
     },
 
-    onConquer:function (sourcePolyIndex, trackPoly, innerPath, outerPath) {
-        var area = 0;
-
+    onConquer: function (sourcePolyIndex, trackPoly, innerPath, outerPath) {        
+        var area = 0, poly;
+        var innerContainsBall = false, outerContainsBall = false;;
+        
         //split
-        var result = [];
-        var firstPoly = this._arrFree[sourcePolyIndex].split(innerPath)[0];
-        var secondPoly = this._arrFree[sourcePolyIndex].split(outerPath)[1];
-
-        result.push(firstPoly);
-        result.push(secondPoly);
-
+        var innerPolys = this._arrFree[sourcePolyIndex].split(innerPath);                
+        var outerPolys = this._arrFree[sourcePolyIndex].split(outerPath);
+        
         //since we now conquered part of the free area, we'll remove it from the list of free areas
         this._arrFree.splice(sourcePolyIndex, 1);
-
-        for (var i = 0; i < result.length; i++) {
-            var poly = result[i];
-            var containsBall = false;
-            for (var b = 0; b < this._arrBalls.length; b++) {
-                if (poly.containsPoint(this._arrBalls[b].get_center())) {
-                    containsBall = true;
-                    break;
-                }
-            }
-            if (containsBall) {
-                this._arrFree.push(poly);
-            } else {
-                this._arrConquered.push(poly);
-                area += Math.abs(poly.get_area());
+        
+        poly = innerPolys[0];
+        for (var b = 0; b < this._arrBalls.length; b++) {            
+            if (poly.containsPoint(this._arrBalls[b].get_center())) {
+                innerContainsBall = true;
+                break;
             }
         }
         
-        //add track polygon to conqured areas
-        this._arrConquered.push(trackPoly);
-        area += Math.abs(trackPoly.get_area());
+        poly = outerPolys[1];
+        for (var b = 0; b < this._arrBalls.length; b++) {            
+            if (poly.containsPoint(this._arrBalls[b].get_center())) {
+                outerContainsBall = true;
+                break;
+            }
+        }
         
-        console.log('<<<-- split polygons completed! -->>>');
-        console.log('conquered array:');
-        console.log(this._arrConquered);
-        console.log('free array:');
-        console.log(this._arrFree);
+        if (innerContainsBall && outerContainsBall) {
+            //add track polygon to conqured areas
+            this._arrConquered.push(trackPoly);
+            area += Math.abs(trackPoly.get_area());
+            this._arrFree.push(innerPolys[0]);
+            this._arrFree.push(outerPolys[1]);
+        } else if (innerContainsBall && !outerContainsBall) {
+            this._arrConquered.push(innerPolys[1]);
+            area += Math.abs(innerPolys[1].get_area());
+            this._arrFree.push(innerPolys[0]);
+        } else if (!innerContainsBall && outerContainsBall) {
+            this._arrConquered.push(outerPolys[0]);
+            area += Math.abs(outerPolys[0].get_area());
+            this._arrFree.push(outerPolys[1]);
+        } else {
+        }
         
         //update score
+        var last = Math.round(this._conquredArea / this._totalArea * 100);
         this._conquredArea += area;
-        this._score += Math.round(area / this._width * this._height / 100);        
         var conqueredPercent = Math.round(this._conquredArea / this._totalArea * 100);
+        this._score += ((conqueredPercent - last) * 10); // Math.round(area / this._width * this._height / 100);
         
         //raise event on changes in score and conquered area
         this._raiseEvent('conquer', conqueredPercent);
@@ -276,13 +293,12 @@ Game.prototype = {
             this.stop();
             this._numOfBalls++;
             this._numOfMonsters++;
-            this.init();
-            this.start();
-        }        
+            var self = this;
+            setTimeout(function() { self.init(); self.start(); }, 1000);
+        }
     },
 
-
-    onFail:function () {
+    onFail: function () {
         this.stop();
         this._numOfLives--;
         this._playAudio('fail');
@@ -293,11 +309,11 @@ Game.prototype = {
         }
         else {
             var self = this;
-            setTimeout(function() { self.init(); self.start(); }, 1000);
+            setTimeout(function() { self.relocatePlayer(); self.start(); }, 1000);
         }
     },
 
-    _playAudio:function (a) {
+    _playAudio: function (a) {
         if (!this._mute && this._audio[a])
             this._audio[a].play();
     }
