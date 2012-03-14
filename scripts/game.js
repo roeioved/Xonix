@@ -42,9 +42,9 @@ Game.prototype = {
         }
 
         //create player
-        this._player = new Player(0, this._cols / 2, new Vector(0, 0), this._grid);
-        //this._player.addEventListener('conquer', this.onConquer, this);
-        //this._player.addEventListener('fail', this.onFail, this);
+        this._player = new Player(0, Math.floor(this._cols / 2), new Vector(0, 0), this._grid);
+        this._player.addEventListener('conquer', this.onConquer, this);
+        this._player.addEventListener('fail', this.onFail, this);
 
         //create balls
         for (var i = 0; i < Game.NUM_OF_BALLS; i++) {
@@ -124,6 +124,8 @@ Game.prototype = {
         for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].step();
         }
+        
+        this._player.step();
     },
 
     end: function () {
