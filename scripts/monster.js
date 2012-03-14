@@ -14,7 +14,7 @@ Monster.prototype = {
         var y = this.get_row() * blockSize;
         
         ctx.beginPath();
-        ctx.rect(x + thickness, y + thickness, blockSize - thickness, blockSize - thickness);
+        ctx.rect(x, y, blockSize, blockSize);
         ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.lineWidth = thickness;
