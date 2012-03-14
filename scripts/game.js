@@ -117,8 +117,6 @@ Game.prototype = {
 
     draw:function () {
 
-        this._grid.draw();
-
         for (var i=0; i<this._monsters.length; i++)
         {
             this._monsters[i].draw(this._ctx, Game.MONSTER_FILL_COLOR, Game.MONSTER_BORDER_COLOR);
