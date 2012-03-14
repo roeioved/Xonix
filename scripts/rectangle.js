@@ -4,7 +4,7 @@ function Rectangle(a, b, c, d) {
 
     this._tl, this._br;
 
-	// a=top_left_x1, b=top_left_y1, c=bottom_right_x1, d=bottom_right_y1
+	// a=top_left_x, b=top_left_y, c=bottom_right_top, d=bottom_right_left
 	if (d!==undefined) {
 		this._tl = new Point(a, b);
 		this._br = new Point(c, d);
@@ -66,6 +66,27 @@ Rectangle.prototype = {
         return new Point(this._tl.get_x() + this.get_width()/2, this._tl.get_y() + this.get_height()/2);
     },
 
+    get_vertices: function() {
+      var top_left = this.get_topLeft();
+      var bottom_right = this.get_bottomRight();
+      return [ top_left, new Point(bottom_right.x, top_left.y), bottom_right, new Point(top_left.x, bottom_right.y) ];
+    },
+
+    get_edges: function() {
+        var edges = [];
+
+        var top_right = new Point(this.get_right(), this.get_top());
+        var bottom_left = new Point(this.get_left(), this.get_bottom());
+
+        edges.push(new Edge(this.get_topLeft(), top_right));
+        edges.push(new Edge(top_right, this.get_bottomRight()));
+        edges.push(new Edge(bottom_left, this.get_bottomRight()));
+        edges.push(new Edge(this.get_topLeft(), bottom_left));
+
+        return edges;
+
+    },
+
     get_width: function() {
         return this._br.get_x() - this._tl.get_x();
     },
@@ -100,8 +121,8 @@ Rectangle.prototype = {
     },
     
     doesIntersect: function(other) {
-        var mn = self.Math.min;
-        var mx = self.Math.max;
+        var mn = Math.min;
+        var mx = Math.max;
         var tl = other.get_topLeft();
         var br = other.get_bottomRight();
         return ( mn( br.get_x(), this._br.get_x() ) - mx( tl.get_x(), this._tl.get_x() ) ) > 0 && ( mn( br.get_y(), this._br.get_y() ) - mx( tl.get_y(), this._tl.get_y() ) ) > 0;
@@ -153,6 +174,37 @@ Rectangle.prototype = {
         ctx.rect(this._tl.get_x(), this._tl.get_y(), this.get_width(), this.get_height());
         ctx.fill();
         ctx.closePath();
+    },
+
+    project: function (axis) {
+        var values = this.get_dotProduct(axis);
+        var max, min;
+
+        max = min = values[0];
+
+        for (var i = 1; i < values.length; i++) {
+            if (values[i] > max) {
+                max = values[i];
+            }
+
+            else if (values[i] < min) {
+                min = values[i];
+            }
+        }
+
+        return { 'min':min, 'max':max };
+    },
+
+    get_dotProduct:function (axis) {
+        var result = [];
+
+        var vertices = this.get_vertices();
+
+        for (var i = 0; i < vertices.length; i++) {
+            result.push(axis.get_x() * vertices[i].get_x() + axis.get_y() * vertices[i].get_y());
+        }
+
+        return result;
     }
     
     /*

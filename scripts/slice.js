@@ -48,7 +48,7 @@ Slice.prototype = {
 
     markEdge:function (p1, p2) {
         for (var i = 0; i < this._edges.length; i++) {
-            if (this._edges[i].get_p1().get_x() == p1.get_x() && this._edges[i].get_p1().y == p1.y && this._edges[i].get_p2().get_x() == p2.get_x() && this._edges[i].get_p2().y == p2.y) {
+            if (this._edges[i].get_p1().get_x() == p1.get_x() && this._edges[i].get_p1().get_y() == p1.get_y() && this._edges[i].get_p2().get_x() == p2.get_x() && this._edges[i].get_p2().get_y() == p2.get_y()) {
                 this._edges[i].isMarked = true;
             }
         }
@@ -68,7 +68,7 @@ Slice.prototype = {
 
     findEdge:function (edge) {
         for (var i = 0; i < this._edges.length; i++) {
-            if (this._edges[i].get_p1().get_x() == edge.get_p1().get_x() && this._edges[i].get_p1().y == edge.get_p1().y && this._edges[i].get_p2().get_x() == edge.get_p2().get_x() && this._edges[i].get_p2().y == edge.get_p2().y) {
+            if (this._edges[i].get_p1().get_x() == edge.get_p1().get_x() && this._edges[i].get_p1().get_y() == edge.get_p1().get_y() && this._edges[i].get_p2().get_x() == edge.get_p2().get_x() && this._edges[i].get_p2().get_y() == edge.get_p2().get_y()) {
                 return this._edges[i];
             }
         }
@@ -106,21 +106,21 @@ Slice.prototype = {
                     }
                 }
             }
-            else if (this._orientation.y) { //vertical
-                if (this._edges[i].get_p1().y <= edge.get_p1().y && this._edges[i].get_p2().y >= edge.get_p2().y) {
+            else if (this._orientation.get_y()) { //vertical
+                if (this._edges[i].get_p1().get_y() <= edge.get_p1().get_y() && this._edges[i].get_p2().get_y() >= edge.get_p2().get_y()) {
                     //our edge contains the new edge
                     var edges = [];
 
-                    if (this._edges[i].get_p1().y < edge.get_p1().y) {
-                        edges.push(new Edge(this._value, this._edges[i].get_p1().y, this._value, edge.get_p1().y));
+                    if (this._edges[i].get_p1().get_y() < edge.get_p1().get_y()) {
+                        edges.push(new Edge(this._value, this._edges[i].get_p1().get_y(), this._value, edge.get_p1().get_y()));
                     }
 
-                    if (edge.get_p2().y <= this._edges[i].get_p2().y) {
-                        edges.push(new Edge(this._value, edge.get_p1().y, this._value, edge.get_p2().y));
+                    if (edge.get_p2().get_y() <= this._edges[i].get_p2().get_y()) {
+                        edges.push(new Edge(this._value, edge.get_p1().get_y(), this._value, edge.get_p2().get_y()));
                     }
 
-                    if (edge.get_p2().y < this._edges[i].get_p2().y) {
-                        edges.push(new Edge(this._value, edge.get_p2().y, this._value, this._edges[i].get_p2().y));
+                    if (edge.get_p2().get_y() < this._edges[i].get_p2().get_y()) {
+                        edges.push(new Edge(this._value, edge.get_p2().get_y(), this._value, this._edges[i].get_p2().get_y()));
                     }
 
                     if (edges.length > 0) {

@@ -1,12 +1,12 @@
 function Monster(left, top, size, fillColor, strokeColor, velocity, boundary, obstacles) {
+    this.set_velocity(velocity);
+    this.set_boundary(boundary);
+    this.set_obstacles(obstacles);
     this._tl = new Point(left, top);
     this._br = new Point(left + size, top + size);
     this._size = size;
     this._fillColor = fillColor;
     this._strokeColor = strokeColor;
-    this._velocity = velocity;
-    this._boundary = boundary;
-    this._obstacles = obstacles;
 }
 
 Monster.prototype = {
@@ -21,24 +21,7 @@ Monster.prototype = {
         ctx.lineWidth = thickness;
         ctx.strokeStyle = this._strokeColor;
         ctx.stroke();
-    },
-
-    get_velocity: function() {
-        return this._velocity;
-    },
-
-    get_boundary: function() {
-        return this._boundary;
-    },
-
-    get_obstacles: function() {
-        return this._obstacles;
-    },
-
-    set_obstacles: function(obstacles) {
-        this._obstacles = obstacles;
     }
-
 };
 
 Monster.prototype = $.extend(

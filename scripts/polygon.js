@@ -8,6 +8,8 @@ function Polygon(a) {
     this._centroid = null;
     this._edges = null;
     this._vectors = null;
+    this._hRectangles = null;
+    this._vRectangles = null;
 
     if (a) {
         if (a instanceof Polygon) {
@@ -20,47 +22,47 @@ function Polygon(a) {
                     this._points.push(new Point(pts[i]));
                 }
             }
-			/*
-            this._box = a.get_box().clone();
-            this._area = a.get_area();
-            this._centroid = a.get_centroid().clone();			
-			
-            this._edges = [];
-            var edges = a.get_edges();
+            /*
+             this._box = a.get_box().clone();
+             this._area = a.get_area();
+             this._centroid = a.get_centroid().clone();
 
-            if (edges) {
-                for (var i = 0; i < edges.length; i++) {
-                    this._edges.push(new Edge(edges[i]));
-                }
-            }
+             this._edges = [];
+             var edges = a.get_edges();
 
-            this._vectors = [];
-            var vectors = a.get_vectors();
+             if (edges) {
+             for (var i = 0; i < edges.length; i++) {
+             this._edges.push(new Edge(edges[i]));
+             }
+             }
 
-            if (vectors) {
-                for (var i = 0; i < vectors.length; i++) {
-                    this._vectors.push(new Vector(vectors[i]));
-                }
-            }
+             this._vectors = [];
+             var vectors = a.get_vectors();
 
-            this._hRectangles = [];
-            var _hRectangles = a.get_rectangles(new Vector(1,0));
+             if (vectors) {
+             for (var i = 0; i < vectors.length; i++) {
+             this._vectors.push(new Vector(vectors[i]));
+             }
+             }
 
-            if (_hRectangles) {
-                for (var i = 0; i < _hRectangles.length; i++) {
-                    this._hRectangles.push(new Rectangle(_hRectangles[i]));
-                }
-            }
+             this._hRectangles = [];
+             var _hRectangles = a.get_rectangles(new Vector(1,0));
 
-            this._vRectangles = [];
-            var _vRectangles = a.get_rectangles(new Vector(0,1));
+             if (_hRectangles) {
+             for (var i = 0; i < _hRectangles.length; i++) {
+             this._hRectangles.push(new Rectangle(_hRectangles[i]));
+             }
+             }
 
-            if (_vRectangles) {
-                for (var i = 0; i < _vRectangles.length; i++) {
-                    this._vRectangles.push(new Rectangle(_vRectangles[i]));
-                }
-            }
-			*/
+             this._vRectangles = [];
+             var _vRectangles = a.get_rectangles(new Vector(0,1));
+
+             if (_vRectangles) {
+             for (var i = 0; i < _vRectangles.length; i++) {
+             this._vRectangles.push(new Rectangle(_vRectangles[i]));
+             }
+             }
+             */
         }
 
         else if (a instanceof Array) { // array of points
@@ -251,79 +253,93 @@ Polygon.prototype = {
         return result;
     },
 
+    //divide polygon to composing rectangles (horizontal or vertical) depending on the orientation.
+    // {1,0} - horizontal  {0,1} vertical
     get_rectangles:function (orientation) {
-        if (!this._hRectangles) {
-            this._hRectangles = [];
 
-            var slices = this._createSlicesWithEdges(orientation);
+        if (orientation.get_x() && this._hRectangles != null) {
+            return this._hRectangles;
+        }
+        else if (orientation.get_y() && this._vRectangles != null) {
+            return this._vRectangles;
+        }
 
-            for (var i = 0; i < slices.length; i++) {
-                var slice = slices[i];
-                var edges = slice.getUnmarkedEdges();
+        orientation.get_x() ? this._hRectangles = [] : this._vRectangles = [];
 
-                while (edges.length > 0) {
-                    for (var edge in edges) {
-                        edge = edges[edge];
+        //slices should be perpendicular to orientation
+        var slicesOrientation = orientation.get_x() ? new Vector(0,1) : new Vector(1,0);
 
-                        var rec = this._getRectangle(edge, i, slices);
+        var slices = this._createSlicesWithEdges(slicesOrientation);
 
-                        if (rec) {
-                            this._hRectangles.push(rec);
+        for (var i = 0; i < slices.length; i++) {
+            var slice = slices[i];
+            var edges = slice.getUnmarkedEdges();
 
-                            var recEdges = rec.get_edges();
+            while (edges.length > 0) {
+                for (var edge in edges) {
+                    edge = edges[edge];
 
-                            for (var recEdge in recEdges) {
-                                recEdge = recEdges[recEdge];
+                    var rec = this._getRectangle(edge, i, slices);
 
-                                if (orientation.get_x() && recEdge.get_p1().get_y() == recEdge.get_p2().get_y()) { //if horizontal
-                                    for (var j = 0; j < slices.length; j++) {
-                                        if (slices[j].get_value() == recEdge.get_p1().get_y()) {
-                                            if (!slices[j].findEdge(recEdge)) //edge was not found
-                                            {
-                                                slices[j].update(recEdge);
-                                            }
-                                            slices[j].markEdge(recEdge.get_p1(), recEdge.get_p2());
-                                            break;
+                    if (rec) {
+
+                        orientation.get_x() ? this._hRectangles.push(rec) : this._vRectangles.push(rec);
+
+                        var recEdges = rec.get_edges();
+
+                        for (var recEdge in recEdges) {
+                            recEdge = recEdges[recEdge];
+
+                            if (slicesOrientation.get_x() && recEdge.get_p1().get_y() == recEdge.get_p2().get_y()) { //if horizontal slices
+                                for (var j = 0; j < slices.length; j++) {
+                                    if (slices[j].get_value() == recEdge.get_p1().get_y()) {
+                                        if (!slices[j].findEdge(recEdge)) //edge was not found
+                                        {
+                                            slices[j].update(recEdge);
                                         }
-                                    }
-                                }
-                                else if (orientation.get_y() && recEdge.get_p1().get_x() == recEdge.get_p2().get_x()) { //if vertical
-                                    for (var j = 0; j < slices.length; j++) {
-                                        if (slices[j].get_value() == recEdge.get_p1().get_x()) {
-                                            if (!slices[j].findEdge(recEdge)) //edge was not found
-                                            {
-                                                slices[j].update(recEdge);
-                                            }
-                                            slices[j].markEdge(recEdge.get_p1(), recEdge.get_p2());
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else { //rectangle not found for edge
-                            for (var j = 0; j < slices.length; j++) {
-                                if (orientation.get_x()) { //horizontal
-                                    if (slices[j].get_value() == edge.get_p1().get_y()) {
-                                        slices[j].markEdge(edge.get_p1(), edge.get_p2());
+                                        slices[j].markEdge(recEdge.get_p1(), recEdge.get_p2());
                                         break;
                                     }
                                 }
-                                else // vertical
-                                {
-                                    if (slices[j].get_value() == edge.get_p1().get_x()) {
-                                        slices[j].markEdge(edge.get_p1(), edge.get_p2());
+                            }
+                            else if (slicesOrientation.get_y() && recEdge.get_p1().get_x() == recEdge.get_p2().get_x()) { //if vertical slices
+                                for (var j = 0; j < slices.length; j++) {
+                                    if (slices[j].get_value() == recEdge.get_p1().get_x()) {
+                                        if (!slices[j].findEdge(recEdge)) //edge was not found
+                                        {
+                                            slices[j].update(recEdge);
+                                        }
+                                        slices[j].markEdge(recEdge.get_p1(), recEdge.get_p2());
                                         break;
                                     }
                                 }
                             }
                         }
                     }
-                    edges = slice.getUnmarkedEdges();
+                    else { //rectangle not found for edge
+                        for (var j = 0; j < slices.length; j++) {
+                            if (slicesOrientation.get_x()) { //horizontal slices
+                                if (slices[j].get_value() == edge.get_p1().get_y()) {
+                                    slices[j].markEdge(edge.get_p1(), edge.get_p2());
+                                    break;
+                                }
+                            }
+                            else // vertical slices
+                            {
+                                if (slices[j].get_value() == edge.get_p1().get_x()) {
+                                    slices[j].markEdge(edge.get_p1(), edge.get_p2());
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
+                edges = slice.getUnmarkedEdges();
             }
         }
-        return this._hRectangles;
+
+        return orientation.get_x() ? this._hRectangles : this._vRectangles;
+
     },
 
     isPointOn:function (p) {
@@ -387,7 +403,7 @@ Polygon.prototype = {
     },
 
 //creates an array of slices. Each slice contains a list of edges positioned on the slice's axis according to its orientation.
-//the orientation should be a vector of the following options: (0,1) - vertical or  (1,0) - horizontal
+//the orientation should be a vector of the following options: (0,1) - vertical slices or  (1,0) - horizontal slices
     _createSlicesWithEdges:function (orientation) {
         var res = [];
         var points = this._points;
@@ -490,14 +506,14 @@ Polygon.prototype = {
                         //we found a good candidate for our edge. we can generate the rectangle and return it
                         right_x = slice_edge.get_p2().get_x() < right_x ? slice_edge.get_p2().get_x() : right_x;
 
-                        var pol = new Polygon([
+                        var rec = new Rectangle(
                             new Point(left_x, edge.get_p1().get_y()),
-                            new Point(right_x, edge.get_p1().get_y()),
-                            new Point(right_x, slice.get_value()),
-                            new Point(left_x, slice.get_value())
-                        ]);
+                            //new Point(right_x, edge.get_p1().get_y()),
+                            new Point(right_x, slice.get_value())
+                            //new Point(left_x, slice.get_value())
+                        );
 
-                        return pol;
+                        return rec;
                     }
                     else if (slice_edge.get_p1().get_x() > left_x && slice_edge.get_p1().get_x() < right_x) {
                         // if edge is not a goot candidate for the bottom edge of the polygon, but still intersects with the upper edge of the polygon, we should decrease the size of
@@ -525,14 +541,14 @@ Polygon.prototype = {
                         //we found a good candidate for our edge. we can generate the rectangle and return it
                         bottom_y = slice_edge.get_p2().get_y() < bottom_y ? slice_edge.get_p2().get_y() : bottom_y;
 
-                        var pol = new Polygon([
+                        var rec = new Rectangle(
                             new Point(edge.get_p1().get_x(), edge.get_p1().get_y()),
-                            new Point(slice_edge.get_p1().get_x(), edge.get_p1().get_y()),
-                            new Point(slice_edge.get_p2().get_x(), bottom_y),
-                            new Point(edge.get_p2().get_x(), bottom_y)
-                        ]);
+                            //new Point(slice_edge.get_p1().get_x(), edge.get_p1().get_y()),
+                            new Point(slice_edge.get_p2().get_x(), bottom_y)
+                            //new Point(edge.get_p2().get_x(), bottom_y)
+                        );
 
-                        return pol;
+                        return rec;
                     }
                     else if (slice_edge.get_p1().get_y() > top_y && slice_edge.get_p1().get_y() < bottom_y) {
                         // if edge is not a goot candidate, but still intersects with the edge of the polygon, we should decrease the size of
@@ -544,43 +560,43 @@ Polygon.prototype = {
         }
     },
 
-//splits polygon to two polygons by path
+    //splits polygon to two polygons by path
     split:function (path) {
         var polygons = [];
         var pointsToAdd = [];
-		
-		var polyEdges = this.get_edges();
-		var pathEdges = path.getEdges();
-		
+
+        var polyEdges = this.get_edges();
+        var pathEdges = path.getEdges();
+
         console.log('<<<-- split polygons -->>>');
-		console.log('polygon:');
-		console.log(this._points);
-		console.log('path:');
-		console.log(path._points);
-		//path.removeDuplicatePoints();
-		//console.log('path distinct');
-		//console.log(path);
-		
-		var counter = 0;
-		for (var pathEdge in pathEdges) {
-				var e1 = pathEdges[pathEdge];
-				
-				for (var polyEdge in polyEdges) {
-						var e2 = polyEdges[polyEdge];
-						var intersect = e1.doesIntersect(e2);
-						if (intersect) {
-								if (pointsToAdd.length == 0) {
-										console.log('replace ' + path._points[pathEdge] + ' with ' + intersect);
-										path._points.splice(pathEdge, 1, new Point(intersect));
-								} else if (pointsToAdd.length == 1) {
-										console.log('replace ' + path._points[pathEdge+1] + ' with ' + intersect);
-										path._points.splice(pathEdge + 1, 1, new Point(intersect));
-								}
-								pointsToAdd.push(intersect);
-						}
-				}
-		}
-		
+        console.log('polygon:');
+        console.log(this._points);
+        console.log('path:');
+        console.log(path._points);
+        //path.removeDuplicatePoints();
+        //console.log('path distinct');
+        //console.log(path);
+
+        var counter = 0;
+        for (var pathEdge in pathEdges) {
+            var e1 = pathEdges[pathEdge];
+
+            for (var polyEdge in polyEdges) {
+                var e2 = polyEdges[polyEdge];
+                var intersect = e1.doesIntersect(e2);
+                if (intersect) {
+                    if (pointsToAdd.length == 0) {
+                        console.log('replace ' + path._points[pathEdge] + ' with ' + intersect);
+                        path._points.splice(pathEdge, 1, new Point(intersect));
+                    } else if (pointsToAdd.length == 1) {
+                        console.log('replace ' + path._points[pathEdge + 1] + ' with ' + intersect);
+                        path._points.splice(pathEdge + 1, 1, new Point(intersect));
+                    }
+                    pointsToAdd.push(intersect);
+                }
+            }
+        }
+
         if (pointsToAdd.length != 2)
             throw "invalid path";
 
@@ -595,10 +611,10 @@ Polygon.prototype = {
         for (iPt = 0; iPt < nPts; iPt++) {
             var pt = pts[iPt].clone();
             var exists = path.containsPoint(pt);
-			
+
             if (exists) {
                 tmp *= -1;
-				
+
                 if (poly2.get_points().length == 0) {
                     if (direction == 'D' || direction == 'L') {
                         for (i = 0; i < path.get_points().length; i++) {
@@ -617,7 +633,7 @@ Polygon.prototype = {
                 else poly2.get_points().push(pt);
             }
         }
-		
+
         polygons.push(poly1);
         polygons.push(poly2);
 
@@ -646,10 +662,9 @@ Polygon.prototype = {
 
             var intersect = 0;
 
-            if (res1.min == res2.max || res2.min == res1.max)
-             {
+            if (res1.min == res2.max || res2.min == res1.max) {
                 intersect = 0;
-             }
+            }
             if (res1.min < res2.min) {
                 intersect = res2.min - res1.max;
             } else {
@@ -726,25 +741,25 @@ Polygon.prototype = {
         }
     },
 
-    drawGradientPoints:function (ctx) {       
+    drawGradientPoints:function (ctx) {
         var pts = this._points;
-        var nPts = pts.length;        
+        var nPts = pts.length;
 
-		var r = 255;
-		var g = 0;
-		var b = 0;
-		var diff = 10;
+        var r = 255;
+        var g = 0;
+        var b = 0;
+        var diff = 10;
         var radius = 5;
-		
-		for (var i = 0; i < nPts; i++) {
-			var pt = pts[i];
+
+        for (var i = 0; i < nPts; i++) {
+            var pt = pts[i];
             ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
             ctx.beginPath();
             ctx.arc(pt.get_x(), pt.get_y(), radius, 0, self.Math.PI * 2, true);
             ctx.closePath();
             ctx.fill();
-			r -= diff;
+            r -= diff;
         }
     }
-	
+
 };

@@ -30,6 +30,22 @@ Circle.prototype = {
         this._y += dy;
     },
 
+    get_x: function() {
+        return this._x;
+    },
+
+    set_x: function(value) {
+      this._x = value;
+    },
+
+    get_y: function() {
+        return this._y;
+    },
+
+    set_y: function(value) {
+        this._y = value;
+    },
+
     draw: function(ctx, fillStyle) {
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
