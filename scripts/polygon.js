@@ -737,12 +737,12 @@ Polygon.prototype = {
 
     drawGradientPoints:function (ctx) {       
         var pts = this._points;
-        var nPts = pts.length;        
+        var nPts = pts.length;
 
 		var r = 255;
 		var g = 0;
 		var b = 0;
-		var diff = 10;
+		var diff = self.Math.round(200 / nPts);
         var radius = 5;
 		
 		for (var i = 0; i < nPts; i++) {
