@@ -42,11 +42,9 @@
             var ctx = canvas.getContext("2d");
             
             var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize, ctx);            
-            /*
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
-            */
             
             game.start();
         });

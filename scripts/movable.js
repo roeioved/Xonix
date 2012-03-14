@@ -53,7 +53,7 @@ Movable.prototype = {
         this._col += cols;
     },
     
-    step:function () {        
+    step:function () {
         var col = this.get_col();
         var row = this.get_row();
         var velocity = this.get_velocity();
