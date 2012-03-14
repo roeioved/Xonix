@@ -395,8 +395,8 @@ Player.prototype = {
         
         if (this._trackPoly) {
             this._trackPoly.draw(ctx, '#00A8A8');
-            this._innerTrack.drawPoints(ctx, 'Red');
-            this._outerTrack.drawPoints(ctx, 'Yellow');
+            //this._innerTrack.drawPoints(ctx, 'Red');
+            //this._outerTrack.drawPoints(ctx, 'Yellow');
         }
         
         ctx.beginPath();
