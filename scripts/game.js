@@ -27,16 +27,16 @@ Game.MONSTER_FILL_COLOR = '#00A8A8';
 Game.prototype = {
 
     init:function () {
-        this._grid = new Grid(this._cols, this._rows, 0);
+        this._grid = new Grid(this._rows, this._cols, 0);
 
         this._balls = [];
         this._monsters = [];
 
         for (var i = 0, j = this._cols - 1, k = this._rows - 1; i < this._frame; i++, j--, k--) {
             this._grid.set_row(i, 1);
-            this._grid.set_row(j, 1);
+            this._grid.set_row(k, 1);
             this._grid.set_col(i, 1);
-            this._grid.set_col(k, 1);
+            this._grid.set_col(j, 1);
         }
 
         //create balls
@@ -46,7 +46,7 @@ Game.prototype = {
             var velocityX = (this._random(0, 1) == 0 ? -1 : 1);
             var velocityY = (this._random(0, 1) == 0 ? -1 : 1);
 
-            var ball = new Ball(row, col, new Vector(velocityX, velocityY), this._grid);
+            var ball = new Ball(row, col, new Vector(velocityX, velocityY), this._grid, 1);
 
             this._balls.push(ball);
         }
@@ -65,7 +65,7 @@ Game.prototype = {
             var velocityX = this._random(0, 1) == 0 ? -1 : 1;
             var velocityY = this._random(0, 1) == 0 ? -1 : 1;
 
-            var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid);
+            var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, 0);
             this._monsters.push(monster);
         }
 
@@ -96,7 +96,7 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._cols * self._blockSize, self._rows * self._blockSize);
             self.step();
             self.draw();
-        }, 1000 / 30);
+        }, 1000 / 20);
 
     },
 
@@ -112,6 +112,8 @@ Game.prototype = {
 
     draw:function () {
 
+        this._grid.draw(this._ctx, this._blockSize, Game.FREE_CELL_COLOR, Game.CONQUERED_CELL_COLOR);
+
         for (var i = 0; i < this._monsters.length; i++) {
             this._monsters[i].draw(this._ctx, this._blockSize, Game.MONSTER_FILL_COLOR, Game.MONSTER_BORDER_COLOR);
         }
@@ -119,8 +121,6 @@ Game.prototype = {
         for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_BORDER_COLOR);
         }
-
-        this._grid.draw(this._ctx, this._blockSize, Game.FREE_CELL_COLOR, Game.CONQUERED_CELL_COLOR);
     },
 
     _random:function (min, max) {
