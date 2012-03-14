@@ -13,8 +13,8 @@ Grid.prototype = {
         this._cols = cols;
 
         this._grid = new Array(rows);
-        for (var row in this._grid) {
-            this._grid[row] = new Array(cols);
+        for (var i=0; i< this._grid.length; i++) {
+            this._grid[i] = new Array(cols);
         }
 
         for(var i=0; i<rows; i++) {
@@ -29,7 +29,7 @@ Grid.prototype = {
     },
 
     set_state: function(row, col, state) {
-        this_grid[row][col] = state;
+        this._grid[row][col] = state;
     },
 
     get_numOfCols: function() {
@@ -53,8 +53,8 @@ Grid.prototype = {
     },
 
     draw: function(ctx, color0, color1) {
-        for(var i=0; i<rows; i++) {
-            for (var j=0; j<cols; j++) {
+        for(var i=0; i<this._rows; i++) {
+            for (var j=0; j<this._cols; j++) {
                 ctx.fillStyle = this.get_state(i,j) == 0 ? color0 : color1;
                 ctx.beginPath();
                 ctx.rect(j * this._blockSize, i * this._blockSize, this._blockSize, this._blockSize);

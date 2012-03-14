@@ -7,11 +7,12 @@
 
 Ball.prototype = {
 
-    draw:function (ctx, blockSize, radius, fillColor, strokeColor) {
+    draw:function (ctx, blockSize, fillColor, strokeColor) {
         var thickness = 1;
-        var x = this.get_col() * blockSize + blockSize / 2;
-        var y = this.get_row() * blockSize + blockSize / 2;
-        
+        var radius = blockSize / 2;
+        var x = this.get_col() * blockSize + radius;
+        var y = this.get_row() * blockSize + radius;
+
         ctx.beginPath();
         ctx.arc(x, y, radius - thickness / 2, 0, Math.PI * 2, false);
         ctx.fillStyle = fillColor;

@@ -9,6 +9,8 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._monsters = [];
     this._balls = [];
     this._intervalId;
+
+    this.init();
 }
 
 Game.NUM_OF_LIVES = 10;
@@ -60,8 +62,8 @@ Game.prototype = {
             var rows_2 = this._random(this._rows - this._frame, this._rows - 1);
             var row = this._random(0, 1) == 0 ? rows_1 : rows_2;
 
-            var velocityX = random(0, 1) == 0 ? -1 : 1;
-            var velocityY = random(0, 1) == 0 ? -1 : 1;
+            var velocityX = this._random(0, 1) == 0 ? -1 : 1;
+            var velocityY = this._random(0, 1) == 0 ? -1 : 1;
 
             var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid);
             this._monsters.push(monster);
@@ -91,43 +93,34 @@ Game.prototype = {
         var self = this;
 
         this._intervalId = setInterval(function () {
-            try {
-                self._ctx.clearRect(0, 0, self._rows * this._blockSize, self._cols * this._blockSize);
-                self.step();
-                self.draw();
-            } catch (err) {
-                clearInterval(self._intervalId);
-                console.log(err.message);
-            }
+            self._ctx.clearRect(0, 0, self._cols * self._blockSize, self._rows * self._blockSize);
+            self.step();
+            self.draw();
         }, 1000 / 30);
 
     },
 
     step:function () {
-        for (var i=0; i<this._monsters.length; i++)
-        {
+        for (var i = 0; i < this._monsters.length; i++) {
             this._monsters[i].step();
         }
 
-        for (var i=0; i<this._balls.length; i++)
-        {
+        for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].step();
         }
     },
 
     draw:function () {
 
-        for (var i=0; i<this._monsters.length; i++)
-        {
-            this._monsters[i].draw(this._ctx, Game.MONSTER_FILL_COLOR, Game.MONSTER_BORDER_COLOR);
+        for (var i = 0; i < this._monsters.length; i++) {
+            this._monsters[i].draw(this._ctx, this._blockSize, Game.MONSTER_FILL_COLOR, Game.MONSTER_BORDER_COLOR);
         }
 
-        for (var i=0; i<this._balls.length; i++)
-        {
-            this._balls[i].draw(this._ctx, Game.BALL_FILL_COLOR, Game.BALL_BORDER_COLOR);
+        for (var i = 0; i < this._balls.length; i++) {
+            this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_BORDER_COLOR);
         }
 
-        this._grid.draw(this._ctx, Game.FREE_CELL_COLOR , Game.CONQUERED_CELL_COLOR);
+        this._grid.draw(this._ctx, Game.FREE_CELL_COLOR, Game.CONQUERED_CELL_COLOR);
     },
 
     _random:function (min, max) {
