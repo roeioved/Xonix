@@ -1,6 +1,6 @@
 function Monster(row, col, velocity, grid) {
-    this._row = row;
-    this._col = col;
+    this.set_row(row);
+    this.set_col(col);
     this.set_velocity(velocity);
     this.set_grid(grid);
 }
@@ -9,8 +9,8 @@ Monster.prototype = {
 
     draw:function (ctx, blockSize, fillColor, strokeColor) {
         var thickness = 2;
-        var x = this.col * blockSize;
-        var y = this.row * blockSize;
+        var x = this.get_col() * blockSize;
+        var y = this.get_row() * blockSize;
         
         ctx.beginPath();
         ctx.rect(x + thickness, y + thickness, blockSize - thickness, blockSize - thickness);
