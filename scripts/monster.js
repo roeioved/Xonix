@@ -1,8 +1,9 @@
-function Monster(row, col, velocity, grid) {
+function Monster(row, col, velocity, grid, blockerState) {
     this.set_row(row);
     this.set_col(col);
     this.set_velocity(velocity);
     this.set_grid(grid);
+    this.set_blockerState(blockerState);
 }
 
 Monster.prototype = {
