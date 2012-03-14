@@ -1,35 +1,31 @@
-﻿function Ball(x, y, radius, fillColor, strokeColor, velocity, boundary, obstacles) {
+﻿function Ball(row, col, velocity, grid) {
+    this._row = row;
+    this._col = col;
     this.set_velocity(velocity);
-    this.set_boundary(boundary);
-    this.set_x(x);
-    this.set_y(y);
-    this._radius = radius;
-    this._fillColor = fillColor;
-    this._strokeColor = strokeColor;
-    this._obstacles = obstacles;
+    this.set_grid(grid);
 }
 
 Ball.prototype = {
 
-    draw:function (ctx) {
+    draw:function (ctx, blockSize, radius, fillColor, strokeColor) {
         var thickness = 1;
-
+        var x = this.col * blockSize + blockSize / 2;
+        var y = this.row * blockSize + blockSize / 2;
+        
         ctx.beginPath();
-        ctx.arc(this._x, this._y, this._radius - thickness / 2, 0, Math.PI * 2, false);
-        ctx.fillStyle = this._fillColor;
+        ctx.arc(x, y, radius - thickness / 2, 0, Math.PI * 2, false);
+        ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.lineWidth = thickness;
-        ctx.strokeStyle = this._strokeColor;
+        ctx.strokeStyle = strokeColor;
         ctx.stroke();
         ctx.closePath();
     }
-
-
+    
 };
 
 Ball.prototype = $.extend(
     {},
-    Circle.prototype,
     Movable.prototype,
     Ball.prototype
 );

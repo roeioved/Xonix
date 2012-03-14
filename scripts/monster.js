@@ -1,32 +1,29 @@
-function Monster(left, top, size, fillColor, strokeColor, velocity, boundary, obstacles) {
+function Monster(row, col, velocity, grid) {
+    this._row = row;
+    this._col = col;
     this.set_velocity(velocity);
-    this.set_boundary(boundary);
-    this.set_obstacles(obstacles);
-    this._tl = new Point(left, top);
-    this._br = new Point(left + size, top + size);
-    this._size = size;
-    this._fillColor = fillColor;
-    this._strokeColor = strokeColor;
+    this.set_grid(grid);
 }
 
 Monster.prototype = {
 
-    draw: function (ctx) {        
+    draw:function (ctx, blockSize, fillColor, strokeColor) {
         var thickness = 2;
+        var x = this.col * blockSize;
+        var y = this.row * blockSize;
         
         ctx.beginPath();
-        ctx.rect(this._tl.get_x() + thickness, this._tl.get_y() + thickness, this._size - thickness, this._size - thickness);
-        ctx.fillStyle = this._fillColor;
+        ctx.rect(x + thickness, y + thickness, blockSize - thickness, blockSize - thickness);
+        ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.lineWidth = thickness;
-        ctx.strokeStyle = this._strokeColor;
+        ctx.strokeStyle = strokeColor;
         ctx.stroke();
     }
 };
 
 Monster.prototype = $.extend(
     {},
-    Rectangle.prototype,
     Movable.prototype,
     Monster.prototype
 );
