@@ -23,6 +23,8 @@ Game.BALL_BORDER_COLOR = '#ffffff';
 Game.BALL_FILL_COLOR = '#00A8A8';
 Game.MONSTER_BORDER_COLOR = '#000000';
 Game.MONSTER_FILL_COLOR = '#00A8A8';
+Game.PLAYER_BORDER_COLOR = '#901290';
+Game.PLAYER_FILL_COLOR = '#FFFFFF';
 
 Game.prototype = {
 
@@ -38,6 +40,11 @@ Game.prototype = {
             this._grid.set_col(i, 1);
             this._grid.set_col(j, 1);
         }
+
+        //create player
+        this._player = new Player(0, this._cols / 2, new Vector(0, 0), this._grid);
+        //this._player.addEventListener('conquer', this.onConquer, this);
+        //this._player.addEventListener('fail', this.onFail, this);
 
         //create balls
         for (var i = 0; i < Game.NUM_OF_BALLS; i++) {
@@ -96,7 +103,7 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._cols * self._blockSize, self._rows * self._blockSize);
             self.step();
             self.draw();
-        }, 1000 / 20);
+        }, 1000 / 30);
 
     },
 
@@ -121,6 +128,8 @@ Game.prototype = {
         for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_BORDER_COLOR);
         }
+        
+        this._player.draw(this._ctx, this._blockSize, Game.PLAYER_FILL_COLOR, Game.PLAYER_BORDER_COLOR);
     },
 
     _random:function (min, max) {
