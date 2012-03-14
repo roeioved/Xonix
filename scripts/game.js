@@ -69,6 +69,11 @@ Game.prototype = {
             this._monsters.push(monster);
         }
 
+        //TODO: create player
+
+        //this._player.addEventListener('conquer', this._onConquer, this);
+        //this._player.addEventListener('fail', this._onFail, this);
+
         var self = this;
 
         $(document).keydown(function (event) {
@@ -100,6 +105,10 @@ Game.prototype = {
 
     },
 
+    stop: function () {
+        clearInterval(this._intervalId);
+    },
+
     step:function () {
         for (var i = 0; i < this._monsters.length; i++) {
             this._monsters[i].step();
@@ -108,6 +117,10 @@ Game.prototype = {
         for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].step();
         }
+    },
+
+    end: function () {
+        this.stop();
     },
 
     draw:function () {
@@ -123,9 +136,26 @@ Game.prototype = {
         }
     },
 
+    addEventListener: function() {
+
+    },
+
     _random:function (min, max) {
         var val = min + Math.random() * (max - min);
         return Math.round(val);
-    }
+    },
 
-}
+    _onFail: function(args) {
+        this._raiseEvent('fail', args);
+    },
+
+    _onConquer: function(args) {
+        this._raiseEvent('conquer', args);
+    }
+};
+
+Game.prototype = $.extend(
+    {},
+    EventHandler.prototype,
+    Game.prototype
+);
