@@ -153,10 +153,10 @@ Game.prototype = {
                 self._ctx.clearRect(0, 0, self._width, self._height);
                 self.step();
                 self.draw();
-            } catch (ex) {
+            } catch (err) {
                 clearInterval(this._intervalId);
-                console.log(ex);
-                //debugger;
+                console.log(err.message);
+                debugger;
             }
         }, 1000 / 60);
     },

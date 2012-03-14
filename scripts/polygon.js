@@ -544,10 +544,10 @@ Polygon.prototype = {
         }
     },
 
-//splits polygon to two polygons by path
+	//splits polygon to two polygons by path
     split:function (path) {
         var polygons = [];
-        var pointsToAdd = [];
+		var pointsToAdd = [];
 		
 		var polyEdges = this.get_edges();
 		var pathEdges = path.getEdges();
@@ -557,39 +557,48 @@ Polygon.prototype = {
 		console.log(this._points);
 		console.log('path:');
 		console.log(path._points);
-		//path.removeDuplicatePoints();
-		//console.log('path distinct');
-		//console.log(path);
 		
 		var counter = 0;
 		for (var pathEdge in pathEdges) {
-				var e1 = pathEdges[pathEdge];
-				
-				for (var polyEdge in polyEdges) {
-						var e2 = polyEdges[polyEdge];
-						var intersect = e1.doesIntersect(e2);
-						if (intersect) {
-								if (pointsToAdd.length == 0) {
-										console.log('replace ' + path._points[pathEdge] + ' with ' + intersect);
-										path._points.splice(pathEdge, 1, new Point(intersect));
-								} else if (pointsToAdd.length == 1) {
-										console.log('replace ' + path._points[pathEdge+1] + ' with ' + intersect);
-										path._points.splice(pathEdge + 1, 1, new Point(intersect));
-								}
-								pointsToAdd.push(intersect);
+			var e1 = pathEdges[pathEdge];
+			
+			for (var polyEdge in polyEdges) {
+				var e2 = polyEdges[polyEdge];
+				var intersect = e1.doesIntersect(e2);
+				console.log('edge ' + e1._p1 + ',' + e1._p2 + ' intersects ' + 'edge ' + e2._p1 + ',' + e2._p2 + '? ' + intersect);
+				if (intersect) {
+					if (pointsToAdd.length == 0) {
+							console.log('replace ' + path._points[pathEdge] + ' with ' + intersect);
+							path._points.splice(pathEdge, 1, new Point(intersect));
+					} else if (pointsToAdd.length == 1) {
+							console.log('replace ' + path._points[pathEdge+1] + ' with ' + intersect);
+							path._points.splice(pathEdge + 1, 1, new Point(intersect));
+					}
+					
+					//check that point is not already exists
+					var exists = false;
+					for (var i in pointsToAdd) {
+						if (pointsToAdd[i].compare(intersect)) {
+							exists = true;
+							break;
 						}
+					}
+					if (!exists) {
+						pointsToAdd.push(intersect);
+					}
 				}
+			}
 		}
 		
-        if (pointsToAdd.length != 2)
+		if (pointsToAdd.length != 2)
             throw "invalid path";
-
+		
         this.addPointsOnPolygon(pointsToAdd);
-
+		
         var poly1 = new Polygon(), poly2 = new Polygon();
         var pts, nPts, iPt, pt, tmp = 1;
         var direction = path.get_direction();
-
+		
         pts = this._points;
         nPts = pts.length;
         for (iPt = 0; iPt < nPts; iPt++) {
@@ -620,7 +629,7 @@ Polygon.prototype = {
 		
         polygons.push(poly1);
         polygons.push(poly2);
-
+		
         return polygons;
     },
 

@@ -130,24 +130,6 @@ Path.prototype = {
 						this._points.splice(idx, 1, p2);
 				}
 		}
-	},
-	
-	removeDuplicatePoints: function () {
-		var points = [];
-		for (var i in this._points) {
-				var exists = false;
-				for (var j in points) {
-						if (this._points[i].compare(points[j])) {
-								console.log('remove ' + this._points[i]);
-								exists = true;
-								break;
-						}						
-				}
-				if (!exists) {
-						points.push(this._points[i]);
-				}
-		}
-		this._points = points;
 	}
 	
 }
