@@ -34,7 +34,7 @@ function Game(width, height, frameBorder, ctx) {
 
 Game.NUM_OF_LIVES = 10;
 Game.PLAYER_SIZE = 10;
-Game.SPEED = Game.PLAYER_SIZE;
+Game.SPEED = 5;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_MONSTERS = 0;
 
@@ -149,10 +149,16 @@ Game.prototype = {
         this._state = GAME_STATES.RUNNING;
 
         this._intervalId = setInterval(function () {
-            self._ctx.clearRect(0, 0, self._width, self._height);
-            self.step();
-            self.draw();
-        }, 1000 / 40);
+            try {
+                self._ctx.clearRect(0, 0, self._width, self._height);
+                self.step();
+                self.draw();
+            } catch (ex) {
+                clearInterval(this._intervalId);
+                console.log(ex);
+                //debugger;
+            }
+        }, 1000 / 60);
     },
 
     stop:function () {
@@ -190,9 +196,9 @@ Game.prototype = {
         this._drawArray(this._ctx, this._arrFree, 'Black');
         this._drawArray(this._ctx, this._arrConquered, '#00A8A8');
         this._drawPoints(this._ctx, this._arrFree);
-        this._drawArray(this._ctx, this._arrBalls);
         this._drawArray(this._ctx, this._arrMonsters);
         this._player.draw(this._ctx);
+        this._drawArray(this._ctx, this._arrBalls);
     },
 
     _drawArray:function (ctx, array, fillStyle) {
@@ -221,40 +227,57 @@ Game.prototype = {
         return obstacles;
     },
 
-    onConquer:function (sourcePolyIndex, trackPoly, innerPath, outerPath) {
-        var area = 0;
-
+    onConquer:function (sourcePolyIndex, trackPoly, innerPath, outerPath) {        
+        var area = 0, poly;
+        var innerContainsBall = false, outerContainsBall = false;;
+        
         //split
-        var result = [];
-        var firstPoly = this._arrFree[sourcePolyIndex].split(innerPath)[0];
-        var secondPoly = this._arrFree[sourcePolyIndex].split(outerPath)[1];
-
-        result.push(firstPoly);
-        result.push(secondPoly);
-
+        var innerPolys = this._arrFree[sourcePolyIndex].split(innerPath);                
+        //innerPolys[0].draw(this._ctx, 'Red');
+        //innerPolys[1].draw(this._ctx, 'Yellow');
+        //debugger;
+        var outerPolys = this._arrFree[sourcePolyIndex].split(outerPath);
+        //outerPolys[0].draw(this._ctx, 'Red');
+        //outerPolys[1].draw(this._ctx, 'Yellow');
+        //debugger;
+        
         //since we now conquered part of the free area, we'll remove it from the list of free areas
         this._arrFree.splice(sourcePolyIndex, 1);
-
-        for (var i = 0; i < result.length; i++) {
-            var poly = result[i];
-            var containsBall = false;
-            for (var b = 0; b < this._arrBalls.length; b++) {
-                if (poly.containsPoint(this._arrBalls[b].get_center())) {
-                    containsBall = true;
-                    break;
-                }
-            }
-            if (containsBall) {
-                this._arrFree.push(poly);
-            } else {
-                this._arrConquered.push(poly);
-                area += Math.abs(poly.get_area());
+        
+        poly = innerPolys[0];
+        for (var b = 0; b < this._arrBalls.length; b++) {            
+            if (poly.containsPoint(this._arrBalls[b].get_center())) {
+                innerContainsBall = true;
+                break;
             }
         }
+        console.log('inner contains ball? ' + innerContainsBall);
         
-        //add track polygon to conqured areas
-        this._arrConquered.push(trackPoly);
-        area += Math.abs(trackPoly.get_area());
+        poly = outerPolys[1];
+        for (var b = 0; b < this._arrBalls.length; b++) {            
+            if (poly.containsPoint(this._arrBalls[b].get_center())) {
+                outerContainsBall = true;
+                break;
+            }
+        }
+        console.log('outer contains ball? ' + outerContainsBall);
+        
+        if (innerContainsBall && outerContainsBall) {
+            //add track polygon to conqured areas
+            this._arrConquered.push(trackPoly);
+            area += Math.abs(trackPoly.get_area());
+            this._arrFree.push(innerPolys[0]);
+            this._arrFree.push(outerPolys[1]);
+        } else if (innerContainsBall && !outerContainsBall) {
+            this._arrConquered.push(innerPolys[1]);
+            area += Math.abs(innerPolys[1].get_area());
+            this._arrFree.push(innerPolys[0]);
+        } else if (!innerContainsBall && outerContainsBall) {
+            this._arrConquered.push(outerPolys[0]);
+            area += Math.abs(outerPolys[0].get_area());
+            this._arrFree.push(outerPolys[1]);
+        } else {
+        }
         
         console.log('<<<-- split polygons completed! -->>>');
         console.log('conquered array:');
@@ -278,7 +301,7 @@ Game.prototype = {
             this._numOfMonsters++;
             this.init();
             this.start();
-        }        
+        }
     },
 
 
