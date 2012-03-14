@@ -52,12 +52,12 @@ Grid.prototype = {
         }
     },
 
-    draw: function(ctx, color0, color1) {
+    draw: function(ctx, blockSize, color0, color1) {
         for(var i=0; i<this._rows; i++) {
             for (var j=0; j<this._cols; j++) {
                 ctx.fillStyle = this.get_state(i,j) == 0 ? color0 : color1;
                 ctx.beginPath();
-                ctx.rect(j * this._blockSize, i * this._blockSize, this._blockSize, this._blockSize);
+                ctx.rect(j * blockSize, i * blockSize, blockSize, blockSize);
                 ctx.fill();
                 ctx.closePath();
             }

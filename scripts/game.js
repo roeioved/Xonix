@@ -120,7 +120,7 @@ Game.prototype = {
             this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_BORDER_COLOR);
         }
 
-        this._grid.draw(this._ctx, Game.FREE_CELL_COLOR, Game.CONQUERED_CELL_COLOR);
+        this._grid.draw(this._ctx, this._blockSize, Game.FREE_CELL_COLOR, Game.CONQUERED_CELL_COLOR);
     },
 
     _random:function (min, max) {
