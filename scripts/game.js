@@ -32,7 +32,7 @@ Game.NUM_OF_MONSTERS = 1;
 
 Game.FREE_FILL_COLOR = '#000000';
 Game.CONQUERED_FILL_COLOR = '#00A8A8';
-Game.TRACK_FILL_COLOR = '#00A8A8';
+Game.TRACK_FILL_COLOR = '#901290';
 Game.PLAYER_FILL_COLOR = '#FFFFFF';
 Game.PLAYER_STROKE_COLOR = '#901290';
 Game.BALL_FILL_COLOR = '#00A8A8';
@@ -43,7 +43,7 @@ Game.MONSTER_STROKE_COLOR = '#000000';
 Game.FREE_STATE = 0;
 Game.CONQUERED_STATE = 1;
 Game.TRACK_STATE = 2;
-
+Game.FLOOD_STATE = 3;
 Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.prototype = {
@@ -58,7 +58,6 @@ Game.prototype = {
         this._player.addEventListener('fail', this.onFail, this);
         
         var self = this;
-        
         $(document).keydown(function (event) {
             switch (event.keyCode) {
                 case Game.KEY_CODES.LEFT:
@@ -80,7 +79,7 @@ Game.prototype = {
     resetLevel: function (level) {
         this._level = level;
         
-        this._grid = new Grid(this._rows, this._cols, Game.FREE_STATE);        
+        this._grid = new Grid(this._rows, this._cols, Game.FREE_STATE);
         
         this._balls = [];
         this._monsters = [];
@@ -181,11 +180,34 @@ Game.prototype = {
             this._grid.set_state(row, col, Game.TRACK_STATE);
         } else if (state == Game.CONQUERED_STATE && this._playerState == Game.TRACK_STATE) {
             this._playerState = Game.CONQUERED_STATE;
-            this._player.stop();            
+            this._player.stop();
             this._grid.replace(Game.TRACK_STATE, Game.CONQUERED_STATE);
             
-            //todo:fill algorithm
-            
+            this._grid.flood(Game.FREE_STATE, Game.FLOOD_STATE);
+			
+            var floodContainsBall = false, freeContainsBall = false;
+
+            for (var ball in this._balls) {
+                ball = this._balls[ball];
+                var state = this._grid.get_state(ball.get_row(), ball.get_col());
+
+                if (state == Game.FLOOD_STATE) {
+                    floodContainsBall = true;
+                }
+                else if (state == Game.FREE_STATE) {
+                    freeContainsBall = true;
+                }
+            }
+
+            if (!freeContainsBall) {
+                this._grid.replace(Game.FREE_STATE, Game.CONQUERED_STATE);
+            }
+            if (floodContainsBall) {
+                this._grid.replace(Game.FLOOD_STATE, Game.FREE_STATE);
+            } else {
+                this._grid.replace(Game.FLOOD_STATE, Game.CONQUERED_STATE);
+            }
+			
             this.refreshScore();
         }
     },
@@ -201,7 +223,9 @@ Game.prototype = {
             this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_STROKE_COLOR);
         }
         
-        this._player.draw(this._ctx, this._blockSize, Game.PLAYER_FILL_COLOR, Game.PLAYER_STROKE_COLOR);
+        var fillStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_STROKE_COLOR : Game.PLAYER_FILL_COLOR;
+        var strokeStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_FILL_COLOR : Game.PLAYER_STROKE_COLOR;
+        this._player.draw(this._ctx, this._blockSize, fillStyle, strokeStyle);
     },
     
     _random: function (min, max) {

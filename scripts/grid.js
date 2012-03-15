@@ -69,7 +69,30 @@ Grid.prototype = {
         return counter;
     },
 
-    findFirst: function (state) {
+    flood:function (oldValue, newValue) {
+        var cell = this._findFirst(oldValue);
+        if (cell) {
+            this._recursiveFlood(cell.row, cell.col, oldValue, newValue);
+        }
+    },
+
+    _recursiveFlood:function (row, col, oldValue, newValue) {
+        for (var i = -1; i <= 1; i++) {
+            var r = row + i;
+            for (var j = -1; j <= 1; j++) {
+                var c = col + j;
+                if (r >= 0 && r < this._rows && c >= 0 && c < this._cols) {
+                    var state = this.get_state(r, c);
+                    if (state == oldValue) {
+                        this.set_state(r, c, newValue);
+                        this._recursiveFlood(r, c, oldValue, newValue);
+                    }
+                }
+            }
+        }
+    },
+
+    _findFirst: function (state) {
         for(var j=0; j<this._cols; j++) {
             for (var i=0; i<this._rows; i++) {
                 if (this.get_state(i, j) == state) {
@@ -79,7 +102,7 @@ Grid.prototype = {
         }
         return null;
     },
-
+	
     replace: function(oldValue, newValue) {
         for(var i=0; i<this._rows; i++) {
             for (var j=0; j<this._cols; j++) {

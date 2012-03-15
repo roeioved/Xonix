@@ -9,12 +9,12 @@ function Monster(row, col, velocity, grid, blockerState) {
 Monster.prototype = {
 
     draw:function (ctx, blockSize, fillColor, strokeColor) {
-        var thickness = 2;
-        var x = this.get_col() * blockSize;
-        var y = this.get_row() * blockSize;
+        var thickness = 3;
+        var x = this.get_col() * blockSize + thickness / 2;
+        var y = this.get_row() * blockSize + thickness / 2;
         
         ctx.beginPath();
-        ctx.rect(x, y, blockSize, blockSize);
+        ctx.rect(x, y, blockSize - thickness, blockSize - thickness);
         ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.lineWidth = thickness;
