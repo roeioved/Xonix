@@ -26,6 +26,8 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._loadAudio();
     
     this._intervalId;
+    this._timerIntervalId;
+    this._time;
 
     this.init();
 }
@@ -34,6 +36,7 @@ Game.NUM_OF_LIVES = 3;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_BALLS = 1;
 Game.NUM_OF_MONSTERS = 1;
+Game.INITIAL_TIME_SEC = 90;
 
 Game.FREE_FILL_COLOR = '#000000';
 Game.CONQUERED_FILL_COLOR = '#00A8A8';
@@ -111,19 +114,19 @@ Game.prototype = {
         
         //update score
         this.updateScore();
+        
+        this._resetTimer();
     },
     
     updateScore: function () {
         //todo: find last conquer to increase score
         
-        var total = this._grid.get_size();
-        var conqured = this._grid.get_count(Game.CONQUERED_STATE);
-        var frame = (2 * this._rows * this._frame) + (2 * (this._cols - this._frame) * this._frame);
-        total -= frame;
-        conqured -= frame;
-        
+        var total = (this._rows - 2 * this._frame) * (this._cols - 2 * this._frame);
+        var frame = (this._frame * this._cols * 2) + (this._rows - 2 * this._frame ) * this._frame * 2;
+        var conqured = this._grid.get_count(Game.CONQUERED_STATE) - frame;
+        console.log('conqured - ' + conqured);
         var pct = Math.round(conqured / total * 100);
-        this._score += pct * 10;
+        this._score += Math.round(pct/100 * 2200);
         
         this._raiseEvent('conquer', pct);
         this._raiseEvent('score', this._score);
@@ -149,6 +152,7 @@ Game.prototype = {
                 self._resetMonsters();
                 self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
                 self.start();
+                self._resetTimer();
             }, 1000);
         }
     },
@@ -181,11 +185,16 @@ Game.prototype = {
             self._ctx.clearRect(0, 0, self._cols * self._blockSize, self._rows * self._blockSize);
             self.step();
             self.draw();
-        }, 1000 / 30);
+        }, 1000 / 35);
+        
+        this._timerIntervalId = setInterval(function() {
+            self._updateTimer();
+        }, 1000);
     },
     
     stop: function () {
         clearInterval(this._intervalId);
+        clearInterval(this._timerIntervalId);
     },
     
     step: function () {
@@ -243,8 +252,8 @@ Game.prototype = {
             var monster = this._monsters[i];
             
             if (playerState == Game.CONQUERED_STATE) {
-                for (var i = -1; i <= 1; i++) {
-                    var row = player.get_row() + i;
+                for (var k = -1; k <= 1; k++) {
+                    var row = player.get_row() + k;
                     for (var j = -1; j <= 1; j++) {
                         var col = player.get_col() + j;
                         if (row >= 0 && row < this._rows && col >= 0 && col < this._cols) {
@@ -313,14 +322,16 @@ Game.prototype = {
         var velocityX = this._random(0, 1) == 0 ? -1 : 1;
         var velocityY = this._random(0, 1) == 0 ? -1 : 1;
         
+        console.log('new monster - ' + velocityX + " " + velocityY);
         var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
         this._monsters.push(monster);
     },
     
     _resetMonsters: function () {
+        var numOfMonsters = this._monsters.length || Game.NUM_OF_MONSTERS;
+        
         this._monsters = [];
         
-        var numOfMonsters = Game.NUM_OF_MONSTERS;
         for (var i = 0; i < numOfMonsters; i++) {
             this._createMonster();
         }
@@ -341,6 +352,23 @@ Game.prototype = {
         if (!this._mute && this._audio[a])
             this._audio[a].play();
     },
+    
+        
+    _updateTimer: function() {
+        if (! --this._time)
+            {
+                this._playAudio('timeout');
+                this._createMonster();
+                this._time = Game.INITIAL_TIME_SEC;
+            }
+            this._raiseEvent("timer", this._time);       
+    },
+    
+    _resetTimer: function() {
+        //Initialize the timer
+        this._time = Game.INITIAL_TIME_SEC;        
+    },
+
     
     _random: function (min, max) {
         var val = min + Math.random() * (max - min);

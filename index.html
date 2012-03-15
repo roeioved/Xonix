@@ -48,7 +48,7 @@
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
             game.addEventListener('end', gameOver, this);
-
+            game.addEventListener('timer', updateTimer, this);
             game.start();
         });
     </script>
