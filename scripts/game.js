@@ -23,7 +23,7 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._audio['end'] = new Audio('sounds/end.wav');
     this._audio['timeout'] = new Audio('sounds/timeout.wav');
     this._audio['level'] = new Audio('sounds/level.wav');
-
+    
     this._intervalId;
 
     this.init();
@@ -312,6 +312,12 @@ Game.prototype = {
     _resetPlayer: function () {
         this._player.stop();
         this._player.moveTo(0, Math.floor(this._cols / 2));
+    },
+    
+    _loadAudio: function () {
+        for (var idx in this._audio) {
+            this._audio[idx].load();
+        }
     },
     
     _playAudio: function (a) {
