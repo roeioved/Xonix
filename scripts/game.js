@@ -114,9 +114,13 @@ Game.prototype = {
     },
     
     updateScore: function () {
+        //todo: find last conquer to increase score
+        
         var total = this._grid.get_size();
         var conqured = this._grid.get_count(Game.CONQUERED_STATE);
-        conqured -= (2 * this._rows * this._frame) + (2 * (this._cols - this._frame) * this._frame);
+        var frame = (2 * this._rows * this._frame) + (2 * (this._cols - this._frame) * this._frame);
+        total -= frame;
+        conqured -= frame;
         
         var pct = Math.round(conqured / total * 100);
         this._score += pct * 10;
@@ -301,15 +305,8 @@ Game.prototype = {
     },
     
     _createMonster: function () {
-        /*
-        var cols_1 = this._random(0, this._frame - 1);
-        var cols_2 = this._random(this._cols - this._frame, this._cols - 1);
-        var col = this._random(0, 1) == 0 ? cols_1 : cols_2;
+        //todo: check if player is near, if so - calc suitable position with opposite velocity from player
         
-        var rows_1 = this._random(0, this._frame - 1);
-        var rows_2 = this._random(this._rows - this._frame, this._rows - 1);
-        var row = this._random(0, 1) == 0 ? rows_1 : rows_2;
-        */
         var row = this._rows - 1;
         var col = this._cols / 2 - 1;
         
