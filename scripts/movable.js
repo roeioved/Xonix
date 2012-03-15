@@ -8,52 +8,57 @@ function Movable(row, col, velocity, grid, blockerState) {
 
 Movable.prototype = {
     
-    get_row:function () {
+    get_row: function () {
         return this._row;
     },
     
-    set_row:function (value) {
+    set_row: function (value) {
         this._row = value;
     },
     
-    get_col:function () {
+    get_col: function () {
         return this._col;
     },
     
-    set_col:function (value) {
+    set_col: function (value) {
         this._col = value;
     },
     
-    get_velocity:function () {
+    get_velocity: function () {
         return this._velocity;
     },
     
-    set_velocity:function (value) {
+    set_velocity: function (value) {
         this._velocity = value;
     },
     
-    get_grid:function () {
+    get_grid: function () {
         return this._grid;
     },
     
-    set_grid:function (value) {
+    set_grid: function (value) {
         this._grid = value;
     },
     
-    get_blockerState:function () {
+    get_blockerState: function () {
         return this._blockerState;
     },
     
-    set_blockerState:function (value) {
+    set_blockerState: function (value) {
         this._blockerState = value;
     },
     
-    offset:function (rows, cols) {
+    moveTo: function (row, col) {
+        this._row = row;
+        this._col = col;
+    },
+    
+    offset: function (rows, cols) {
         this._row += rows;
         this._col += cols;
     },
     
-    step:function () {
+    step: function () {
         var col = this.get_col();
         var row = this.get_row();
         var velocity = this.get_velocity();

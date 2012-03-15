@@ -4,8 +4,6 @@ function Player(row, col, velocity, grid, enemies) {
     this.set_velocity(velocity);
     this.set_grid(grid);
     this._enemies = enemies;
-    
-    //this.killTrack();
 }
 
 Player.prototype = {
@@ -15,21 +13,6 @@ Player.prototype = {
         this.set_col(0);
         this.set_velocity(new Vector(0, 0));
     },
-    
-    /*
-    killTrack: function () {
-        this._prevDirection = null;
-        this._currDirection = null;
-        this._trackStatus = 0; // 0-no track  1-starting  2-conquering  3-finishing  4-finished
-        this._prevTrackRect = null;
-        this._innerTrack = null;
-        this._outerTrack = null;
-        this._trackPoly = null;
-        this._freeAreaIndex = null;
-        
-        this.stop();
-    },
-    */
     
     get_enemies: function () {
         return this._enemies;
@@ -75,16 +58,10 @@ Player.prototype = {
         this.offset(velocity.get_y(), velocity.get_x());
     },
     
-    draw:function (ctx, blockSize, fillColor, strokeColor) {
+    draw: function (ctx, blockSize, fillColor, strokeColor) {
         var thickness = 2;
         var x = this.get_col() * blockSize;
         var y = this.get_row() * blockSize;
-        
-        /*
-        if (this._trackPoly) {
-            this._trackPoly.draw(ctx, '#00A8A8');
-        }
-        */
         
         ctx.beginPath();
         ctx.rect(x, y, blockSize, blockSize);
