@@ -9,8 +9,8 @@ function Ball(row, col, velocity, grid, blockerState) {
 Ball.prototype = {
 
     draw:function (ctx, blockSize, fillColor, strokeColor) {
-        var thickness = 1;
-        var radius = Math.floor(blockSize / 2);
+        var thickness = 2;
+        var radius = Math.floor(blockSize / 2 - thickness / 2);
         var x = this.get_col() * blockSize + radius;
         var y = this.get_row() * blockSize + radius;
         

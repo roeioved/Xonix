@@ -69,11 +69,8 @@ Grid.prototype = {
         return counter;
     },
 
-    flood:function (oldValue, newValue) {
-        var cell = this._findFirst(oldValue);
-        if (cell) {
-            this._recursiveFlood(cell.row, cell.col, oldValue, newValue);
-        }
+    flood:function (row, col, oldValue, newValue) {
+        this._recursiveFlood(row, col, oldValue, newValue);
     },
 
     _recursiveFlood:function (row, col, oldValue, newValue) {
@@ -92,11 +89,11 @@ Grid.prototype = {
         }
     },
 
-    _findFirst: function (state) {
-        for(var j=0; j<this._cols; j++) {
-            for (var i=0; i<this._rows; i++) {
+    findFirst:function (state) {
+        for (var j = 0; j < this._cols; j++) {
+            for (var i = 0; i < this._rows; i++) {
                 if (this.get_state(i, j) == state) {
-                    return {row: i, col: j};
+                    return {row:i, col:j};
                 }
             }
         }
@@ -143,12 +140,3 @@ Grid.prototype = {
     }
 
 };
-
-
-Grid.State = {
-    Free:0,
-    Occupied:1,
-    Path:2,
-    Flood1:3,
-    Flood2:4
-}
