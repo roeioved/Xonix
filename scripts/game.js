@@ -8,7 +8,7 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._grid;
     
     this._player;
-    this._playerState = Game.CONQUERED_STATE;
+    this._playerState;
     
     this._balls = [];
     this._monsters = [];
@@ -44,6 +44,8 @@ Game.FREE_STATE = 0;
 Game.CONQUERED_STATE = 1;
 Game.TRACK_STATE = 2;
 
+Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
+
 Game.prototype = {
     
     init: function () {
@@ -64,6 +66,7 @@ Game.prototype = {
         this._player = new Player(0, Math.floor(this._cols / 2), new Vector(0, 0), this._grid);
         this._player.addEventListener('conquer', this.onConquer, this);
         this._player.addEventListener('fail', this.onFail, this);
+        this._playerState = Game.CONQUERED_STATE;
         
         //create balls
         for (var i = 0; i < Game.NUM_OF_BALLS; i++) {
@@ -101,16 +104,16 @@ Game.prototype = {
         
         $(document).keydown(function (event) {
             switch (event.keyCode) {
-                case KEY_CODES.LEFT:
+                case Game.KEY_CODES.LEFT:
                     self._player.moveLeft();
                     break;
-                case KEY_CODES.UP:
+                case Game.KEY_CODES.UP:
                     self._player.moveUp();
                     break;
-                case KEY_CODES.RIGHT:
+                case Game.KEY_CODES.RIGHT:
                     self._player.moveRight();
                     break;
-                case KEY_CODES.DOWN:
+                case Game.KEY_CODES.DOWN:
                     self._player.moveDown();
                     break;
             }

@@ -22,7 +22,7 @@ Grid.prototype = {
             }
         }
     },
-        
+
     get_state: function(row, col) {
         return this._grid[row][col];
     },
@@ -68,7 +68,18 @@ Grid.prototype = {
         
         return counter;
     },
-    
+
+    findFirst: function (state) {
+        for(var j=0; j<this._cols; j++) {
+            for (var i=0; i<this._rows; i++) {
+                if (this.get_state(i, j) == state) {
+                    return {row: i, col: j};
+                }
+            }
+        }
+        return null;
+    },
+
     replace: function(oldValue, newValue) {
         for(var i=0; i<this._rows; i++) {
             for (var j=0; j<this._cols; j++) {

@@ -14,12 +14,11 @@
     <script type="text/javascript" src="scripts/ball.js"></script>
     <script type="text/javascript" src="scripts/monster.js"></script>
     <script type="text/javascript" src="scripts/player.js"></script>
-    <script type="text/javascript" src="scripts/keycodes.js"></script>
     <script type="text/javascript" src="scripts/game.js"></script>
 
     <script>
-        var canvasWidth = 550,  // 640
-            canvasHeight = 360, // 460
+        var canvasWidth = 640,
+            canvasHeight = 460,
             frame = 20,
             blockSize = 10;
         var game;
@@ -45,7 +44,7 @@
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
-            
+
             game.start();
         });
     </script>
@@ -53,7 +52,7 @@
 
 <body>
 <div id="container">
-    <canvas id="canvas" width="550" height="360"></canvas>
+    <canvas id="canvas" width="640" height="460"></canvas>
     <div id="status">
         Score: <span id="score">0</span>    Xn: <span id="lives">3</span>   Full: <span id="conqured">0</span>%    Time: <span id="timer">90</span>
     </div>
