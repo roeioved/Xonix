@@ -23,6 +23,7 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._audio['end'] = new Audio('sounds/end.wav');
     this._audio['timeout'] = new Audio('sounds/timeout.wav');
     this._audio['level'] = new Audio('sounds/level.wav');
+    this._loadAudio();
     
     this._intervalId;
 
@@ -106,15 +107,12 @@ Game.prototype = {
         }
         
         //create monsters
-        var numOfMonsters = Game.NUM_OF_MONSTERS * this._level;
-        for (var i = 0; i < numOfMonsters; i++) {
-            this._createMonster();
-        }
+        this._resetMonsters();
         
         //update score
         this.updateScore();
     },
-        
+    
     updateScore: function () {
         var total = this._grid.get_size();
         var conqured = this._grid.get_count(Game.CONQUERED_STATE);
@@ -142,8 +140,9 @@ Game.prototype = {
             this._playAudio('fail');
             
             var self = this;
-            setTimeout(function() {
+            setTimeout(function() {                
                 self._resetPlayer();
+                self._resetMonsters();
                 self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
                 self.start();
             }, 1000);
@@ -234,12 +233,24 @@ Game.prototype = {
             this.updateScore();
         }
         
+        var playerState = grid.get_state(player.get_row(), player.get_col());
+        
         for (var i = 0; i < this._monsters.length; i++) {
             var monster = this._monsters[i];
             
-            if (player.get_row() == monster.get_row() + monster.get_velocity().get_y() && player.get_col() == monster.get_col() + monster.get_velocity().get_x()) {
-                this.fail();
-                return;
+            if (playerState == Game.CONQUERED_STATE) {
+                for (var i = -1; i <= 1; i++) {
+                    var row = player.get_row() + i;
+                    for (var j = -1; j <= 1; j++) {
+                        var col = player.get_col() + j;
+                        if (row >= 0 && row < this._rows && col >= 0 && col < this._cols) {
+                            if (row == monster.get_row() && col == monster.get_col()) {
+                                this.fail();
+                                return;
+                            }
+                        }
+                    }
+                }
             }
             
             monster.step();
@@ -252,13 +263,9 @@ Game.prototype = {
             if (state == Game.TRACK_STATE) {
                 this.fail();
                 return;
-            }            
-            if (player.get_row() == ball.get_row() + ball.get_velocity().get_y() && player.get_col() == ball.get_col() + ball.get_velocity().get_x()) {
-                this.fail();
-                return;
             }
             
-            ball.step();            
+            ball.step();
         }
     },
 
@@ -294,6 +301,7 @@ Game.prototype = {
     },
     
     _createMonster: function () {
+        /*
         var cols_1 = this._random(0, this._frame - 1);
         var cols_2 = this._random(this._cols - this._frame, this._cols - 1);
         var col = this._random(0, 1) == 0 ? cols_1 : cols_2;
@@ -301,12 +309,24 @@ Game.prototype = {
         var rows_1 = this._random(0, this._frame - 1);
         var rows_2 = this._random(this._rows - this._frame, this._rows - 1);
         var row = this._random(0, 1) == 0 ? rows_1 : rows_2;
+        */
+        var row = this._rows - 1;
+        var col = this._cols / 2 - 1;
         
         var velocityX = this._random(0, 1) == 0 ? -1 : 1;
         var velocityY = this._random(0, 1) == 0 ? -1 : 1;
         
         var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
-        this._monsters.push(monster);        
+        this._monsters.push(monster);
+    },
+    
+    _resetMonsters: function () {
+        this._monsters = [];
+        
+        var numOfMonsters = Game.NUM_OF_MONSTERS;
+        for (var i = 0; i < numOfMonsters; i++) {
+            this._createMonster();
+        }
     },
     
     _resetPlayer: function () {

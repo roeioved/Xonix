@@ -9,7 +9,7 @@ function Monster(row, col, velocity, grid, blockerState) {
 Monster.prototype = {
 
     draw:function (ctx, blockSize, fillColor, strokeColor) {
-        var thickness = 3;
+        var thickness = 2;
         var x = this.get_col() * blockSize + thickness / 2;
         var y = this.get_row() * blockSize + thickness / 2;
         
