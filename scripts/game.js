@@ -19,10 +19,10 @@ function Game(rows, cols, blockSize, frame, ctx) {
 
     this._mute = false;
     this._audio = [];
-    this._audio['fail'] = new Audio('sounds/fail.mp3');
-    this._audio['end'] = new Audio('sounds/end.mp3');
-    this._audio['timer'] = new Audio('sounds/timer.mp3');
-    this._audio['level'] = new Audio('sounds/level.mp3');
+    this._audio['fail'] = new Audio('sounds/fail.wav');
+    this._audio['end'] = new Audio('sounds/end.wav');
+    this._audio['timeout'] = new Audio('sounds/timeout.wav');
+    this._audio['level'] = new Audio('sounds/level.wav');
 
     this._intervalId;
 
@@ -106,7 +106,7 @@ Game.prototype = {
         }
         
         //create monsters
-        var numOfMonsters = Game.NUM_OF_MONSTERS * (this._level - 1);
+        var numOfMonsters = Game.NUM_OF_MONSTERS * this._level;
         for (var i = 0; i < numOfMonsters; i++) {
             this._createMonster();
         }
@@ -140,6 +140,7 @@ Game.prototype = {
             this.end();
         } else {
             this._playAudio('fail');
+            
             var self = this;
             setTimeout(function() {
                 self._resetPlayer();
@@ -164,7 +165,10 @@ Game.prototype = {
         this._playAudio('end');
         this._raiseEvent('end', this._score);
         
-        //todo
+        var self = this;
+        setTimeout(function() {
+            //todo
+        }, 2000); 
     },
 
     start: function () {
@@ -182,42 +186,37 @@ Game.prototype = {
     },
     
     step: function () {
-        for (var i = 0; i < this._monsters.length; i++) {
-            this._monsters[i].step();
-        }
+        var player = this._player;
+        var grid = this._grid;
         
-        for (var i = 0; i < this._balls.length; i++) {
-            this._balls[i].step();
-        }
+        player.step();
         
-        this._player.step();
-        
-        var row = this._player.get_row();
-        var col = this._player.get_col();
-        var state = this._grid.get_state(row, col);
+        var row = player.get_row();
+        var col = player.get_col();
+        var state = grid.get_state(row, col);
         if (state == Game.FREE_STATE) {            
             this._playerState = Game.TRACK_STATE;
-            this._grid.set_state(row, col, Game.TRACK_STATE);
+            grid.set_state(row, col, Game.TRACK_STATE);
         } else if (state == Game.TRACK_STATE) {
             this.fail();
         } else if (state == Game.CONQUERED_STATE && this._playerState == Game.TRACK_STATE) {
             this._playerState = Game.CONQUERED_STATE;
-            this._player.stop();
-            this._grid.replace(Game.TRACK_STATE, Game.CONQUERED_STATE);
+            player.stop();
+            grid.replace(Game.TRACK_STATE, Game.CONQUERED_STATE);
             
             var floodStates = {};
             var floodState = Game.FLOOD_STATE;
             
-            var cell = this._grid.findFirst(Game.FREE_STATE);            
+            var cell = grid.findFirst(Game.FREE_STATE);            
             while (cell) {
-                this._grid.flood(cell.row, cell.col, Game.FREE_STATE, floodState);
+                grid.flood(cell.row, cell.col, Game.FREE_STATE, floodState);
                 floodStates[floodState++] = false;
-                cell = this._grid.findFirst(Game.FREE_STATE);
+                cell = grid.findFirst(Game.FREE_STATE);
             }
             
             for (var ball in this._balls) {
                 ball = this._balls[ball];
-                var state = this._grid.get_state(ball.get_row(), ball.get_col());
+                var state = grid.get_state(ball.get_row(), ball.get_col());
                 floodStates[state] = true;
             }
             
@@ -225,14 +224,41 @@ Game.prototype = {
                 floodState = floodStates[floodIndex];
                 
                 if (floodState) {
-                    this._grid.replace(floodIndex, Game.FREE_STATE);
+                    grid.replace(floodIndex, Game.FREE_STATE);
                 } else {
-                    this._grid.replace(floodIndex, Game.CONQUERED_STATE);
+                    grid.replace(floodIndex, Game.CONQUERED_STATE);
                 }
             }
             
             //update score
             this.updateScore();
+        }
+        
+        for (var i = 0; i < this._monsters.length; i++) {
+            var monster = this._monsters[i];
+            
+            if (player.get_row() == monster.get_row() + monster.get_velocity().get_y() && player.get_col() == monster.get_col() + monster.get_velocity().get_x()) {
+                this.fail();
+                return;
+            }
+            
+            monster.step();
+        }
+        
+        for (var i = 0; i < this._balls.length; i++) {
+            var ball = this._balls[i];
+            
+            var state = grid.get_state(ball.get_row() + ball.get_velocity().get_y(), ball.get_col() + ball.get_velocity().get_x());
+            if (state == Game.TRACK_STATE) {
+                this.fail();
+                return;
+            }            
+            if (player.get_row() == ball.get_row() + ball.get_velocity().get_y() && player.get_col() == ball.get_col() + ball.get_velocity().get_x()) {
+                this.fail();
+                return;
+            }
+            
+            ball.step();            
         }
     },
 

@@ -1,9 +1,8 @@
-function Player(row, col, velocity, grid, enemies) {
+function Player(row, col, velocity, grid) {
     this.set_row(row);
     this.set_col(col);
     this.set_velocity(velocity);
     this.set_grid(grid);
-    this._enemies = enemies;
 }
 
 Player.prototype = {
@@ -12,14 +11,6 @@ Player.prototype = {
         this.set_row(0);
         this.set_col(0);
         this.set_velocity(new Vector(0, 0));
-    },
-    
-    get_enemies: function () {
-        return this._enemies;
-    },
-
-    set_enemies: function (enemies) {
-        this._enemies = enemies;
     },
     
     stop: function () {
