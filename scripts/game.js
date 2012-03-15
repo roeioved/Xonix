@@ -13,7 +13,8 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._balls = [];
     this._monsters = [];
 
-    this._score;
+    this._levelScore;
+    this._totalScore;
     this._numOfLives;
     this._level;
 
@@ -91,6 +92,8 @@ Game.prototype = {
         this._balls = [];
         this._monsters = [];
         
+        this._levelScore = 0;
+        
         //build frames
         for (var i = 0, j = this._cols - 1, k = this._rows - 1; i < this._frame; i++, j--, k--) {
             this._grid.set_row(i, Game.CONQUERED_STATE);
@@ -126,7 +129,8 @@ Game.prototype = {
         var conqured = this._grid.get_count(Game.CONQUERED_STATE) - frame;
         console.log('conqured - ' + conqured);
         var pct = Math.round(conqured / total * 100);
-        this._score += Math.round(pct/100 * 2200);
+        this._levelScore = Math.round(pct/100 * 2200) - this._levelScore;
+        this._score += this._levelScore;
         
         this._raiseEvent('conquer', pct);
         this._raiseEvent('score', this._score);
@@ -147,9 +151,9 @@ Game.prototype = {
             this._playAudio('fail');
             
             var self = this;
-            setTimeout(function() {                
-                self._resetPlayer();
+            setTimeout(function() {
                 self._resetMonsters();
+                self._resetPlayer();
                 self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
                 self.start();
                 self._resetTimer();
@@ -314,16 +318,28 @@ Game.prototype = {
     },
     
     _createMonster: function () {
-        //todo: check if player is near, if so - calc suitable position with opposite velocity from player
         
         var row = this._rows - 1;
         var col = this._cols / 2 - 1;
         
+        var player_col = this._player.get_col();
+        var player_row = this._player.get_row();
+        
         var velocityX = this._random(0, 1) == 0 ? -1 : 1;
         var velocityY = this._random(0, 1) == 0 ? -1 : 1;
         
-        console.log('new monster - ' + velocityX + " " + velocityY);
+        /*if ( Math.sqrt(Math.pow(col - player_col, 2) + Math.pow(row - player_row, 2)) < this._cols / 2)
+        {
+            console.log("too close !!!");
+            
+            if ((player_col - col) / velocityX > 0)
+            {
+                velocityX *= -1;
+            }
+        }*/
+        
         var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
+        
         this._monsters.push(monster);
     },
     
