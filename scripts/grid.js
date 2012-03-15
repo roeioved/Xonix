@@ -93,7 +93,7 @@ Grid.prototype = {
         for (var j = 0; j < this._cols; j++) {
             for (var i = 0; i < this._rows; i++) {
                 if (this.get_state(i, j) == state) {
-                    return {row:i, col:j};
+                    return {row: i, col: j};
                 }
             }
         }
@@ -111,25 +111,19 @@ Grid.prototype = {
             }
         }
     },
-
-    draw:function (ctx, blockSize, color0, color1, color2) {
-        for (var i = 0; i < this._rows; i++) {
-            for (var j = 0; j < this._cols; j++) {
+        
+    draw: function(ctx, blockSize, color0, color1, color2) {
+        for(var i=0; i<this._rows; i++) {
+            for (var j=0; j<this._cols; j++) {
                 var state = this.get_state(i, j);
                 var fillStyle;
-
+                
                 switch (state) {
-                    case 0:
-                        fillStyle = color0;
-                        break;
-                    case 1:
-                        fillStyle = color1;
-                        break;
-                    case 2:
-                        fillStyle = color2;
-                        break;
+                    case 0: fillStyle = color0; break;
+                    case 1: fillStyle = color1; break;
+                    case 2: fillStyle = color2; break;
                 }
-
+                
                 ctx.fillStyle = fillStyle;
                 ctx.beginPath();
                 ctx.rect(j * blockSize, i * blockSize, blockSize, blockSize);
@@ -138,5 +132,5 @@ Grid.prototype = {
             }
         }
     }
-
+    
 };
