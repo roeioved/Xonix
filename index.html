@@ -35,6 +35,9 @@
         function updateTimer(value) {
             $('#timer').html(value);
         }
+        function gameOver(value) {
+            
+        }
         
         $(document).ready(function() {
             var canvas = document.getElementById("canvas");
@@ -44,6 +47,7 @@
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
+            game.addEventListener('end', gameOver, this);
 
             game.start();
         });

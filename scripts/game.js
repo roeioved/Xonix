@@ -14,6 +14,7 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._monsters = [];
 
     this._score;
+    this._numOfLives;
     this._level;
 
     this._mute = true;
@@ -25,7 +26,7 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this.init();
 }
 
-Game.NUM_OF_LIVES = 10;
+Game.NUM_OF_LIVES = 3;
 Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_BALLS = 1;
 Game.NUM_OF_MONSTERS = 1;
@@ -50,12 +51,10 @@ Game.prototype = {
     
     init: function () {
         this._score = 0;
+        this._numOfLives = Game.NUM_OF_LIVES;
         
         //reset level
         this.resetLevel(1);
-        
-        this._player.addEventListener('conquer', this.onConquer, this);
-        this._player.addEventListener('fail', this.onFail, this);
         
         var self = this;
         $(document).keydown(function (event) {
@@ -127,11 +126,11 @@ Game.prototype = {
             this._monsters.push(monster);
         }
         
-        //refresh score
-        this.refreshScore();
+        //update score
+        this.updateScore();
     },
-    
-    refreshScore: function () {
+
+    updateScore: function () {
         var total = this._grid.get_size();
         var conqured = this._grid.get_count(Game.CONQUERED_STATE);
         conqured -= (2 * this._rows * this._frame) + (2 * (this._cols - this._frame) * this._frame);
@@ -146,11 +145,46 @@ Game.prototype = {
             this.nextLevel();
         }
     },
+        
+    resetPlayer: function () {
+        this._player.stop();
+        this._player.moveTo(0, Math.floor(this._cols / 2));
+    },
+    
+    fail: function () {
+        this.stop();
+        this._numOfLives--;
+        this._playAudio('fail');
+        this._raiseEvent('fail', this._numOfLives);
+        
+        if (this._numOfLives == 0) {
+            this.end();            
+        } else {
+            var self = this;
+            setTimeout(function() {
+                self.resetPlayer();
+                self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
+                self.start();
+            }, 1000);
+        }
+    },
     
     nextLevel: function () {
-        this.resetLevel(this._level + 1);
-    }, 
+        this.stop();
+        
+        var self = this;
+        setTimeout(function() {
+            self.resetLevel(self._level + 1);
+            self.start();
+        }, 1000); 
+    },
     
+    end: function () {
+        this._raiseEvent('end', this._score);
+        
+        //todo
+    },
+
     start: function () {
         var self = this;
         
@@ -160,7 +194,11 @@ Game.prototype = {
             self.draw();
         }, 1000 / 30);
     },
-
+    
+    stop: function () {
+        clearInterval(this._intervalId);
+    },
+    
     step: function () {
         for (var i = 0; i < this._monsters.length; i++) {
             this._monsters[i].step();
@@ -175,59 +213,71 @@ Game.prototype = {
         var row = this._player.get_row();
         var col = this._player.get_col();
         var state = this._grid.get_state(row, col);
-        if (state == Game.FREE_STATE) {
+        if (state == Game.FREE_STATE) {            
             this._playerState = Game.TRACK_STATE;
             this._grid.set_state(row, col, Game.TRACK_STATE);
+        } else if (state == Game.TRACK_STATE) {
+            this.fail();
         } else if (state == Game.CONQUERED_STATE && this._playerState == Game.TRACK_STATE) {
             this._playerState = Game.CONQUERED_STATE;
             this._player.stop();
             this._grid.replace(Game.TRACK_STATE, Game.CONQUERED_STATE);
-
-            var cell = this._grid.findFirst(Game.FREE_STATE);
+            
             var floodStates = {};
             var floodState = Game.FLOOD_STATE;
-
+            
+            var cell = this._grid.findFirst(Game.FREE_STATE);            
             while (cell) {
                 this._grid.flood(cell.row, cell.col, Game.FREE_STATE, floodState);
                 floodStates[floodState++] = false;
                 cell = this._grid.findFirst(Game.FREE_STATE);
             }
-
+            
             for (var ball in this._balls) {
                 ball = this._balls[ball];
                 var state = this._grid.get_state(ball.get_row(), ball.get_col());
                 floodStates[state] = true;
             }
-
+            
             for (var floodIndex in floodStates)
             {
                 floodState = floodStates[floodIndex];
-
+                
                 if (floodState) {
                     this._grid.replace(floodIndex, Game.FREE_STATE);
                 } else {
                     this._grid.replace(floodIndex, Game.CONQUERED_STATE);
                 }
             }
-
-            this.refreshScore();
+            
+            //update score
+            this.updateScore();
         }
     },
 
     draw: function () {
+        //draw grid
         this._grid.draw(this._ctx, this._blockSize, Game.FREE_FILL_COLOR, Game.CONQUERED_FILL_COLOR, Game.TRACK_FILL_COLOR);
         
+        //draw monsters
         for (var i = 0; i < this._monsters.length; i++) {
             this._monsters[i].draw(this._ctx, this._blockSize, Game.MONSTER_FILL_COLOR, Game.MONSTER_STROKE_COLOR);
         }
         
+        //draw balls
         for (var i = 0; i < this._balls.length; i++) {
             this._balls[i].draw(this._ctx, this._blockSize, Game.BALL_FILL_COLOR, Game.BALL_STROKE_COLOR);
         }
         
+        //draw player
         var fillStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_STROKE_COLOR : Game.PLAYER_FILL_COLOR;
         var strokeStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_FILL_COLOR : Game.PLAYER_STROKE_COLOR;
         this._player.draw(this._ctx, this._blockSize, fillStyle, strokeStyle);
+    },
+    
+    _playAudio: function (a) {
+        if (!this._mute && this._audio[a])
+            this._audio[a].play();
     },
     
     _random: function (min, max) {
