@@ -17,9 +17,12 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._numOfLives;
     this._level;
 
-    this._mute = true;
+    this._mute = false;
     this._audio = [];
     this._audio['fail'] = new Audio('sounds/fail.mp3');
+    this._audio['end'] = new Audio('sounds/end.mp3');
+    this._audio['timer'] = new Audio('sounds/timer.mp3');
+    this._audio['level'] = new Audio('sounds/level.mp3');
 
     this._intervalId;
 
@@ -45,6 +48,7 @@ Game.FREE_STATE = 0;
 Game.CONQUERED_STATE = 1;
 Game.TRACK_STATE = 2;
 Game.FLOOD_STATE = 1000;
+
 Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.prototype = {
@@ -98,38 +102,19 @@ Game.prototype = {
         //create balls
         var numOfBalls = Game.NUM_OF_BALLS * this._level;
         for (var i = 0; i < numOfBalls; i++) {
-            var col = this._random(this._frame, this._cols - this._frame);
-            var row = this._random(this._frame, this._rows - this._frame);
-            var velocityX = (this._random(0, 1) == 0 ? -1 : 1);
-            var velocityY = (this._random(0, 1) == 0 ? -1 : 1);
-            
-            var ball = new Ball(row, col, new Vector(velocityX, velocityY), this._grid, Game.CONQUERED_STATE);
-            
-            this._balls.push(ball);
+            this._createBall();
         }
         
         //create monsters
         var numOfMonsters = Game.NUM_OF_MONSTERS * (this._level - 1);
         for (var i = 0; i < numOfMonsters; i++) {
-            var cols_1 = this._random(0, this._frame - 1);
-            var cols_2 = this._random(this._cols - this._frame, this._cols - 1);
-            var col = this._random(0, 1) == 0 ? cols_1 : cols_2;
-            
-            var rows_1 = this._random(0, this._frame - 1);
-            var rows_2 = this._random(this._rows - this._frame, this._rows - 1);
-            var row = this._random(0, 1) == 0 ? rows_1 : rows_2;
-            
-            var velocityX = this._random(0, 1) == 0 ? -1 : 1;
-            var velocityY = this._random(0, 1) == 0 ? -1 : 1;
-            
-            var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
-            this._monsters.push(monster);
+            this._createMonster();
         }
         
         //update score
         this.updateScore();
     },
-
+        
     updateScore: function () {
         var total = this._grid.get_size();
         var conqured = this._grid.get_count(Game.CONQUERED_STATE);
@@ -146,23 +131,18 @@ Game.prototype = {
         }
     },
         
-    resetPlayer: function () {
-        this._player.stop();
-        this._player.moveTo(0, Math.floor(this._cols / 2));
-    },
-    
     fail: function () {
         this.stop();
         this._numOfLives--;
-        this._playAudio('fail');
         this._raiseEvent('fail', this._numOfLives);
         
         if (this._numOfLives == 0) {
-            this.end();            
+            this.end();
         } else {
+            this._playAudio('fail');
             var self = this;
             setTimeout(function() {
-                self.resetPlayer();
+                self._resetPlayer();
                 self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
                 self.start();
             }, 1000);
@@ -171,6 +151,7 @@ Game.prototype = {
     
     nextLevel: function () {
         this.stop();
+        this._playAudio('level');
         
         var self = this;
         setTimeout(function() {
@@ -180,6 +161,7 @@ Game.prototype = {
     },
     
     end: function () {
+        this._playAudio('end');
         this._raiseEvent('end', this._score);
         
         //todo
@@ -239,8 +221,7 @@ Game.prototype = {
                 floodStates[state] = true;
             }
             
-            for (var floodIndex in floodStates)
-            {
+            for (var floodIndex in floodStates) {
                 floodState = floodStates[floodIndex];
                 
                 if (floodState) {
@@ -273,6 +254,38 @@ Game.prototype = {
         var fillStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_STROKE_COLOR : Game.PLAYER_FILL_COLOR;
         var strokeStyle = this._playerState == Game.TRACK_STATE ? Game.PLAYER_FILL_COLOR : Game.PLAYER_STROKE_COLOR;
         this._player.draw(this._ctx, this._blockSize, fillStyle, strokeStyle);
+    },
+    
+    _createBall: function () {
+        var col = this._random(this._frame, this._cols - this._frame);
+        var row = this._random(this._frame, this._rows - this._frame);
+        var velocityX = (this._random(0, 1) == 0 ? -1 : 1);
+        var velocityY = (this._random(0, 1) == 0 ? -1 : 1);
+        
+        var ball = new Ball(row, col, new Vector(velocityX, velocityY), this._grid, Game.CONQUERED_STATE);
+        
+        this._balls.push(ball);
+    },
+    
+    _createMonster: function () {
+        var cols_1 = this._random(0, this._frame - 1);
+        var cols_2 = this._random(this._cols - this._frame, this._cols - 1);
+        var col = this._random(0, 1) == 0 ? cols_1 : cols_2;
+        
+        var rows_1 = this._random(0, this._frame - 1);
+        var rows_2 = this._random(this._rows - this._frame, this._rows - 1);
+        var row = this._random(0, 1) == 0 ? rows_1 : rows_2;
+        
+        var velocityX = this._random(0, 1) == 0 ? -1 : 1;
+        var velocityY = this._random(0, 1) == 0 ? -1 : 1;
+        
+        var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
+        this._monsters.push(monster);        
+    },
+    
+    _resetPlayer: function () {
+        this._player.stop();
+        this._player.moveTo(0, Math.floor(this._cols / 2));
     },
     
     _playAudio: function (a) {
