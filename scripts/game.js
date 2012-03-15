@@ -12,16 +12,16 @@ function Game(rows, cols, blockSize, frame, ctx) {
     
     this._balls = [];
     this._monsters = [];
-    
+
     this._score;
     this._level;
-    
+
     this._mute = true;
     this._audio = [];
     this._audio['fail'] = new Audio('sounds/fail.mp3');
 
     this._intervalId;
-    
+
     this.init();
 }
 
@@ -43,7 +43,7 @@ Game.MONSTER_STROKE_COLOR = '#000000';
 Game.FREE_STATE = 0;
 Game.CONQUERED_STATE = 1;
 Game.TRACK_STATE = 2;
-Game.FLOOD_STATE = 3;
+Game.FLOOD_STATE = 1000;
 Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.prototype = {
@@ -182,32 +182,34 @@ Game.prototype = {
             this._playerState = Game.CONQUERED_STATE;
             this._player.stop();
             this._grid.replace(Game.TRACK_STATE, Game.CONQUERED_STATE);
-            
-            this._grid.flood(Game.FREE_STATE, Game.FLOOD_STATE);
-			
-            var floodContainsBall = false, freeContainsBall = false;
+
+            var cell = this._grid.findFirst(Game.FREE_STATE);
+            var floodStates = {};
+            var floodState = Game.FLOOD_STATE;
+
+            while (cell) {
+                this._grid.flood(cell.row, cell.col, Game.FREE_STATE, floodState);
+                floodStates[floodState++] = false;
+                cell = this._grid.findFirst(Game.FREE_STATE);
+            }
 
             for (var ball in this._balls) {
                 ball = this._balls[ball];
                 var state = this._grid.get_state(ball.get_row(), ball.get_col());
-
-                if (state == Game.FLOOD_STATE) {
-                    floodContainsBall = true;
-                }
-                else if (state == Game.FREE_STATE) {
-                    freeContainsBall = true;
-                }
+                floodStates[state] = true;
             }
 
-            if (!freeContainsBall) {
-                this._grid.replace(Game.FREE_STATE, Game.CONQUERED_STATE);
+            for (var floodIndex in floodStates)
+            {
+                floodState = floodStates[floodIndex];
+
+                if (floodState) {
+                    this._grid.replace(floodIndex, Game.FREE_STATE);
+                } else {
+                    this._grid.replace(floodIndex, Game.CONQUERED_STATE);
+                }
             }
-            if (floodContainsBall) {
-                this._grid.replace(Game.FLOOD_STATE, Game.FREE_STATE);
-            } else {
-                this._grid.replace(Game.FLOOD_STATE, Game.CONQUERED_STATE);
-            }
-			
+
             this.refreshScore();
         }
     },
