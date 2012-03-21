@@ -20,6 +20,7 @@ body {
     height: 40px;
 }
 #header a.xonix {
+    float: left;
     font-size: 46px;
     color: #901290;
     text-decoration: none;
@@ -27,44 +28,25 @@ body {
 #header div.like {
     float: right;
 }
+#mute {
+    float: right;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+#mute.off { background: transparent url(../images/mute_off.png) no-repeat; }
+#mute.on { background: transparent url(../images/mute_on.png) no-repeat; }
 #footer {
     margin-top: 20px;
     width: 640px;
     height: 40px;
     font-size: 14px;
-    color: #fff;
+    color: #999;
     text-align: center;
     text-transform: uppercase;
 }
-/*
-#intro {
-    position: absolute;
-    width: 640px;
-    height: 80px;
-    animation: INTRO 3s infinite;
-    -webkit-animation: INTRO 2s 1;
-    -moz-animation: INTRO 2s 1;
-    -ms-animation: INTRO 2s 1;
-}
-keyframes INTRO {
-    0% { top: -100px; }
-    100% { top: 0; }
-}
-@-webkit-keyframes INTRO {
-    0% { top: -100px; }    
-    100% { top: 0; }
-}
-@-moz-keyframes INTRO {
-    0% { top: -100px; }    
-    100% { top: 0; }
-}
-@-ms-keyframes INTRO {
-    0% { top: -100px; }    
-    100% { top: 0; }
-}
-*/
 #canvas {
-    margin-top: 20px;
+    margin-top: 3px;
     background: #00A8A8;
     width: 640px;
     height: 460px;

@@ -389,8 +389,19 @@ Game.prototype = {
     _random: function (min, max) {
         var val = min + Math.random() * (max - min);
         return Math.round(val);
-    }
+    },
     
+    get_mute: function () {
+        return this._mute;  
+    },
+    
+    set_mute: function (status) {
+        this._mute = status;
+    },
+
+    toggleMute: function () {
+        this._mute = !this._mute;
+    }
 }
 
 Game.prototype = $.extend(

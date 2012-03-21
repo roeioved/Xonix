@@ -2,8 +2,10 @@
 
 <head>
     <title>HTML5 XoniX</title>
+    <meta name="robots" content="index, follow" />
 
     <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="image_src" type="image/png" href="images/icon.png" />
     <link rel="stylesheet" type="text/css" href="style/reset.min.css">
     <link rel="stylesheet" type="text/css" href="style/style.css">
 
@@ -16,7 +18,7 @@
     <script type="text/javascript" src="scripts/monster.js"></script>
     <script type="text/javascript" src="scripts/player.js"></script>
     <script type="text/javascript" src="scripts/game.js"></script>
-
+    
     <script>
         var canvasWidth = 640,
             canvasHeight = 460,
@@ -51,6 +53,16 @@
             game.addEventListener('end', gameOver, this);
             game.addEventListener('timer', updateTimer, this);
             game.start();
+            
+            var mute = game.get_mute();            
+            $('#mute').addClass(mute ? "on" : "off");
+            
+            $('#mute').click(function () {
+                game.toggleMute();
+                mute = !mute;
+                $('#mute').removeClass("on").removeClass("off");
+                $('#mute').addClass(mute ? "on" : "off");
+            });
             
             /*setInterval(function() {var text = $('#cursor').text(); text == "_" ? $('#cursor').text("") : $('#cursor').text("_");  }, 300);
             
@@ -87,26 +99,12 @@
     
     <div id="container">
         <div id="header">
-            <a href="/" class="xonix">XONIX</a>
+            <a href="/" class="xonix">XONIX</a>            
             <div class="like">
                 <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fapps.facebook.com%2Fxonix_classic%2F&amp;send=false&amp;layout=button_count&amp;width=90&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=verdana&amp;height=21&amp;appId=295068687232226" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:90px; height:21px;" allowTransparency="true"></iframe>
             </div>
         </div>
-        
-        <!--<div style="position: absolute; width:100%; height:100%; background: #000000; color: #ffffff; font-size: 30px;">
-            <div>
-                SCORE: 2001    
-            </div>
-            <div>
-                YOUR SCORE IS ON OF THE BEST 15.
-            </div>
-            <div>
-                ENTER YOUR NAME: <span id="user_name"></span><span id="cursor">_</span>
-            </div>
-            <div>
-                <span style="text-decoration: underline; cursor: pointer;">PLAY AGAIN</span>
-            </div>
-        </div>-->
+        <div id="mute"></div>
         <canvas id="canvas" width="640" height="460"></canvas>
         <div id="status">
             <label class="score">Score: <span id="score">0</span></label>
