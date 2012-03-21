@@ -131,6 +131,36 @@ Grid.prototype = {
                 ctx.closePath();
             }
         }
+    },
+    
+    draw_delay: function(ctx, blockSize, color0, color1, color2) {
+        
+        var d = 0;
+        
+        for(var i=0; i<this._rows; i++) {
+            setInterval(function(self, i, ctx, blockSize, color0, color1, color2) {
+                for (var j=0; j<self._cols; j++) {
+                    var state = self.get_state.call(self, i, j);
+                    var fillStyle;
+                    
+                    switch (state) {
+                        case 0: fillStyle = color0; break;
+                        case 1: fillStyle = color1; break;
+                        case 2: fillStyle = color2; break;
+                    }
+                    
+                    ctx.fillStyle = fillStyle;
+                    ctx.beginPath();
+                    ctx.rect(j * blockSize, i * blockSize, blockSize, blockSize);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                
+            }, d, this, i, ctx, blockSize, color0, color1, color2);
+            
+            d += 10;
+        }
+        
     }
     
 };

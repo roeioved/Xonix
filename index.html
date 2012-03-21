@@ -50,12 +50,35 @@
             game.addEventListener('end', gameOver, this);
             game.addEventListener('timer', updateTimer, this);
             game.start();
+            
+            /*setInterval(function() {var text = $('#cursor').text(); text == "_" ? $('#cursor').text("") : $('#cursor').text("_");  }, 300);
+            
+            $(document).bind('keypress', function(e) {
+                if ($('#user_name').text().length < 20) {
+                    $('#user_name').text( $('#user_name').text() + String.fromCharCode(e.which));
+                }
+            });
+            $(document).bind('keydown', function(e) { if (e.which == 8) { $('#user_name').text( $('#user_name').text().substr(0, $('#user_name').text().length - 1) ) }});*/
         });
     </script>
 </head>
 
 <body>
     <div id="container">
+        <!--<div style="position: absolute; width:100%; height:100%; background: #000000; color: #ffffff; font-size: 30px;">
+            <div>
+                SCORE: 2001    
+            </div>
+            <div>
+                YOUR SCORE IS ON OF THE BEST 15.
+            </div>
+            <div>
+                ENTER YOUR NAME: <span id="user_name"></span><span id="cursor">_</span>
+            </div>
+            <div>
+                <span style="text-decoration: underline; cursor: pointer;">PLAY AGAIN</span>
+            </div>
+        </div>-->
         <canvas id="canvas" width="640" height="460"></canvas>
         <div id="status">
             Score: <span id="score">0</span>    Xn: <span id="lives">3</span>   Full: <span id="conqured">0</span>%    Time: <span id="timer">90</span>
