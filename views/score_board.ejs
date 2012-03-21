@@ -1,0 +1,15 @@
+<div id="scoreBoard" style="position: absolute; width:100%; height:100%; top:0px; left:0px; background: #000000; color: #ffffff; font-size: 30px;">
+    <div style="text-align: center; margin-top: 10px;">
+        HIGHSCORES TABLE
+    </div>
+    <table id="scoreBoard_table" style="color: #ffffff; margin-top: 30px; margin: auto; ">
+        <% for (var i=0; i < this.length; i++) { %>
+        <tr>
+            <td style="width: 50px;"><%= i + 1 %></td>
+            <td style="width: 200px;"><%= this[i].name %></td>
+            <td><%= this[i].score %></td>
+        </tr>
+        <% } %>
+    </table>
+
+</div>
