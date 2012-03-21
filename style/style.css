@@ -1,11 +1,11 @@
 @font-face {
     font-family: dos;
-    src: url('dos.ttf');
+    src: url('../fonts/dos.ttf');
 }
 
 body {
     font-family: dos;
-    background-color: Black;
+    background: #000;
     padding: 0px;
     margin: 0px;
     height: 100%;
@@ -13,18 +13,56 @@ body {
 
 #container {
     position: relative;
-    top:100px;
-    width: 650px;
+    padding-top: 20px;
+    width: 640px;
     margin-left: auto;
     margin-right: auto;
 }
+#header {
+    width: 640px;
+    height: 40px;
+}
+#header a.xonix {
+    float: left;
+    font-size: 46px;
+    color: #901290;
+    text-decoration: none;
+}
+#header div.like {
+    float: right;
+}
+#mute {
+    float: right;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+#mute.off { background: transparent url(../images/mute_off.png) no-repeat; }
+#mute.on { background: transparent url(../images/mute_on.png) no-repeat; }
+#footer {
+    margin-top: 20px;
+    width: 640px;
+    height: 40px;
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    text-transform: uppercase;
+}
 #canvas {
+    margin-top: 100px;
     background: #00A8A8;
     width: 640px;
     height: 460px;
 }
 #status {
+    position: relative;
     width: 640px;
+    height: 28px;
     color: #fff;
-    font-size: 22px;
+    font-size: 28px;
 }
+#status label { position: absolute; }
+#status label.score { left: 0px; }
+#status label.lives { left: 225px; }
+#status label.conqured { left: 330px; }
+#status label.timer { left: 510px; }
