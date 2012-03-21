@@ -24,6 +24,18 @@ body {
     color: #901290;
     text-decoration: none;
 }
+#header div.like {
+    float: right;
+}
+#footer {
+    margin-top: 20px;
+    width: 640px;
+    height: 40px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+}
 /*
 #intro {
     position: absolute;
@@ -58,7 +70,14 @@ keyframes INTRO {
     height: 460px;
 }
 #status {
+    position: relative;
     width: 640px;
+    height: 28px;
     color: #fff;
-    font-size: 22px;
+    font-size: 28px;
 }
+#status label { position: absolute; }
+#status label.score { left: 0px; }
+#status label.lives { left: 225px; }
+#status label.conqured { left: 330px; }
+#status label.timer { left: 510px; }
