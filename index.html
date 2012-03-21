@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="style/style.css">
 
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/jquerymx-3.2.custom.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
     <script type="text/javascript" src="scripts/movable.js"></script>
     <script type="text/javascript" src="scripts/vector.js"></script>
@@ -18,7 +19,11 @@
     <script type="text/javascript" src="scripts/monster.js"></script>
     <script type="text/javascript" src="scripts/player.js"></script>
     <script type="text/javascript" src="scripts/game.js"></script>
-    
+    <script type="text/javascript" src="scripts/json2.js"></script>
+    <script type="text/javascript" src="scripts/jStorage.js"></script>
+    <script type="text/javascript" src="scripts/controllers/score_controller.js"></script>
+    <script type="text/javascript" src="scripts/controllers/scoreBoard_controller.js"></script>
+
     <script>
         var canvasWidth = 640,
             canvasHeight = 460,
@@ -63,15 +68,6 @@
                 $('#mute').removeClass("on").removeClass("off");
                 $('#mute').addClass(mute ? "on" : "off");
             });
-            
-            /*setInterval(function() {var text = $('#cursor').text(); text == "_" ? $('#cursor').text("") : $('#cursor').text("_");  }, 300);
-            
-            $(document).bind('keypress', function(e) {
-                if ($('#user_name').text().length < 20) {
-                    $('#user_name').text( $('#user_name').text() + String.fromCharCode(e.which));
-                }
-            });
-            $(document).bind('keydown', function(e) { if (e.which == 8) { $('#user_name').text( $('#user_name').text().substr(0, $('#user_name').text().length - 1) ) }});*/
         });
     </script>
 </head>
