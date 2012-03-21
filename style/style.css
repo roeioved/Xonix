@@ -6,16 +6,19 @@
 body {
     font-family: dos;
     background-color: Black;
+    padding: 0px;
+    margin: 0px;
+    height: 100%;
 }
 
 #container {
     position: relative;
+    top:100px;
     width: 650px;
     margin-left: auto;
     margin-right: auto;
 }
 #canvas {
-    margin-top: 100px;
     background: #00A8A8;
     width: 640px;
     height: 460px;
