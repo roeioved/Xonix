@@ -65,7 +65,30 @@
 </head>
 
 <body>
+    <div id="fb-root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId  : '295068687232226',
+          status : true,
+          cookie : true,
+          xfbml  : true
+        });
+      };
+    
+      (function(d){
+         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement('script'); js.id = id; js.async = true;
+         js.src = "//connect.facebook.net/en_US/all.js";
+         ref.parentNode.insertBefore(js, ref);
+       }(document));
+    </script>
+    
     <div id="container">
+        <div id="header">
+            <a href="/" class="xonix">XONIX</a>
+        </div>
         <!--<div style="position: absolute; width:100%; height:100%; background: #000000; color: #ffffff; font-size: 30px;">
             <div>
                 SCORE: 2001    
