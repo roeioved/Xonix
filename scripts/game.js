@@ -34,7 +34,18 @@ function Game(rows, cols, blockSize, frame) {
     this._scoreBoardController = new ScoreBoard($(document.body));
     
     this._ctx = this._gameController.get_context2d();
-    this.init();
+
+    var self = this;
+
+    this._introController.addEventListener('start', function() {
+        self._introController.hide();
+        self._gameController.show();
+        self.init();
+        self.start();
+    });
+
+    this._introController.show();
+
 }
 
 Game.NUM_OF_LIVES = 3;
@@ -67,17 +78,13 @@ Game.prototype = {
     init:function () {
 
         var self = this;
-        this._introController.addEventListener('start', function() {
-            self._introController.hide();
-            self._gameController.show();
-            self.start();
-        });
-
-        this._introController.show();
 
         this._score = 0;
         this._numOfLives = Game.NUM_OF_LIVES;
-        
+
+        //clear canvas
+        this.clear();
+
         //reset level
         this.resetLevel(1);
 
@@ -240,9 +247,9 @@ Game.prototype = {
                     $.jStorage.set('scoreBoard', scoreBoard);
                     
                     self._scoreBoardController.addEventListener('enter', function() {
-                        self._scoreBoardController.hide();
                         self.init();
-                        self._gameController.show();                                            
+                        self._scoreBoardController.hide();
+                        self._gameController.show();
                         self.start();
                     });
                     
@@ -255,8 +262,8 @@ Game.prototype = {
             }
             else {
                 self._scoreBoardController.addEventListener('enter', function() {
-                    self._scoreBoardController.hide();
                     self.init();
+                    self._scoreBoardController.hide();
                     self._gameController.show();
                     self.start();
                 });
@@ -271,7 +278,7 @@ Game.prototype = {
         var self = this;
         
         this._intervalId = setInterval(function () {
-            self._ctx.clearRect(0, 0, self._cols * self._blockSize, self._rows * self._blockSize);
+            self.clear();
             self.step();
             self.draw();
         }, 1000 / 35);
@@ -279,6 +286,10 @@ Game.prototype = {
         this._timerIntervalId = setInterval(function () {
             self._updateTimer();
         }, 1000);
+    },
+
+    clear: function() {
+        this._ctx.clearRect(0, 0, this._cols * this._blockSize, this._rows * this._blockSize);
     },
     
     stop:function () {
