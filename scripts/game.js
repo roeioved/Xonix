@@ -159,8 +159,8 @@ Game.prototype = {
             
             var self = this;
             setTimeout(function () {
-                self._resetMonsters();
                 self._resetPlayer();
+                self._resetMonsters();
                 self._grid.replace(Game.TRACK_STATE, Game.FREE_STATE);
                 self.start();
                 self._resetTimer();
