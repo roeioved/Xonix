@@ -16,6 +16,8 @@ function Game(rows, cols, blockSize, frame) {
     this._totalScore;
     this._numOfLives;
     this._level;
+    this._frameRate;
+
 
     this._audio = [];
     this._audio['fail'] = new Audio('sounds/fail.wav');
@@ -53,6 +55,7 @@ Game.CONQUERED_PERCENT_MINIMUM_LIMIT = 75;
 Game.NUM_OF_BALLS = 1;
 Game.NUM_OF_MONSTERS = 1;
 Game.INITIAL_TIME_SEC = 60;
+Game.INITIAL_FRAME_RATE = 14;
 
 Game.FREE_FILL_COLOR = '#000000';
 Game.CONQUERED_FILL_COLOR = '#00A8A8';
@@ -73,6 +76,7 @@ Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.LEADERBOARD = 15;
 
+
 Game.supportsBrowser = function() {
     var elem = document.createElement('canvas');
     var canvasSupport = elem.getContext && elem.getContext('2d');
@@ -90,11 +94,17 @@ Game.prototype = {
         this._score = 0;
         this._numOfLives = Game.NUM_OF_LIVES;
 
+        this._raiseEvent('lives', Game.NUM_OF_LIVES);
+
+        this._frameRate = Game.INITIAL_FRAME_RATE;
+        this._balls = [];
+        this._monsters = [];
+
         //clear canvas
-        this.clear();
+        this.clearCanvas();
 
         //reset level
-        this.resetLevel(1);
+        this.setLevel(1);
 
         $(document).keydown(function (event) {
             switch (event.keyCode) {
@@ -118,14 +128,11 @@ Game.prototype = {
         });
     },
     
-    resetLevel:function (level) {
+    setLevel:function (level) {
         this._level = level;
         
         this._grid = new Grid(this._rows, this._cols, Game.FREE_STATE);
-        
-        this._balls = [];
-        this._monsters = [];
-        
+
         this._levelScore = 0;
         
         //build frames
@@ -139,9 +146,18 @@ Game.prototype = {
         //create player
         this._player = new Player(0, Math.floor(this._cols / 2), new Vector(0, 0), this._grid);
         this._playerState = Game.CONQUERED_STATE;
-        
-        //create balls
-        var numOfBalls = Game.NUM_OF_BALLS * this._level;
+
+        //add lives each 3 levels
+        this._numOfLives = (this._numOfLives || Game.NUM_OF_LIVES) + (this._level % 3 == 0 ? 1 : 0) ;
+
+        //increase frame rate every 2 levels
+        this._frameRate += (this._level % 2 == 0 ? 2 : 0);
+
+        //increase number of balls every 3 levels
+        var numOfBalls =  (this._balls.length || Game.NUM_OF_BALLS) + (this._level % 3 == 0 ? 1 : 0) ;
+
+        this._balls = [];
+
         for (var i = 0; i < numOfBalls; i++) {
             this._createBall();
         }
@@ -174,7 +190,7 @@ Game.prototype = {
     fail:function () {
         this.stop();
         this._numOfLives--;
-        this._raiseEvent('fail', this._numOfLives);
+        this._raiseEvent('lives', this._numOfLives);
         
         if (this._numOfLives == 0) {
             this.end();
@@ -197,8 +213,9 @@ Game.prototype = {
         this._playAudio('level');
         
         var self = this;
+
         setTimeout(function () {
-            self.resetLevel(self._level + 1);
+            self.setLevel(self._level + 1);
             self.start();
         }, 1000);
     },
@@ -286,17 +303,17 @@ Game.prototype = {
         var self = this;
         
         this._intervalId = setInterval(function () {
-            self.clear();
+            self.clearCanvas();
             self.step();
             self.draw();
-        }, 1000 / 35);
+        }, 1000 / this._frameRate);
         
         this._timerIntervalId = setInterval(function () {
             self._updateTimer();
         }, 1000);
     },
 
-    clear: function() {
+    clearCanvas: function() {
         this._ctx.clearRect(0, 0, this._cols * this._blockSize, this._rows * this._blockSize);
     },
     
@@ -433,7 +450,7 @@ Game.prototype = {
 
         //if monster and player are too close, well move the monster
         if (Math.sqrt(Math.pow(col - player_col, 2) + Math.pow(row - player_row, 2)) < this._cols / 2) {
-            row = 0;
+            row = player_row < this._rows / 2 ?  row : 0;
         }
         
         var monster = new Monster(row, col, new Vector(velocityX, velocityY), this._grid, Game.FREE_STATE);
@@ -445,8 +462,10 @@ Game.prototype = {
     },
 
     _resetMonsters:function () {
-        var numOfMonsters = this._monsters.length || Game.NUM_OF_MONSTERS;
-        
+
+        //increase number of monsters every 4 levels
+        var numOfMonsters = (this._monsters.length  || Game.NUM_OF_MONSTERS) + (this._level % 6 == 0 ? 1 : 0);
+
         this._monsters = [];
         
         for (var i = 0; i < numOfMonsters; i++) {

@@ -59,7 +59,7 @@
             if (Game.supportsBrowser()) {
                 var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize);
                 game.addEventListener('conquer', updateConquered, this);
-                game.addEventListener('fail', updateLives, this);
+                game.addEventListener('lives', updateLives, this);
                 game.addEventListener('score', updateScore, this);
                 game.addEventListener('timer', updateTimer, this);
 
