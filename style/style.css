@@ -24,8 +24,17 @@ html, body {
     text-decoration: none;
 }
 
-#header div.like {
+#header #like {
     float: right;
+}
+
+#header #inviteFriends {    
+    float: right;
+    margin-right: 20px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    background: transparent url(../images/invite_friends.png) no-repeat;
 }
 
 #actions {
