@@ -12,7 +12,7 @@ html, body {
 
 #header {
     margin: auto;
-    margin-top: 10px;
+    padding-top: 10px;
     width: 640px;
     height: 40px;
 }

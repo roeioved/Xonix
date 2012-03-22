@@ -35,8 +35,6 @@
     <script type="text/javascript" src="scripts/controllers/intro_controller.js"></script>-->
 
     <script>
-        var isFrame = !(window.top === window.self);
-        
         var canvasWidth = 640,
                 canvasHeight = 460,
                 frame = 20,
@@ -86,35 +84,31 @@
 <body>
 <div id="fb-root"></div>
 <script>
-    if (isFrame) {
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId:'295068687232226',
-                status:true,
-                cookie:true,
-                xfbml:true
-            });
-        };
-        function inviteFriends() {
-            FB.ui({
-                method:'apprequests',
-                message:'OMG! Xonix is back!'
-            });
-        }
-        (function (d) {
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) {
-                return;
-            }
-            js = d.createElement('script');
-            js.id = id;
-            js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-    } else {
-        $('#inviteFriends').hide();
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId:'295068687232226',
+            status:true,
+            cookie:true,
+            xfbml:true
+        });
+    };
+    function inviteFriends() {
+        FB.ui({
+            method:'apprequests',
+            message:'OMG! Xonix is back!'
+        });
     }
+    (function (d) {
+        var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement('script');
+        js.id = id;
+        js.async = true;
+        js.src = "//connect.facebook.net/en_US/all.js";
+        ref.parentNode.insertBefore(js, ref);
+    }(document));
 </script>
 
 <div id="header">
