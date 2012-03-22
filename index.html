@@ -31,8 +31,6 @@
     <script type="text/javascript" src="scripts/controllers/scoreBoard_controller.js"></script>
     <script type="text/javascript" src="scripts/controllers/intro_controller.js"></script>
 
-
-
     <script>
         var canvasWidth = 640,
                 canvasHeight = 460,
@@ -120,20 +118,20 @@
 <div id="header">
     <a href="/" class="xonix">XONIX</a>
 
-    <div id="tweet">
-        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://apps.facebook.com/xonix_classic" data-lang="en">Tweet</a>
+    <div id="like">
+        <div class="fb-like" data-href="http://apps.facebook.com/xonix_classic" data-send="true" data-layout="button_count" data-show-faces="false"></div>
     </div>
     <div id="plusone">
         <g:plusone size="medium" href="http://apps.facebook.com/xonix_classic"></g:plusone>
     </div>
-    <div id="like">
-        <div class="fb-like" data-href="http://apps.facebook.com/xonix_classic" data-send="true" data-layout="button_count" data-show-faces="false"></div>
+    <div id="tweet">
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://apps.facebook.com/xonix_classic" data-lang="en">Tweet</a>
     </div>
 </div>
 
 <div id="actions">
-    <a id="inviteFriends" href="#" onclick="inviteFriends();" title="Invite Friends"></a>
-    <div id="mute"></div>
+    <div id="mute" class="button"></div>
+    <a id="inviteFriends" class="button" href="#" onclick="inviteFriends();" title="Invite Friends"></a>
 </div>
 
 <div id="container">
@@ -149,9 +147,9 @@
         Original DOS version created by Ilan Rav and Dani Katz @ 1984
     </div>
     <div id="links">
-        <a id="facebook" class="social" href="#" onclick="shareFacebook();" title="Share on Facebook"></a>
-        <a id="twitter" class="social" href="http://twitter.com/home?status=OMG! Xonix is back! http://apps.facebook.com/xonix_classic" title="Tweet on Twitter" target="_blank"></a>
-        <a id="google" class="social" href="#" title="Share on Google+" target="_blank"></a>
+        <a id="facebook" class="social button" href="#" onclick="shareFacebook();" title="Share on Facebook"></a>
+        <a id="twitter" class="social button" href="http://twitter.com/home?status=OMG! Xonix is back! http://apps.facebook.com/xonix_classic" title="Tweet on Twitter" target="_blank"></a>
+        <a id="google" class="social button" href="#" title="Share on Google+" target="_blank"></a>
     </div>
 </div>
 

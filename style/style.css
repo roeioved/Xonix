@@ -37,33 +37,44 @@ html, body {
     margin-top: 10px;
 }
 
-#header #inviteFriends {
-    float: right;
+.button {
+    display: inline-block;
     width: 32px;
     height: 32px;
-    background: transparent url(../images/invite_friends.png) no-repeat;
+    opacity: 0.7;
+    background-color: transparent;
+    background-repeat: no-repeat;
+}
+.button:hover {
+    opacity: 1;
 }
 
 #actions {
     margin: auto;
     margin-top: 10px;
     width: 640px;
-    height: 16px;
+    height: 32px;
+}
+
+#inviteFriends {
+    float: right;
+    background-image: url(../images/invite_friends.png);
+    margin-right: 10px;
 }
 
 #mute {
     float: right;
-    width: 16px;
-    height: 16px;
     cursor: pointer;
+    background-color: transparent;
+    background-repeat: no-repeat;
 }
 
 #mute.off {
-    background: transparent url(../images/mute_off.png) no-repeat;
+    background-image: url(../images/mute_off.png);
 }
 
 #mute.on {
-    background: transparent url(../images/mute_on.png) no-repeat;
+    background-image: url(../images/mute_on.png);
 }
 
 #container {
@@ -99,19 +110,12 @@ html, body {
     text-align: center;
 }
 #footer .social {
-    display: inline-block;
     margin-left: 5px;
     margin-right: 5px;
-    width: 32px;
-    height: 32px;
-    opacity: 0.7;
 }
-#footer .social:hover {
-    opacity: 1;
-}
-#footer #facebook.social { background: transparent url(../images/facebook.png) no-repeat; }
-#footer #twitter.social { background: transparent url(../images/twitter.png) no-repeat; }
-#footer #google.social { background: transparent url(../images/google.png) no-repeat; }
+#footer #facebook.social { background-image: url(../images/facebook.png); }
+#footer #twitter.social { background-image: url(../images/twitter.png); }
+#footer #google.social { background-image: url(../images/google.png); }
 
 .page {
     border: solid 1px #fff;
@@ -161,6 +165,9 @@ html, body {
     color: #fff;
     font-size: 30px;
     line-height: 50px;
+}
+#gameOver div {
+    padding-left: 10px;
 }
 
 #scoreBoard {
