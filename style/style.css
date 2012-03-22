@@ -25,16 +25,29 @@ html, body {
 }
 
 #header #like {
-    float: right;
+    float: left;
+    margin-top: 10px;
+    margin-left: 20px;    
 }
 
 #header #inviteFriends {    
     float: right;
-    margin-right: 20px;
     width: 32px;
     height: 32px;
-    cursor: pointer;
     background: transparent url(../images/invite_friends.png) no-repeat;
+}
+
+#header .social {
+    float: right;
+    margin-left: 10px;
+    width: 32px;
+    height: 32px;
+}
+#header #facebook.social {
+    background: transparent url(../images/facebook.png) no-repeat;
+}
+#header #twitter.social {
+    background: transparent url(../images/twitter.png) no-repeat;
 }
 
 #actions {
@@ -161,4 +174,26 @@ html, body {
     cursor: pointer;
     margin: auto;
     margin-top: 70px;
+    /*   
+    animation: BLINK 1s infinite;
+    -webkit-animation: BLINK 1s infinite;
+    -moz-animation: BLINK 1s infinite;
+    -ms-animation: BLINK 1s infinite;
+    */
+}
+@keyframes BLINK {
+    0%   { opacity: 0; }
+	100% { opacity: 1; }
+}
+@-webkit-keyframes BLINK {
+    0%   { opacity: 0; }
+	100% { opacity: 1; }
+}
+@-moz-keyframes BLINK {
+    0%   { opacity: 0; }
+	100% { opacity: 1; }
+}
+@-ms-keyframes BLINK {
+    0%   { opacity: 0; }
+	100% { opacity: 1; }
 }

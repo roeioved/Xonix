@@ -4,11 +4,15 @@
     <title>HTML5 XoniX</title>
     <meta name="robots" content="index, follow" />
 
+    <meta property="og:title" content="Classic Xonix" />
+    <meta property="og:description" content="The popular classic Xonix is back!" />
+    <meta property="og:image" content="html5xonix.appspot.com/images/icon.png" />
+
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="image_src" type="image/png" href="images/icon.png" />
     <link rel="stylesheet" type="text/css" href="style/reset.min.css">
     <link rel="stylesheet" type="text/css" href="style/style.css">
-
+    
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="scripts/jquerymx-3.2.custom.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
@@ -87,6 +91,14 @@
             });
         }
         
+        function shareFacebook() {
+            FB.ui({
+                method: 'send',
+                name: 'Classic Xonix',
+                link: 'http://apps.facebook.com/xonix_classic',
+            });
+        }
+        
         (function(d){
             var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
             if (d.getElementById(id)) {return;}
@@ -101,6 +113,8 @@
         <div id="like">
             <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fapps.facebook.com%2Fxonix_classic%2F&amp;send=false&amp;layout=button_count&amp;width=80&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=verdana&amp;height=21&amp;appId=295068687232226" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;" allowTransparency="true"></iframe>            
         </div>
+        <a id="facebook" class="social" href="#" onclick="shareFacebook();" title="Share on Facebook"></a>
+        <a id="twitter" class="social" href="#" onclick="shareTwitter();" title="Tweet on Twitter"></a>
         <a id="inviteFriends" href="#" onclick="inviteFriends();" title="Invite Friends"></a>
     </div>
     
