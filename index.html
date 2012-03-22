@@ -53,19 +53,18 @@
             $('#mute').removeClass("on").removeClass("off");
             $('#mute').addClass(status ? "on" : "off");
         }
-
+        
         $(document).ready(function () {
-
             if (Game.supportsBrowser()) {
                 var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize);
                 game.addEventListener('conquer', updateConquered, this);
                 game.addEventListener('lives', updateLives, this);
                 game.addEventListener('score', updateScore, this);
                 game.addEventListener('timer', updateTimer, this);
-
+                
                 var mute = game.get_mute();
-                setMute(mute)
-
+                setMute(mute);
+                
                 $('#mute').click(function () {
                     var mute = game.toggleMute();
                     setMute(mute);
@@ -89,14 +88,12 @@
             xfbml:true
         });
     };
-
     function inviteFriends() {
         FB.ui({
             method:'apprequests',
             message:'OMG! Xonix is back!'
         });
     }
-
     function shareFacebook() {
         FB.ui({
             method:'send',
@@ -104,7 +101,6 @@
             link:'http://apps.facebook.com/xonix_classic'
         });
     }
-
     (function (d) {
         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
         if (d.getElementById(id)) {
