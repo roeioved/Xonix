@@ -222,81 +222,59 @@ Game.prototype = {
     
     end:function () {
         this._playAudio('end');
-        
-        var scoreBoard = $.jStorage.get('scoreBoard');
-        if (!scoreBoard) {
-            scoreBoard = [];
-        }
-        
-        var isHighScore = false;
-        
-        for (var i = 0; i < scoreBoard.length; i++) {
-            if (this._score > scoreBoard[i].score) {
-                isHighScore = true;
-                break;
-            }
-        }
-        
-        if (!isHighScore && this._score > 0 && i < Game.LEADERBOARD - 1) {
-            isHighScore = true;
-        }
-        
-        var self = this;
-        
-        setTimeout(function () {
-            if (isHighScore) {
-                self._scoreController.addEventListener('enter', function(name) {
-                    var entry = { 'name': name, 'score': self._score };
-                    
-                    if (scoreBoard.length == 0) {
-                        scoreBoard.push(entry);
-                    } else {
-                        var last = scoreBoard[scoreBoard.length - 1];                        
-                        if (self._score > last.score) {
-                            for (var i = 0; i < scoreBoard.length; i++) {
-                                if (self._score > scoreBoard[i].score) {
-                                    scoreBoard.splice(i, 0, entry);
-                                    added = true;
-                                    break;
-                                }
-                            }
-                            
-                            for (var i = scoreBoard.length - 1; i > Game.LEADERBOARD - 1; i--) {
-                                scoreBoard.pop();
-                            }
-                        } else if (scoreBoard.length < Game.LEADERBOARD) {
-                            scoreBoard.push(entry);                            
-                        }
+
+        LeaderBoard.get(15, function(lb) {
+            if (lb) {
+                var isHighScore = false;
+
+                for (var i = 0; i < lb.length; i++) {
+                    if (this._score > lb[i].score) {
+                        isHighScore = true;
+                        break;
                     }
-                    
-                    $.jStorage.set('scoreBoard', scoreBoard);
-                    
-                    self._scoreBoardController.addEventListener('enter', function() {
-                        self.init();
-                        self._scoreBoardController.hide();
-                        self._gameController.show();
-                        self.start();
-                    });
-                    
-                    self._scoreController.hide();
-                    self._scoreBoardController.show(scoreBoard);                    
-                });
-                
-                self._gameController.hide();
-                self._scoreController.show(self._score, Game.LEADERBOARD);
+                }
+
+                if (!isHighScore && this._score > 0 && i < Game.LEADERBOARD - 1) {
+                    isHighScore = true;
+                }
+
+                var self = this;
+
+                setTimeout(function () {
+                    if (isHighScore) {
+                        self._scoreController.addEventListener('enter', function(name) {
+                            var entry = { 'name': name, 'score': self._score };
+
+                            self._scoreBoardController.addEventListener('enter', function() {
+                                self.init();
+                                self._scoreBoardController.hide();
+                                self._gameController.show();
+                                self.start();
+                            });
+
+                            LeaderBoard.set(name, self._score, 15, function(lb) {
+                                self._scoreController.hide();
+                                self._scoreBoardController.show(lb);
+                            });
+                        });
+
+                        self._gameController.hide();
+                        self._scoreController.show(self._score, Game.LEADERBOARD);
+                    }
+                    else {
+                        self._scoreBoardController.addEventListener('enter', function() {
+                            self.init();
+                            self._scoreBoardController.hide();
+                            self._gameController.show();
+                            self.start();
+                        });
+
+                        self._gameController.hide();
+                        self._scoreBoardController.show(lb);
+                    }
+                }, 1000);
             }
-            else {
-                self._scoreBoardController.addEventListener('enter', function() {
-                    self.init();
-                    self._scoreBoardController.hide();
-                    self._gameController.show();
-                    self.start();
-                });
-                
-                self._gameController.hide();
-                self._scoreBoardController.show(scoreBoard);
-            }
-        }, 1000);
+        });
     },
 
     start:function () {
