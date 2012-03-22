@@ -8,6 +8,9 @@ handlers:
   static_files: index.html
   upload: index.html
 
+- url: /score
+  script: score.py
+
 - url: /fonts
   static_dir: fonts
   mime_type: font/ttf
