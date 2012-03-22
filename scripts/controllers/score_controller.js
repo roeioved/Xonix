@@ -40,6 +40,7 @@ $.Controller('Score', {
     _onKeyDown:function (e) {
         if (e.which == 8) {
             $('#user_name').text($('#user_name').text().substr(0, $('#user_name').text().length - 1))
+            e.preventDefault();
         }
         else if (e.which == 13) {
             this._raiseEvent('enter', $('#user_name').text());

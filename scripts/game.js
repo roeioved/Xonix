@@ -59,6 +59,8 @@ Game.FLOOD_STATE = 1000;
 
 Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
+Game.LEADERBOARD = 15;
+
 Game.prototype = {
 
     init:function () {
@@ -196,7 +198,7 @@ Game.prototype = {
             }
         }
         
-        if (!isHighScore && this._score > 0 && i < 14) {
+        if (!isHighScore && this._score > 0 && i < Game.LEADERBOARD - 1) {
             isHighScore = true;
         }
         
@@ -205,22 +207,26 @@ Game.prototype = {
         setTimeout(function () {
             if (isHighScore) {
                 self._scoreController.addEventListener('enter', function(name) {
-                    
                     var entry = { 'name': name, 'score': self._score };
                     
                     if (scoreBoard.length == 0) {
                         scoreBoard.push(entry);
-                    }
-                    else {
-                        for (var i = 0; i < scoreBoard.length; i++) {
-                            if (self._score > scoreBoard[i].score) {
-                                scoreBoard.splice(i, 0, entry);
-                                break;
+                    } else {
+                        var last = scoreBoard[scoreBoard.length - 1];                        
+                        if (self._score > last.score) {
+                            for (var i = 0; i < scoreBoard.length; i++) {
+                                if (self._score > scoreBoard[i].score) {
+                                    scoreBoard.splice(i, 0, entry);
+                                    added = true;
+                                    break;
+                                }
                             }
-                        }
-                        
-                        for (var i = scoreBoard.length - 1; i > 14;  i--) {
-                            scoreBoard.pop();
+                            
+                            for (var i = scoreBoard.length - 1; i > Game.LEADERBOARD - 1; i--) {
+                                scoreBoard.pop();
+                            }
+                        } else if (scoreBoard.length < Game.LEADERBOARD) {
+                            scoreBoard.push(entry);                            
                         }
                     }
                     
