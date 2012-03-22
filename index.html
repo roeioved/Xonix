@@ -2,17 +2,17 @@
 
 <head>
     <title>HTML5 XoniX</title>
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow"/>
 
-    <meta property="og:title" content="Classic Xonix" />
-    <meta property="og:description" content="The popular classic Xonix is back!" />
-    <meta property="og:image" content="html5xonix.appspot.com/images/icon.png" />
+    <meta property="og:title" content="Classic Xonix"/>
+    <meta property="og:description" content="The popular classic Xonix is back!"/>
+    <meta property="og:image" content="html5xonix.appspot.com/images/icon.png"/>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
-    <link rel="image_src" type="image/png" href="images/icon.png" />
+    <link rel="image_src" type="image/png" href="images/icon.png"/>
     <link rel="stylesheet" type="text/css" href="style/reset.min.css">
     <link rel="stylesheet" type="text/css" href="style/style.css">
-    
+
     <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="scripts/jquerymx-3.2.custom.min.js"></script>
     <script type="text/javascript" src="scripts/event_handler.js"></script>
@@ -32,11 +32,11 @@
 
     <script>
         var canvasWidth = 640,
-            canvasHeight = 460,
-            frame = 20,
-            blockSize = 10;
+                canvasHeight = 460,
+                frame = 20,
+                blockSize = 10;
         var game;
-        
+
         function updateScore(value) {
             $('#score').html(value);
         }
@@ -49,100 +49,116 @@
         function updateTimer(value) {
             $('#timer').html(value);
         }
-        function setMute (status) {
+        function setMute(status) {
             $('#mute').removeClass("on").removeClass("off");
             $('#mute').addClass(status ? "on" : "off");
         }
-        
-        $(document).ready(function() {
-            var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize);            
-            game.addEventListener('conquer', updateConquered, this);
-            game.addEventListener('fail', updateLives, this);
-            game.addEventListener('score', updateScore, this);
-            game.addEventListener('timer', updateTimer, this);
-            
-            var mute = game.get_mute();
-            setMute(mute)
-            
-            $('#mute').click(function() {
-                var mute = game.toggleMute();
-                setMute(mute);
-            });
+
+        $(document).ready(function () {
+
+            if (Game.supportsBrowser()) {
+                var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize);
+                game.addEventListener('conquer', updateConquered, this);
+                game.addEventListener('fail', updateLives, this);
+                game.addEventListener('score', updateScore, this);
+                game.addEventListener('timer', updateTimer, this);
+
+                var mute = game.get_mute();
+                setMute(mute)
+
+                $('#mute').click(function () {
+                    var mute = game.toggleMute();
+                    setMute(mute);
+                });
+            }
+            else {
+                alert("Oops ! Xonix supports only modern browsers.");
+            }
         });
     </script>
 </head>
 
 <body>
-    <div id="fb-root"></div>
-    <script>
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId  : '295068687232226',
-                status : true,
-                cookie : true,
-                xfbml  : true
-            });
-        };
-        
-        function inviteFriends() {
-            FB.ui({
-                method: 'apprequests',
-                message: 'OMG! Xonix is back!'
-            });
-        }
-        
-        function shareFacebook() {
-            FB.ui({
-                method: 'send',
-                name: 'Classic Xonix',
-                link: 'http://apps.facebook.com/xonix_classic',
-            });
-        }
-        
-        (function(d){
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) {return;}
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-    </script>
-    
-    <div id="header">
-        <a href="/" class="xonix">XONIX</a>
-        <div id="like">
-            <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fapps.facebook.com%2Fxonix_classic%2F&amp;send=false&amp;layout=button_count&amp;width=80&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=verdana&amp;height=21&amp;appId=295068687232226" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;" allowTransparency="true"></iframe>            
-        </div>
-        <a id="facebook" class="social" href="#" onclick="shareFacebook();" title="Share on Facebook"></a>
-        <a id="twitter" class="social" href="#" onclick="shareTwitter();" title="Tweet on Twitter"></a>
-        <a id="inviteFriends" href="#" onclick="inviteFriends();" title="Invite Friends"></a>
-    </div>
-    
-    <div id="actions">
-        <div id="mute"></div>        
-    </div>    
-    
-    <div id="container">
+<div id="fb-root"></div>
+<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId:'295068687232226',
+            status:true,
+            cookie:true,
+            xfbml:true
+        });
+    };
 
-    </div>
-    
-    <div id="footer">
-        HTML5 version created by Yair Levinson and Roei Oved @ 2012
-        <br/>
-        Original DOS version created by Ilan Rav and Dani Katz @ 1984
-    </div>
+    function inviteFriends() {
+        FB.ui({
+            method:'apprequests',
+            message:'OMG! Xonix is back!'
+        });
+    }
 
-    <script type="text/javascript">    
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-30218356-1']);
-        _gaq.push(['_trackPageview']);
-        
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();    
-    </script>
+    function shareFacebook() {
+        FB.ui({
+            method:'send',
+            name:'Classic Xonix',
+            link:'http://apps.facebook.com/xonix_classic',
+        });
+    }
+
+    (function (d) {
+        var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement('script');
+        js.id = id;
+        js.async = true;
+        js.src = "//connect.facebook.net/en_US/all.js";
+        ref.parentNode.insertBefore(js, ref);
+    }(document));
+</script>
+
+<div id="header">
+    <a href="/" class="xonix">XONIX</a>
+
+    <div id="like">
+        <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fapps.facebook.com%2Fxonix_classic%2F&amp;send=false&amp;layout=button_count&amp;width=80&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=verdana&amp;height=21&amp;appId=295068687232226"
+                scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;"
+                allowTransparency="true"></iframe>
+    </div>
+    <a id="facebook" class="social" href="#" onclick="shareFacebook();" title="Share on Facebook"></a>
+    <a id="twitter" class="social" href="#" onclick="shareTwitter();" title="Tweet on Twitter"></a>
+    <a id="inviteFriends" href="#" onclick="inviteFriends();" title="Invite Friends"></a>
+</div>
+
+<div id="actions">
+    <div id="mute"></div>
+</div>
+
+<div id="container">
+
+</div>
+
+<div id="footer">
+    HTML5 version created by Yair Levinson and Roei Oved @ 2012
+    <br/>
+    Original DOS version created by Ilan Rav and Dani Katz @ 1984
+</div>
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30218356-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+    })();
+</script>
 </body>
 
 </html>

@@ -73,6 +73,14 @@ Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.LEADERBOARD = 15;
 
+Game.supportsBrowser = function() {
+    var elem = document.createElement('canvas');
+    var canvasSupport = elem.getContext && elem.getContext('2d');
+    var audioTagSupport = !!(document.createElement('audio').canPlayType);
+
+    return canvasSupport && audioTagSupport;
+}
+
 Game.prototype = {
 
     init:function () {
