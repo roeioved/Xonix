@@ -116,6 +116,7 @@ html, body {
 #footer #facebook.social { background-image: url(../images/facebook.png); }
 #footer #twitter.social { background-image: url(../images/twitter.png); }
 #footer #google.social { background-image: url(../images/google.png); }
+#footer #chromewebstore.social { background-image: url(../images/chromewebstore.png); }
 
 .page {
     border: solid 1px #fff;
