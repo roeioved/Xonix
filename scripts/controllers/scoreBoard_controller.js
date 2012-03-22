@@ -15,7 +15,11 @@ $.Controller('ScoreBoard', {
 
         var self = this;
         $(document).bind('keydown.sb', function (e) {
-            self._onEnter.call(self, e);
+            self._raiseEvent('keydown');
+        });
+
+        $(document).bind('click.sb', function (e) {
+            self._raiseEvent('click');
         });
     },
 
@@ -24,13 +28,10 @@ $.Controller('ScoreBoard', {
             this._root.hide();
         }
         $(document).unbind('keydown.sb');
-    },
-
-    _onEnter:function (e) {
-        if (e.which == 13) {
-            this._raiseEvent('enter');
-        }
+        $(document).unbind('click.sb');
     }
+
+
 });
 
 ScoreBoard.prototype = $.extend(

@@ -240,15 +240,23 @@ Game.prototype = {
                 }
 
                 setTimeout(function () {
+                    function nextView() {
+                        self.init();
+                        self._scoreBoardController.hide();
+                        self._gameController.show();
+                        self.start();
+                    }
+
                     if (isHighScore) {
                         self._scoreController.addEventListener('enter', function(name) {
                             var entry = { 'name': name, 'score': self._score };
 
-                            self._scoreBoardController.addEventListener('enter', function() {
-                                self.init();
-                                self._scoreBoardController.hide();
-                                self._gameController.show();
-                                self.start();
+                            self._scoreBoardController.addEventListener('keydown', function() {
+                                nextView();
+                            });
+
+                            self._scoreBoardController.addEventListener('click', function() {
+                                nextView();
                             });
 
                             LeaderBoard.set(name, self._score, Game.LEADERBOARD, function(leaderboard) {
@@ -261,11 +269,12 @@ Game.prototype = {
                         self._scoreController.show(self._score, Game.LEADERBOARD);
                     }
                     else {
-                        self._scoreBoardController.addEventListener('enter', function() {
-                            self.init();
-                            self._scoreBoardController.hide();
-                            self._gameController.show();
-                            self.start();
+                        self._scoreBoardController.addEventListener('keydown', function() {
+                            nextView();
+                        });
+
+                        self._scoreBoardController.addEventListener('click', function() {
+                            nextView();
                         });
 
                         self._gameController.hide();
