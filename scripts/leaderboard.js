@@ -12,7 +12,7 @@ LeaderBoard = {
     },
 
     set: function(name, score, count, callback) {
-        $.post("leaderboard/get", {name: name, score: score, count: count}, function(data) {
+        $.post("leaderboard/set", {name: name, score: score, count: count}, function(data) {
             if (callback)
             {
                 callback.call(this, data.leaderboard);

@@ -223,22 +223,22 @@ Game.prototype = {
     end:function () {
         this._playAudio('end');
 
+        var self = this;
+
         LeaderBoard.get(15, function(lb) {
             if (lb) {
                 var isHighScore = false;
 
                 for (var i = 0; i < lb.length; i++) {
-                    if (this._score > lb[i].score) {
+                    if (self._score > lb[i].score) {
                         isHighScore = true;
                         break;
                     }
                 }
 
-                if (!isHighScore && this._score > 0 && i < Game.LEADERBOARD - 1) {
+                if (!isHighScore && self._score > 0 && i < Game.LEADERBOARD - 1) {
                     isHighScore = true;
                 }
-
-                var self = this;
 
                 setTimeout(function () {
                     if (isHighScore) {
@@ -252,9 +252,9 @@ Game.prototype = {
                                 self.start();
                             });
 
-                            LeaderBoard.set(name, self._score, 15, function(lb) {
+                            LeaderBoard.set(name, self._score, 15, function(leaderboard) {
                                 self._scoreController.hide();
-                                self._scoreBoardController.show(lb);
+                                self._scoreBoardController.show(leaderboard);
                             });
                         });
 
