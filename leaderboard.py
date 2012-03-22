@@ -26,8 +26,7 @@ class GetLeaderboardPage(webapp.RequestHandler):
         for score in scores:
             top.append({ 'player': score.player, 'score': score.score })
 
-        data = { 'leaderboard': top }
-        self.response.out.write(json.dumps(data))
+        self.response.out.write(json.dumps(top))
 
 class SetLeaderboardPage(webapp.RequestHandler):
     def post(self):
