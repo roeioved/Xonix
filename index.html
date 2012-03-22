@@ -21,6 +21,7 @@
     <script type="text/javascript" src="scripts/game.js"></script>
     <script type="text/javascript" src="scripts/json2.js"></script>
     <script type="text/javascript" src="scripts/jStorage.js"></script>
+    <script type="text/javascript" src="scripts/controllers/game_controller.js"></script>
     <script type="text/javascript" src="scripts/controllers/score_controller.js"></script>
     <script type="text/javascript" src="scripts/controllers/scoreBoard_controller.js"></script>
 
@@ -48,26 +49,13 @@
         }
         
         $(document).ready(function() {
-            var canvas = document.getElementById("canvas");
-            var ctx = canvas.getContext("2d");
-            
-            var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize, ctx);            
+            var game = new Game(canvasHeight / blockSize, canvasWidth / blockSize, blockSize, frame / blockSize);            
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
             game.addEventListener('end', gameOver, this);
             game.addEventListener('timer', updateTimer, this);
             game.start();
-            
-            var mute = game.get_mute();            
-            $('#mute').addClass(mute ? "on" : "off");
-            
-            $('#mute').click(function () {
-                game.toggleMute();
-                mute = !mute;
-                $('#mute').removeClass("on").removeClass("off");
-                $('#mute').addClass(mute ? "on" : "off");
-            });
         });
     </script>
 </head>
@@ -93,27 +81,19 @@
        }(document));
     </script>
     
-    <div id="container">
-        <div id="header">
+    <div id="header">
             <a href="/" class="xonix">XONIX</a>            
             <div class="like">
                 <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fapps.facebook.com%2Fxonix_classic%2F&amp;send=false&amp;layout=button_count&amp;width=90&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=verdana&amp;height=21&amp;appId=295068687232226" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:90px; height:21px;" allowTransparency="true"></iframe>
             </div>
         </div>
-        <div id="mute"></div>
-        <canvas id="canvas" width="640" height="460"></canvas>
-        <div id="status">
-            <label class="score">Score: <span id="score">0</span></label>
-            <label class="lives">Xn: <span id="lives">3</span></label>
-            <label class="conqured">Full: <span id="conqured">0</span>%</label>
-            <label class="timer">Time: <span id="timer">90</span></label>
-        </div>
+    <div id="container">
         
-        <div id="footer">
+    </div>
+    <div id="footer">
             Created by Yair Levinson and Roei Oved @ 2012
             <br/>
             Originality created by Ilan Rav and Dani Katz @ 1984
-        </div>
     </div>
 
     <script type="text/javascript">    

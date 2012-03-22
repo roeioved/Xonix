@@ -9,6 +9,9 @@ $.Controller('Score', {
             this._root = $($.View('./views/score.ejs', { 'score':score }));
             this._root.appendTo($('#container'));
         }
+        else{
+            $('#score_val', this._root).text(score);
+        }
 
         this._root.show();
         this._bindEvents();

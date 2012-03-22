@@ -3,22 +3,25 @@
     src: url('../fonts/dos.ttf');
 }
 
-body {
+
+html, body {
     font-family: dos;
-    background: #000;
+    background-color: #000;
     padding: 0px;
     margin: 0px;
-    height: 100%;
 }
 
 #container {
+    margin-top: 50px;
     position: relative;
-    padding-top: 20px;
     width: 640px;
+    height: 500px;
     margin-left: auto;
     margin-right: auto;
 }
 #header {
+    margin: auto;
+    margin-top: 10px;
     width: 640px;
     height: 40px;
 }
@@ -40,7 +43,8 @@ body {
 #mute.off { background: transparent url(../images/mute_off.png) no-repeat; }
 #mute.on { background: transparent url(../images/mute_on.png) no-repeat; }
 #footer {
-    margin-top: 20px;
+    margin: auto;
+    margin-top: 40px;
     width: 640px;
     height: 40px;
     font-size: 14px;
@@ -49,7 +53,6 @@ body {
     text-transform: uppercase;
 }
 #canvas {
-    margin-top: 100px;
     background: #00A8A8;
     width: 640px;
     height: 460px;

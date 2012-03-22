@@ -1,9 +1,9 @@
-function Game(rows, cols, blockSize, frame, ctx) {
+function Game(rows, cols, blockSize, frame) {
     this._rows = rows;
     this._cols = cols;
     this._blockSize = blockSize;
     this._frame = frame;
-    this._ctx = ctx;
+    
 
     this._grid;
 
@@ -30,9 +30,11 @@ function Game(rows, cols, blockSize, frame, ctx) {
     this._timerIntervalId;
     this._time;
 
+    this._gameController = new GameController($(document.body));
     this._scoreController = new Score($(document.body));
     this._scoreBoardController = new ScoreBoard($(document.body));
-
+    
+    this._ctx = this._gameController.get_context2d();        
     this.init();
 }
 
@@ -63,9 +65,22 @@ Game.prototype = {
 
     init:function () {
 
+        this._gameController.show();
+        
+        var mute = this.get_mute();
+        this._gameController.set_mute(mute ? "on" : "off");
+        
+        this._gameController.addEventListener('mute', function() {
+            this.toggleMute();
+            mute = !mute;
+            this._gameController.set_mute(mute ? "on" : "off");
+        });
+        
+
         this._score = 0;
         this._numOfLives = Game.NUM_OF_LIVES;
 
+        
         //reset level
         this.resetLevel(1);
 
@@ -195,7 +210,7 @@ Game.prototype = {
             }
         }
 
-        if (!isHighScore && i < 14) {
+        if (!isHighScore && this._score > 0 && i < 14) {
             isHighScore = true;
         }
 
@@ -209,15 +224,20 @@ Game.prototype = {
 
                     var entry = { 'name': name, 'score': self._score };
 
-                    for (var i = 0; i < scoreBoard.length; i++) {
-                        if (self._score > scoreBoard[i].score) {
-                            scoreBoard.splice(i, 0, entry);
-                            break;
-                        }
+                    if (scoreBoard.length == 0) {
+                        scoreBoard.push(entry);
                     }
-
-                    for (var i = scoreBoard.length - 1; i > 14;  i--) {
-                        scoreBoard.pop();
+                    else {
+                        for (var i = 0; i < scoreBoard.length; i++) {
+                            if (self._score > scoreBoard[i].score) {
+                                scoreBoard.splice(i, 0, entry);
+                                break;
+                            }
+                        }
+    
+                        for (var i = scoreBoard.length - 1; i > 14;  i--) {
+                            scoreBoard.pop();
+                        }
                     }
 
                     $.jStorage.set('scoreBoard', scoreBoard);
@@ -225,6 +245,7 @@ Game.prototype = {
                     self._scoreBoardController.addEventListener('enter', function() {
                         self._scoreBoardController.hide();
                         self.init();
+                        self._gameController.show();                                            
                         self.start();
                     });
 
@@ -232,16 +253,19 @@ Game.prototype = {
                     self._scoreBoardController.show(scoreBoard);
 
                 });
-
+                
+                self._gameController.hide();
                 self._scoreController.show(self._score);
             }
             else {
                 self._scoreBoardController.addEventListener('enter', function() {
                     self._scoreBoardController.hide();
                     self.init();
+                    self._gameController.show();
                     self.start();
                 });
 
+                self._gameController.hide();
                 self._scoreBoardController.show(scoreBoard);
             }
 
