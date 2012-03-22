@@ -8,6 +8,9 @@ handlers:
   static_files: index.html
   upload: index.html
 
+- url: /play
+  static_files: index.html
+
 - url: /leaderboard/set
   script: leaderboard.py
 
