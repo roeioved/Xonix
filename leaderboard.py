@@ -18,9 +18,6 @@ class GetLeaderboardPage(webapp.RequestHandler):
 
         self.response.headers['Content-Type'] = 'application/json'
 
-        q = db.GqlQuery("SELECT * FROM Leaderboard")
-        db.delete(q)
-
         top = []
         scores = db.GqlQuery("SELECT * FROM Leaderboard ORDER BY score DESC LIMIT " + str(count))
         for score in scores:
