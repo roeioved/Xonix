@@ -244,7 +244,7 @@ Game.prototype = {
                 });
                 
                 self._gameController.hide();
-                self._scoreController.show(self._score);
+                self._scoreController.show(self._score, Game.LEADERBOARD);
             }
             else {
                 self._scoreBoardController.addEventListener('enter', function() {

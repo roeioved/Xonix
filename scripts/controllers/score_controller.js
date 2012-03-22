@@ -2,13 +2,13 @@ $.Controller('Score', {
     init:function () {
     },
     
-    show:function (score) {
+    show:function (score, leaderboard) {
         if (!this._root) {
-            this._root = $($.View('./views/score.ejs', { 'score':score }));
+            this._root = $($.View('./views/score.ejs', { 'score':score, 'leaderboard':leaderboard }));
             this._root.appendTo($('#container'));
-        }
-        else{
+        } else {
             $('#score_val', this._root).text(score);
+            $('#leaderboard_val', this._root).text(leaderboard);
         }
         
         this._root.show();
