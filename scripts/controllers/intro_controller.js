@@ -6,7 +6,7 @@ $.Controller('Intro', {
             this._root.appendTo($('#container'));
 
             var self = this;
-            $('#start', this._root).click(function() {
+            this._root.click(function() {
                 self._raiseEvent('start');
             });
         }
