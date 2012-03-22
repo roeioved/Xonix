@@ -44,9 +44,6 @@
         function updateTimer(value) {
             $('#timer').html(value);
         }
-        function gameOver(value) {
-            
-        }
         function setMute (status) {
             $('#mute').removeClass("on").removeClass("off");
             $('#mute').addClass(status ? "on" : "off");
@@ -57,7 +54,6 @@
             game.addEventListener('conquer', updateConquered, this);
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
-            game.addEventListener('end', gameOver, this);
             game.addEventListener('timer', updateTimer, this);
             game.start();
             

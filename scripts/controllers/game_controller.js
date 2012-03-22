@@ -17,10 +17,14 @@ $.Controller('GameController', {
         }
     },
     
+    get_canvas: function() {
+        return document.getElementById("canvas");
+    },
+    
     get_context2d: function() {
         var canvas = document.getElementById("canvas");
         return canvas.getContext("2d");
-    },
+    }
     
 });
 

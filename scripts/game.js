@@ -32,7 +32,8 @@ function Game(rows, cols, blockSize, frame) {
     this._scoreController = new Score($(document.body));
     this._scoreBoardController = new ScoreBoard($(document.body));
     
-    this._ctx = this._gameController.get_context2d();        
+    this._canvas = this._gameController.get_canvas();
+    this._ctx = this._gameController.get_context2d();
     this.init();
 }
 
@@ -61,7 +62,7 @@ Game.KEY_CODES = {LEFT:37, UP:38, RIGHT:39, DOWN:40};
 
 Game.prototype = {
 
-    init:function () {        
+    init:function () {
         this._gameController.show();
         
         this._score = 0;
@@ -76,15 +77,19 @@ Game.prototype = {
             switch (event.keyCode) {
                 case Game.KEY_CODES.LEFT:
                     self._player.moveLeft();
+                    event.preventDefault();
                     break;
                 case Game.KEY_CODES.UP:
                     self._player.moveUp();
+                    event.preventDefault();
                     break;
                 case Game.KEY_CODES.RIGHT:
                     self._player.moveRight();
+                    event.preventDefault();
                     break;
                 case Game.KEY_CODES.DOWN:
                     self._player.moveDown();
+                    event.preventDefault();
                     break;
             }
         });
@@ -195,8 +200,6 @@ Game.prototype = {
         if (!isHighScore && this._score > 0 && i < 14) {
             isHighScore = true;
         }
-        
-        this._raiseEvent('end', this._score);
         
         var self = this;
         
