@@ -25,9 +25,16 @@ html, body {
 }
 
 #header #like {
-    float: left;
+    float: right;
     margin-top: 10px;
-    margin-left: 20px;
+}
+#header #plusone {
+    float: right;
+    margin-top: 10px;
+}
+#header #tweet {
+    float: right;
+    margin-top: 10px;
 }
 
 #header #inviteFriends {
@@ -35,21 +42,6 @@ html, body {
     width: 32px;
     height: 32px;
     background: transparent url(../images/invite_friends.png) no-repeat;
-}
-
-#header .social {
-    float: right;
-    margin-left: 10px;
-    width: 32px;
-    height: 32px;
-}
-
-#header #facebook.social {
-    background: transparent url(../images/facebook.png) no-repeat;
-}
-
-#header #twitter.social {
-    background: transparent url(../images/twitter.png) no-repeat;
 }
 
 #actions {
@@ -84,14 +76,50 @@ html, body {
 }
 
 #footer {
+    position: relative;
     margin: auto;
-    margin-top: 40px;
+    margin-top: 20px;
     width: 640px;
-    height: 40px;
+    height: 80px;
     font-size: 13px;
     color: #999;
     text-align: center;
     text-transform: uppercase;
+}
+#footer #copyright {    
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+    text-align: center;    
+}
+#footer #links {
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+    text-align: center;
+}
+#footer .social {
+    display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.7;
+}
+#footer .social:hover {
+    opacity: 1;
+}
+#footer #facebook.social { background: transparent url(../images/facebook.png) no-repeat; }
+#footer #twitter.social { background: transparent url(../images/twitter.png) no-repeat; }
+#footer #google.social { background: transparent url(../images/google.png) no-repeat; }
+
+.page {
+    border: solid 1px #fff;
+    width: 640px;
+    height: 488px;    
+}
+#game.page {
+    border: 0;
 }
 
 #canvas {
