@@ -23,3 +23,6 @@ handlers:
 
 - url: /style
   static_dir: style
+
+  - url: /views
+  static_dir: views
