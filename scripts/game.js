@@ -32,7 +32,6 @@ function Game(rows, cols, blockSize, frame) {
     this._scoreController = new Score($(document.body));
     this._scoreBoardController = new ScoreBoard($(document.body));
     
-    this._canvas = this._gameController.get_canvas();
     this._ctx = this._gameController.get_context2d();
     this.init();
 }
