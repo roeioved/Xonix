@@ -14,11 +14,11 @@ $.Controller('ScoreBoard', {
         this._root.show();
 
         var self = this;
-        $(document).bind('keydown.sb', function (e) {
+        this._root.bind('keydown.sb', function (e) {
             self._raiseEvent('keydown');
         });
 
-        $(document).bind('click.sb', function (e) {
+        this._root.bind('click.sb', function (e) {
             self._raiseEvent('click');
         });
     },
@@ -27,8 +27,8 @@ $.Controller('ScoreBoard', {
         if (this._root) {
             this._root.hide();
         }
-        $(document).unbind('keydown.sb');
-        $(document).unbind('click.sb');
+        this._root.unbind('keydown.sb');
+        this._root.unbind('click.sb');
     }
 
 
