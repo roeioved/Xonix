@@ -16,12 +16,14 @@ html, body {
     width: 640px;
     height: 40px;
 }
+
 #header a.xonix {
     float: left;
     font-size: 46px;
     color: #901290;
     text-decoration: none;
 }
+
 #header div.like {
     float: right;
 }
@@ -39,8 +41,14 @@ html, body {
     height: 16px;
     cursor: pointer;
 }
-#mute.off { background: transparent url(../images/mute_off.png) no-repeat; }
-#mute.on { background: transparent url(../images/mute_on.png) no-repeat; }
+
+#mute.off {
+    background: transparent url(../images/mute_off.png) no-repeat;
+}
+
+#mute.on {
+    background: transparent url(../images/mute_on.png) no-repeat;
+}
 
 #container {
     margin-top: 10px;
@@ -75,11 +83,26 @@ html, body {
     color: #fff;
     font-size: 28px;
 }
-#status label { position: absolute; }
-#status label.score { left: 0px; }
-#status label.lives { left: 225px; }
-#status label.conqured { left: 330px; }
-#status label.timer { left: 510px; }
+
+#status label {
+    position: absolute;
+}
+
+#status label.score {
+    left: 0px;
+}
+
+#status label.lives {
+    left: 225px;
+}
+
+#status label.conqured {
+    left: 330px;
+}
+
+#status label.timer {
+    left: 510px;
+}
 
 #gameOver {
     position: relative;
@@ -95,13 +118,38 @@ html, body {
     color: #fff;
     font-size: 30px;
 }
+
 #scoreBoard .title {
     margin-top: 10px;
     text-align: center;
 }
+
 #scoreBoard_table {
     margin: auto;
     margin-top: 30px;
-    font-size: 22px;     
+    font-size: 22px;
     color: #fff;
+}
+
+.intro_cotainer {
+    text-align: center;
+    padding-top: 110px;
+}
+
+.intro_title {
+    color: #fff;
+    font-size: 30px;
+    display: block;
+}
+
+.into_start_button {
+    color: #fff;
+    font-size: 30px;
+    border: solid 1px #fff;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: auto;
+    margin-top: 70px;
 }

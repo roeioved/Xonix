@@ -24,6 +24,7 @@
     <script type="text/javascript" src="scripts/controllers/game_controller.js"></script>
     <script type="text/javascript" src="scripts/controllers/score_controller.js"></script>
     <script type="text/javascript" src="scripts/controllers/scoreBoard_controller.js"></script>
+    <script type="text/javascript" src="scripts/controllers/intro_controller.js"></script>
 
     <script>
         var canvasWidth = 640,
@@ -55,7 +56,7 @@
             game.addEventListener('fail', updateLives, this);
             game.addEventListener('score', updateScore, this);
             game.addEventListener('timer', updateTimer, this);
-            game.start();
+
             
             var mute = game.get_mute();
             setMute(mute)
@@ -101,6 +102,7 @@
     </div>    
     
     <div id="container">
+
     </div>
     
     <div id="footer">

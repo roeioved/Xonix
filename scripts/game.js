@@ -28,6 +28,7 @@ function Game(rows, cols, blockSize, frame) {
     this._timerIntervalId;
     this._time;
 
+    this._introController = new Intro($(document.body));
     this._gameController = new GameController($(document.body));
     this._scoreController = new Score($(document.body));
     this._scoreBoardController = new ScoreBoard($(document.body));
@@ -64,16 +65,22 @@ Game.LEADERBOARD = 15;
 Game.prototype = {
 
     init:function () {
-        this._gameController.show();
-        
+
+        var self = this;
+        this._introController.addEventListener('start', function() {
+            self._introController.hide();
+            self._gameController.show();
+            self.start();
+        });
+
+        this._introController.show();
+
         this._score = 0;
         this._numOfLives = Game.NUM_OF_LIVES;
         
         //reset level
         this.resetLevel(1);
-        
-        var self = this;
-        
+
         $(document).keydown(function (event) {
             switch (event.keyCode) {
                 case Game.KEY_CODES.LEFT:
