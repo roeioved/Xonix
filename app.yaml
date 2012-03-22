@@ -8,8 +8,11 @@ handlers:
   static_files: index.html
   upload: index.html
 
-- url: /score
-  script: score.py
+- url: /leaderboard/set
+  script: leaderboard.py
+
+- url: /leaderboard/get
+  script: leaderboard.py
 
 - url: /fonts
   static_dir: fonts

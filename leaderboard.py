@@ -12,15 +12,32 @@ class Leaderboard(db.Model):
     score = db.IntegerProperty()
     date = db.DateTimeProperty(auto_now_add=True)
 
-class MainPage(webapp.RequestHandler):
+class GetLeaderboardPage(webapp.RequestHandler):
     def get(self):
+        count = int(cgi.escape(self.request.get('count')))
+
         self.response.headers['Content-Type'] = 'application/json'
+
+        q = db.GqlQuery("SELECT * FROM Leaderboard")
+        db.delete(q)
+
+        top = []
+        scores = db.GqlQuery("SELECT * FROM Leaderboard ORDER BY score DESC LIMIT " + str(count))
+        for score in scores:
+            top.append({ 'player': score.player, 'score': score.score })
+
+        data = { 'leaderboard': top }
+        self.response.out.write(json.dumps(data))
+
+class SetLeaderboardPage(webapp.RequestHandler):
+    def post(self):
         playerName = cgi.escape(self.request.get('name'))
         playerScore = long(cgi.escape(self.request.get('score')))
-        #self.response.out.write('Hello ' + playerName + ', you scored ' + str(playerScore) + '!' + '<br/>')
+        count = int(cgi.escape(self.request.get('count')))
+
+        self.response.headers['Content-Type'] = 'application/json'
 
         place = Leaderboard.all().filter('score >=', playerScore).count()
-        #self.response.out.write('You are in place ' + str(place + 1) + '<br/>')
 
         row = Leaderboard()
         row.id = str(uuid.uuid1())
@@ -29,16 +46,20 @@ class MainPage(webapp.RequestHandler):
         row.put()
 
         top = []
-        scores = db.GqlQuery("SELECT * FROM Leaderboard ORDER BY score DESC LIMIT 15")
+        scores = db.GqlQuery("SELECT * FROM Leaderboard ORDER BY score DESC LIMIT " + str(count))
         for score in scores:
-            #self.response.out.write(score.player + ' ' + str(score.score) + '<br>')
             top.append({ 'player': score.player, 'score': score.score })
 
         data = { 'place': place, 'leaderboard': top }
         self.response.out.write(json.dumps(data))
 
+class DeleteLeaderboardPage(webapp.RequestHandler):
+    def postt(self):
+        results = db.GqlQuery("SELECT * FROM Leaderboard")
+        db.delete(results)
+
 application = webapp.WSGIApplication(
-                                     [('/score', MainPage)],
+                                     [('/leaderboard/get', GetLeaderboardPage), ('/leaderboard/set', SetLeaderboardPage)],
                                      debug=True)
 
 def main():
