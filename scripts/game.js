@@ -18,7 +18,6 @@ function Game(rows, cols, blockSize, frame) {
     this._level;
     this._frameRate;
 
-
     this._audio = [];
     this._audio['fail'] = new Audio('sounds/fail.wav');
     this._audio['end'] = new Audio('sounds/end.wav');
@@ -225,7 +224,7 @@ Game.prototype = {
 
         var self = this;
 
-        LeaderBoard.get(15, function(lb) {
+        LeaderBoard.get(Game.LEADERBOARD, function(lb) {
             if (lb) {
                 var isHighScore = false;
 
@@ -252,7 +251,7 @@ Game.prototype = {
                                 self.start();
                             });
 
-                            LeaderBoard.set(name, self._score, 15, function(leaderboard) {
+                            LeaderBoard.set(name, self._score, Game.LEADERBOARD, function(leaderboard) {
                                 self._scoreController.hide();
                                 self._scoreBoardController.show(leaderboard);
                             });
