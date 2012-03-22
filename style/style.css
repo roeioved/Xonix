@@ -3,7 +3,6 @@
     src: url('../fonts/dos.ttf');
 }
 
-
 html, body {
     font-family: dos;
     background-color: #000;
@@ -11,14 +10,6 @@ html, body {
     margin: 0px;
 }
 
-#container {
-    margin-top: 50px;
-    position: relative;
-    width: 640px;
-    height: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
 #header {
     margin: auto;
     margin-top: 10px;
@@ -34,6 +25,12 @@ html, body {
 #header div.like {
     float: right;
 }
+#actions {
+    margin: auto;
+    margin-top: 10px;
+    width: 640px;
+    height: 16px;
+}
 #mute {
     float: right;
     width: 16px;
@@ -42,12 +39,19 @@ html, body {
 }
 #mute.off { background: transparent url(../images/mute_off.png) no-repeat; }
 #mute.on { background: transparent url(../images/mute_on.png) no-repeat; }
+#container {
+    margin-top: 10px;
+    position: relative;
+    width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+}
 #footer {
     margin: auto;
     margin-top: 40px;
     width: 640px;
     height: 40px;
-    font-size: 14px;
+    font-size: 13px;
     color: #999;
     text-align: center;
     text-transform: uppercase;

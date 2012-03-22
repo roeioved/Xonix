@@ -4,10 +4,6 @@ $.Controller('GameController', {
             this._root = $($.View('./views/game.ejs'));
             this._root.hide();
             this._root.appendTo($('#container'));
-            
-            $('#mute', this._root).click(function (e) {
-                this._raiseEvent('mute');
-            });
         }
     },
 
@@ -26,10 +22,6 @@ $.Controller('GameController', {
         return canvas.getContext("2d");
     },
     
-    set_mute: function(val) {
-        $('#mute').removeClass("on").removeClass("off");
-        $('#mute').addClass(val);
-    }
 });
 
 
