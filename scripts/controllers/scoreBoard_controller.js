@@ -14,7 +14,7 @@ $.Controller('ScoreBoard', {
         this._root.show();
 
         var self = this;
-        this._root.bind('keydown.sb', function (e) {
+        $(document).bind('keydown.sb', function (e) {
             self._raiseEvent('keydown');
         });
 
@@ -27,7 +27,7 @@ $.Controller('ScoreBoard', {
         if (this._root) {
             this._root.hide();
         }
-        this._root.unbind('keydown.sb');
+        $(document).unbind('keydown.sb');
         this._root.unbind('click.sb');
     }
 
