@@ -18,6 +18,9 @@ handlers:
 - url: /leaderboard/get
   script: leaderboard.py
 
+- url: /leaderboard/del
+  script: leaderboard.py
+
 - url: /fonts
   static_dir: fonts
   mime_type: font/ttf

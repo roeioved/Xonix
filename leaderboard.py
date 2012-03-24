@@ -50,12 +50,14 @@ class SetLeaderboardPage(webapp.RequestHandler):
         self.response.out.write(json.dumps(data))
 
 class DeleteLeaderboardPage(webapp.RequestHandler):
-    def postt(self):
-        results = db.GqlQuery("SELECT * FROM Leaderboard")
+    def get(self):
+        playerName = cgi.escape(self.request.get('name'))
+
+        results = db.GqlQuery("SELECT * FROM Leaderboard WHERE player = " + str(playerName))
         db.delete(results)
 
 application = webapp.WSGIApplication(
-                                     [('/leaderboard/get', GetLeaderboardPage), ('/leaderboard/set', SetLeaderboardPage)],
+                                     [('/leaderboard/get', GetLeaderboardPage), ('/leaderboard/set', SetLeaderboardPage), ('/leaderboard/del', SetLeaderboardPage)],
                                      debug=True)
 
 def main():
