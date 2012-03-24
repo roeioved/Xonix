@@ -316,6 +316,17 @@ Game.prototype = {
         
         var row = player.get_row();
         var col = player.get_col();
+        
+        for (var i = 0; i < this._balls.length; i++) {
+            var ball = this._balls[i];
+            
+            if (row == ball.get_row() && col == ball.get_col())
+            {
+               this.fail();
+               return;
+            }
+        }
+        
         var state = grid.get_state(row, col);
         if (state == Game.FREE_STATE) {
             this._playerState = Game.TRACK_STATE;
