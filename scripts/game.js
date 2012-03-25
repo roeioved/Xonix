@@ -174,8 +174,7 @@ Game.prototype = {
         var total = (this._rows - 2 * this._frame) * (this._cols - 2 * this._frame);
         var frame = (this._frame * this._cols * 2) + (this._rows - 2 * this._frame ) * this._frame * 2;
         var conqured = this._grid.get_count(Game.CONQUERED_STATE) - frame;
-        var pct = Math.round(conqured / total * 100);
-        this._levelScore = Math.round(pct / 100 * 2200) - this._levelScore;
+        this._levelScore = Math.round((conqured / total) * 2200 - this._levelScore);
         this._score += this._levelScore;
         
         this._raiseEvent('conquer', pct);
